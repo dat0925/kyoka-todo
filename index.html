@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>✨ きょうのミッション ✨</title>
-
   <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
   <meta name="mobile-web-app-capable" content="yes" />
@@ -13,23 +12,25 @@
   <meta name="apple-mobile-web-app-title" content="ミッション" />
   <link rel="apple-touch-icon" href="icon-192.png" />
   <meta name="theme-color" content="#ff7eb3" />
-
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet"/>
   <style>
-    :root {
-      --pink:#ff7eb3; --pink2:#ffb3d1; --purple:#c97ef7;
-      --yellow:#ffe066; --mint:#7ee8c8; --bg:#fff0f8;
-    }
+    :root{--pink:#ff7eb3;--pink2:#ffb3d1;--purple:#c97ef7;--yellow:#ffe066;--mint:#7ee8c8;--bg:#fff0f8;}
     *{margin:0;padding:0;box-sizing:border-box;}
+
+    /* ── スクロール可能なページ全体 ── */
     body{
       font-family:'Noto Sans JP',sans-serif;
       background:var(--bg);
       min-height:100vh;
       display:flex;flex-direction:column;
-      align-items:center;justify-content:center;
-      overflow:hidden;position:relative;
-      padding:20px 0;
+      align-items:center;
+      overflow-y:auto;          /* スクロール許可 */
+      overflow-x:hidden;
+      position:relative;
+      padding:20px 0 40px;
     }
+
+    /* 星は fixed なのでスクロールに追従しない */
     .stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
     .star{position:absolute;animation:floatStar linear infinite;opacity:0.55;}
     @keyframes floatStar{
@@ -37,42 +38,50 @@
       10% {opacity:0.55;}90%{opacity:0.55;}
       100%{transform:translateY(-10vh) rotate(360deg);opacity:0;}
     }
+
+    /* ── カード ── */
     .card{
       position:relative;z-index:1;
       background:#fff;border-radius:36px;
-      padding:32px 28px 28px;
+      padding:24px 22px 24px;
       width:min(440px,92vw);
       box-shadow:0 8px 40px rgba(255,126,179,.18);
       border:3px solid var(--pink2);
-      display:flex;flex-direction:column;align-items:center;gap:18px;
+      display:flex;flex-direction:column;align-items:center;gap:14px;
     }
-    .title{font-size:1.25rem;font-weight:900;color:var(--purple);letter-spacing:.12em;}
+
+    /* タイトル：コンパクトに */
+    .title{
+      font-size:1.1rem;font-weight:900;
+      color:var(--purple);letter-spacing:.12em;
+      line-height:1;
+    }
     .title span{color:var(--pink);}
 
-    /* ---- ドラム ---- */
+    /* ── ドラム ── */
     .drum-wrap{width:100%;display:flex;flex-direction:column;align-items:center;}
     .pointer{
       width:0;height:0;
-      border-left:16px solid transparent;border-right:16px solid transparent;
-      border-top:28px solid var(--purple);
+      border-left:14px solid transparent;border-right:14px solid transparent;
+      border-top:24px solid var(--purple);
       filter:drop-shadow(0 2px 4px rgba(201,126,247,.5));
-      margin-bottom:-4px;z-index:3;position:relative;
+      margin-bottom:-3px;z-index:3;position:relative;
     }
     .drum-window{
-      width:100%;height:120px;border-radius:24px;
+      width:100%;height:104px;border-radius:20px;
       border:4px solid var(--pink);
       background:linear-gradient(135deg,#fff5fb,#fce4f6);
       overflow:hidden;position:relative;
       box-shadow:0 4px 24px rgba(255,126,179,.18),inset 0 2px 8px rgba(255,255,255,.8);
     }
     .drum-window::before,.drum-window::after{
-      content:'';position:absolute;left:0;right:0;height:36px;z-index:2;pointer-events:none;
+      content:'';position:absolute;left:0;right:0;height:28px;z-index:2;pointer-events:none;
     }
     .drum-window::before{top:0;background:linear-gradient(to bottom,rgba(255,245,251,.95),transparent);}
     .drum-window::after{bottom:0;background:linear-gradient(to top,rgba(252,228,246,.95),transparent);}
     .highlight-bar{
       position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);
-      height:64px;
+      height:56px;
       background:linear-gradient(90deg,rgba(255,224,102,.35),rgba(255,126,179,.18),rgba(255,224,102,.35));
       border-top:2px dashed var(--yellow);border-bottom:2px dashed var(--yellow);
       z-index:1;pointer-events:none;
@@ -82,117 +91,123 @@
       position:absolute;left:0;right:0;top:0;will-change:transform;
     }
     .drum-item{
-      height:120px;width:100%;
-      display:flex;align-items:center;justify-content:center;gap:12px;
-      flex-shrink:0;padding:0 16px;
+      height:104px;width:100%;
+      display:flex;align-items:center;justify-content:center;gap:10px;
+      flex-shrink:0;padding:0 14px;
     }
-    .drum-icon{font-size:2.2rem;line-height:1;flex-shrink:0;}
+    .drum-icon{font-size:2rem;line-height:1;flex-shrink:0;}
     .drum-label{
-      font-size:clamp(1rem,4vw,1.75rem);font-weight:900;
+      font-size:clamp(1rem,4vw,1.65rem);font-weight:900;
       color:#e060a0;letter-spacing:.08em;
       white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
     }
 
-    /* ---- 結果 ---- */
-    .result-box{
-      width:100%;border-radius:20px;padding:14px 16px;
-      background:linear-gradient(135deg,#fff0fb,#fce8ff);
-      border:2.5px solid var(--pink2);
-      display:flex;align-items:center;justify-content:center;gap:10px;
-      min-height:64px;
+    /* ── ボタン行：まわす＋チェックを横並びに ── */
+    .btn-row{
+      width:100%;display:flex;gap:10px;align-items:stretch;
     }
-    .result-icon{font-size:1.9rem;flex-shrink:0;}
-    .result-text{font-size:clamp(1rem,4vw,1.45rem);font-weight:900;color:var(--purple);letter-spacing:.06em;}
-    .result-box.pop{animation:popIn .4s cubic-bezier(.34,1.56,.64,1);}
-    @keyframes popIn{0%{transform:scale(.85);}100%{transform:scale(1);}}
-
-    /* ---- チェックボタン ---- */
-    #check-btn{
-      width:100%;padding:14px;border-radius:50px;border:none;
-      background:linear-gradient(135deg,#7ee8c8,#5ec8f0);
+    #roll-btn{
+      flex:1;padding:14px 10px;border-radius:50px;border:none;
+      background:linear-gradient(135deg,var(--pink),var(--purple));
       color:#fff;font-family:'Noto Sans JP',sans-serif;
       font-size:1.05rem;font-weight:900;letter-spacing:.15em;
       cursor:pointer;
-      box-shadow:0 4px 18px rgba(94,200,240,.4);
-      transition:transform .15s,box-shadow .15s,opacity .15s;
-      display:none;
-    }
-    #check-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(94,200,240,.5);}
-    #check-btn:active{transform:scale(.97);}
-    #check-btn.visible{display:block;}
-    #check-btn.done{
-      background:linear-gradient(135deg,#ccc,#aaa);
-      box-shadow:none;cursor:default;
-    }
-
-    /* ---- まわすボタン ---- */
-    #roll-btn{
-      width:100%;padding:18px;border-radius:50px;border:none;
-      background:linear-gradient(135deg,var(--pink),var(--purple));
-      color:#fff;font-family:'Noto Sans JP',sans-serif;
-      font-size:1.2rem;font-weight:900;letter-spacing:.2em;
-      cursor:pointer;
-      box-shadow:0 6px 24px rgba(255,126,179,.45);
+      box-shadow:0 5px 20px rgba(255,126,179,.4);
       transition:transform .15s,box-shadow .15s;
     }
-    #roll-btn:hover:not(:disabled){transform:translateY(-3px) scale(1.02);box-shadow:0 10px 32px rgba(255,126,179,.5);}
+    #roll-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 28px rgba(255,126,179,.5);}
     #roll-btn:active:not(:disabled){transform:scale(.97);}
     #roll-btn:disabled{opacity:.6;cursor:not-allowed;}
 
-    /* ---- ミッションリスト ---- */
+    #check-btn{
+      flex:0 0 auto;
+      padding:14px 16px;border-radius:50px;border:none;
+      background:linear-gradient(135deg,#7ee8c8,#5ec8f0);
+      color:#fff;font-family:'Noto Sans JP',sans-serif;
+      font-size:.95rem;font-weight:900;letter-spacing:.08em;
+      cursor:pointer;
+      box-shadow:0 4px 16px rgba(94,200,240,.4);
+      transition:transform .15s,box-shadow .15s,opacity .2s,max-width .25s ease;
+      white-space:nowrap;
+      /* 初期：非表示（幅0に折りたたむ） */
+      max-width:0;overflow:hidden;padding-left:0;padding-right:0;
+      opacity:0;pointer-events:none;
+    }
+    #check-btn.visible{
+      max-width:160px;padding-left:16px;padding-right:16px;
+      opacity:1;pointer-events:auto;
+    }
+    #check-btn:hover{transform:translateY(-2px);box-shadow:0 7px 20px rgba(94,200,240,.5);}
+    #check-btn:active{transform:scale(.97);}
+    #check-btn.done{
+      background:linear-gradient(135deg,#b2e8d8,#a0d8ee);
+      box-shadow:none;cursor:default;opacity:.7;
+    }
+
+    /* ── ミッションリスト ── */
     .mission-list-wrap{width:100%;}
     .mission-list-title{
-      font-size:.75rem;font-weight:700;color:#c097d0;
+      font-size:.72rem;font-weight:700;color:#c097d0;
       letter-spacing:.12em;margin-bottom:8px;text-align:center;
     }
     .mission-list{
-      display:flex;flex-wrap:wrap;gap:6px;justify-content:center;
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(108px, 1fr));
+      gap:7px;
     }
     .mission-chip{
       display:flex;align-items:center;gap:5px;
-      padding:5px 12px;border-radius:20px;
-      font-size:.78rem;font-weight:700;letter-spacing:.05em;
+      padding:7px 10px;border-radius:16px;
+      font-size:.78rem;font-weight:700;letter-spacing:.03em;
       border:2px solid var(--pink2);
       color:#d070a8;background:#fff5fb;
-      transition:all .25s;cursor:default;
+      transition:all .22s;
+      cursor:pointer;          /* タップ可能に */
       user-select:none;
+      -webkit-tap-highlight-color:transparent;
     }
+    .mission-chip:hover{
+      border-color:var(--pink);background:#ffe8f5;
+      transform:scale(1.04);
+    }
+    .mission-chip:active{transform:scale(.96);}
     .mission-chip.checked{
       background:linear-gradient(135deg,#e8faf4,#d4f4ea);
       border-color:#7ee8c8;color:#2a9e7a;
       text-decoration:line-through;
-      opacity:.65;
+      opacity:.7;
     }
-    .mission-chip .chip-icon{font-size:1rem;}
-    .mission-chip .chip-check{font-size:.85rem;}
+    .mission-chip.checked:hover{
+      opacity:.85;transform:scale(1.02);
+    }
+    .chip-icon{font-size:.95rem;flex-shrink:0;}
 
-    /* ---- リセット & カウント ---- */
+    /* ── 全完了バナー ── */
+    .all-done-banner{
+      display:none;
+      width:100%;border-radius:18px;padding:12px;
+      background:linear-gradient(135deg,#fff8e1,#fff3e0);
+      border:2.5px solid var(--yellow);
+      text-align:center;font-size:.95rem;font-weight:900;color:#e0900a;
+      letter-spacing:.04em;
+    }
+    .all-done-banner.visible{display:block;}
+
+    /* ── 下部行 ── */
     .bottom-row{
       display:flex;align-items:center;justify-content:space-between;
       width:100%;
     }
-    .count-row{font-size:.72rem;color:#c097d0;letter-spacing:.08em;}
+    .count-row{font-size:.7rem;color:#c097d0;letter-spacing:.08em;}
     .count-row b{color:var(--pink);}
     .reset-btn{
-      font-size:.7rem;color:#c097d0;background:none;border:1px solid #e8d0f0;
+      font-size:.68rem;color:#c097d0;background:none;border:1px solid #e8d0f0;
       border-radius:12px;padding:4px 10px;cursor:pointer;
-      font-family:'Noto Sans JP',sans-serif;
-      transition:all .2s;
+      font-family:'Noto Sans JP',sans-serif;transition:all .2s;
     }
     .reset-btn:hover{background:#fff0fb;color:#c97ef7;border-color:#c97ef7;}
 
-    /* ---- 全完了バナー ---- */
-    .all-done-banner{
-      display:none;
-      width:100%;border-radius:20px;padding:16px;
-      background:linear-gradient(135deg,#fff8e1,#fff3e0);
-      border:2.5px solid var(--yellow);
-      text-align:center;font-size:1rem;font-weight:900;color:#e0900a;
-      letter-spacing:.05em;
-    }
-    .all-done-banner.visible{display:block;}
-
-    /* ---- confetti ---- */
+    /* ── confetti ── */
     .confetti-piece{
       position:fixed;border-radius:2px;pointer-events:none;z-index:100;
       animation:confettiFall 1.6s ease-in forwards;
@@ -206,8 +221,10 @@
 <body>
 <div class="stars" id="stars"></div>
 <div class="card">
+
   <div class="title">✨ きょうの <span>ミッション</span> ✨</div>
 
+  <!-- ドラム -->
   <div class="drum-wrap">
     <div class="pointer"></div>
     <div class="drum-window">
@@ -216,25 +233,20 @@
     </div>
   </div>
 
-  <div class="result-box" id="result-box">
-    <span class="result-icon" id="result-icon">🎀</span>
-    <span class="result-text" id="result-text">ボタンをおしてね！</span>
+  <!-- まわすボタン ＋ チェックボタン（横並び） -->
+  <div class="btn-row">
+    <button id="roll-btn" onclick="startRoll()">🎲 まわす！</button>
+    <button id="check-btn" onclick="checkMission()">✅ おわった！</button>
   </div>
-
-  <!-- チェックボタン（結果が出たら表示） -->
-  <button id="check-btn" onclick="checkMission()">✅ おわった！チェック！</button>
-
-  <!-- まわすボタン -->
-  <button id="roll-btn" onclick="startRoll()">🎲 まわす！</button>
 
   <!-- 全完了バナー -->
   <div class="all-done-banner" id="all-done-banner">
-    🎉 きょうのミッション ぜんぶ クリア！すごい！🎉
+    🎊 きょうのミッション ぜんぶ クリア！すごい！🎊
   </div>
 
-  <!-- ミッションリスト -->
+  <!-- ミッションリスト（タップでチェック可能） -->
   <div class="mission-list-wrap">
-    <div class="mission-list-title">📋 きょうのミッションリスト</div>
+    <div class="mission-list-title">📋 タップしてもチェックできるよ！</div>
     <div class="mission-list" id="mission-list"></div>
   </div>
 
@@ -242,89 +254,65 @@
     <div class="count-row">まわした回数 <b id="count">0</b> かい</div>
     <button class="reset-btn" onclick="resetAll()">🔄 リセット</button>
   </div>
+
 </div>
 
 <script>
 // ============================================================
 // 効果音
 // ============================================================
-let audioCtx = null;
-function getCtx(){
-  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-  return audioCtx;
-}
+let audioCtx=null;
+function getCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
 function playStart(){
   const ctx=getCtx();
-  [440,550,660].forEach((freq,i)=>{
+  [440,550,660].forEach((f,i)=>{
     const o=ctx.createOscillator(),g=ctx.createGain();
-    o.connect(g);g.connect(ctx.destination);
-    o.type='triangle';o.frequency.value=freq;
+    o.connect(g);g.connect(ctx.destination);o.type='triangle';o.frequency.value=f;
     const t=ctx.currentTime+i*.07;
-    g.gain.setValueAtTime(0,t);
-    g.gain.linearRampToValueAtTime(.2,t+.03);
-    g.gain.exponentialRampToValueAtTime(.001,t+.15);
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.2,t+.03);g.gain.exponentialRampToValueAtTime(.001,t+.15);
     o.start(t);o.stop(t+.16);
   });
 }
 function playRollTick(speed){
-  const ctx=getCtx();
-  const o=ctx.createOscillator(),g=ctx.createGain();
-  o.connect(g);g.connect(ctx.destination);
-  o.type='square';o.frequency.value=500+speed*800;
-  g.gain.setValueAtTime(.06,ctx.currentTime);
-  g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.04);
+  const ctx=getCtx(),o=ctx.createOscillator(),g=ctx.createGain();
+  o.connect(g);g.connect(ctx.destination);o.type='square';o.frequency.value=500+speed*800;
+  g.gain.setValueAtTime(.06,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.04);
   o.start(ctx.currentTime);o.stop(ctx.currentTime+.04);
 }
 function playLand(){
-  const ctx=getCtx();
-  const o=ctx.createOscillator(),g=ctx.createGain();
-  o.connect(g);g.connect(ctx.destination);
-  o.type='sine';
-  o.frequency.setValueAtTime(200,ctx.currentTime);
-  o.frequency.exponentialRampToValueAtTime(60,ctx.currentTime+.3);
-  g.gain.setValueAtTime(.5,ctx.currentTime);
-  g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.35);
+  const ctx=getCtx(),o=ctx.createOscillator(),g=ctx.createGain();
+  o.connect(g);g.connect(ctx.destination);o.type='sine';
+  o.frequency.setValueAtTime(200,ctx.currentTime);o.frequency.exponentialRampToValueAtTime(60,ctx.currentTime+.3);
+  g.gain.setValueAtTime(.5,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.35);
   o.start(ctx.currentTime);o.stop(ctx.currentTime+.4);
 }
 function playFanfare(){
   const ctx=getCtx();
   [{f:523,t:0},{f:659,t:.12},{f:784,t:.24},{f:1047,t:.36}].forEach(({f,t})=>{
     const o=ctx.createOscillator(),g=ctx.createGain();
-    o.connect(g);g.connect(ctx.destination);
-    o.type='triangle';o.frequency.value=f;
+    o.connect(g);g.connect(ctx.destination);o.type='triangle';o.frequency.value=f;
     const at=ctx.currentTime+t;
-    g.gain.setValueAtTime(0,at);
-    g.gain.linearRampToValueAtTime(.22,at+.02);
-    g.gain.exponentialRampToValueAtTime(.001,at+.18);
+    g.gain.setValueAtTime(0,at);g.gain.linearRampToValueAtTime(.22,at+.02);g.gain.exponentialRampToValueAtTime(.001,at+.18);
     o.start(at);o.stop(at+.2);
   });
 }
-// チェック音：明るいポーン
 function playCheck(){
   const ctx=getCtx();
   [{f:880,t:0},{f:1100,t:.08},{f:1320,t:.16}].forEach(({f,t})=>{
     const o=ctx.createOscillator(),g=ctx.createGain();
-    o.connect(g);g.connect(ctx.destination);
-    o.type='sine';o.frequency.value=f;
+    o.connect(g);g.connect(ctx.destination);o.type='sine';o.frequency.value=f;
     const at=ctx.currentTime+t;
-    g.gain.setValueAtTime(0,at);
-    g.gain.linearRampToValueAtTime(.25,at+.02);
-    g.gain.exponentialRampToValueAtTime(.001,at+.25);
+    g.gain.setValueAtTime(0,at);g.gain.linearRampToValueAtTime(.25,at+.02);g.gain.exponentialRampToValueAtTime(.001,at+.25);
     o.start(at);o.stop(at+.3);
   });
 }
-// 全クリア音
 function playAllClear(){
   const ctx=getCtx();
-  const melody=[523,659,784,659,1047];
-  melody.forEach((f,i)=>{
+  [523,659,784,659,1047].forEach((f,i)=>{
     const o=ctx.createOscillator(),g=ctx.createGain();
-    o.connect(g);g.connect(ctx.destination);
-    o.type='triangle';o.frequency.value=f;
+    o.connect(g);g.connect(ctx.destination);o.type='triangle';o.frequency.value=f;
     const at=ctx.currentTime+i*.13;
-    g.gain.setValueAtTime(0,at);
-    g.gain.linearRampToValueAtTime(.28,at+.02);
-    g.gain.exponentialRampToValueAtTime(.001,at+.22);
+    g.gain.setValueAtTime(0,at);g.gain.linearRampToValueAtTime(.28,at+.02);g.gain.exponentialRampToValueAtTime(.001,at+.22);
     o.start(at);o.stop(at+.25);
   });
 }
@@ -332,7 +320,7 @@ function playAllClear(){
 // ============================================================
 // ミッション定義
 // ============================================================
-const ALL_ITEMS = [
+const ALL_ITEMS=[
   {label:'ピアノ',          icon:'🎹'},
   {label:'日記',            icon:'📔'},
   {label:'勉強',            icon:'📚'},
@@ -347,47 +335,40 @@ const ALL_ITEMS = [
 ];
 
 // ============================================================
-// localStorage キー（日付付き：毎日リセット）
+// localStorage（日付付き）
 // ============================================================
-const TODAY = new Date().toISOString().slice(0,10); // "2026-03-22"
-const STORAGE_KEY  = `mission_checked_${TODAY}`;
-const ROLL_KEY     = `mission_rolls_${TODAY}`;
-
-function loadChecked(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); }catch{return[];} }
-function saveChecked(arr){ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
-function loadRolls(){  return parseInt(localStorage.getItem(ROLL_KEY)||'0',10); }
-function saveRolls(n){ localStorage.setItem(ROLL_KEY, n); }
+const TODAY=new Date().toISOString().slice(0,10);
+const STORAGE_KEY=`mission_checked_${TODAY}`;
+const ROLL_KEY=`mission_rolls_${TODAY}`;
+function loadChecked(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');}catch{return[];}}
+function saveChecked(a){localStorage.setItem(STORAGE_KEY,JSON.stringify(a));}
+function loadRolls(){return parseInt(localStorage.getItem(ROLL_KEY)||'0',10);}
+function saveRolls(n){localStorage.setItem(ROLL_KEY,n);}
 
 // ============================================================
 // 状態
 // ============================================================
-let checkedLabels = loadChecked();   // チェック済みラベル配列
-let rollCount     = loadRolls();
-let currentLabel  = null;            // 現在ドラムに表示中
-let rolling       = false;
-
-// 残りミッション（チェック済みを除く）
-function remaining(){ return ALL_ITEMS.filter(it=>!checkedLabels.includes(it.label)); }
+let checkedLabels=loadChecked();
+let rollCount=loadRolls();
+let currentLabel=null;
+let rolling=false;
+function remaining(){return ALL_ITEMS.filter(it=>!checkedLabels.includes(it.label));}
 
 // ============================================================
 // DOM
 // ============================================================
-const strip      = document.getElementById('strip');
-const resultBox  = document.getElementById('result-box');
-const resultIcon = document.getElementById('result-icon');
-const resultText = document.getElementById('result-text');
-const countEl    = document.getElementById('count');
-const btn        = document.getElementById('roll-btn');
-const checkBtn   = document.getElementById('check-btn');
-const missionList= document.getElementById('mission-list');
-const allDoneBanner = document.getElementById('all-done-banner');
-
-countEl.textContent = rollCount;
+const strip=document.getElementById('strip');
+const countEl=document.getElementById('count');
+const btn=document.getElementById('roll-btn');
+const checkBtn=document.getElementById('check-btn');
+const missionList=document.getElementById('mission-list');
+const allDoneBanner=document.getElementById('all-done-banner');
+countEl.textContent=rollCount;
 
 // ============================================================
-// ドラムストリップ構築
+// ドラムストリップ構築（ITEM_Hをドラム窓の高さに合わせる）
 // ============================================================
-const REPEATS=6, ITEM_H=120, LOOP_LEN=ALL_ITEMS.length;
+const REPEATS=6,ITEM_H=104,LOOP_LEN=ALL_ITEMS.length;
 const allSlots=[];
 for(let r=0;r<REPEATS;r++) ALL_ITEMS.forEach(it=>allSlots.push(it));
 allSlots.forEach(it=>{
@@ -396,13 +377,12 @@ allSlots.forEach(it=>{
   div.innerHTML=`<span class="drum-icon">${it.icon}</span><span class="drum-label">${it.label}</span>`;
   strip.appendChild(div);
 });
-
-let stripIndex=0; // 現在表示中の ALL_ITEMS インデックス
-function itemY(idx){ return -(idx*ITEM_H); }
+let stripIndex=0;
+function itemY(idx){return -(idx*ITEM_H);}
 strip.style.transform=`translateY(${itemY(LOOP_LEN*2+stripIndex)}px)`;
 
 // ============================================================
-// ミッションリスト描画
+// ミッションリスト描画（タップでチェック切替）
 // ============================================================
 function renderList(){
   missionList.innerHTML='';
@@ -410,133 +390,137 @@ function renderList(){
     const chip=document.createElement('div');
     const done=checkedLabels.includes(it.label);
     chip.className='mission-chip'+(done?' checked':'');
-    chip.innerHTML=`<span class="chip-icon">${it.icon}</span>${it.label}${done?'<span class="chip-check">✓</span>':''}`;
+    chip.innerHTML=`<span class="chip-icon">${it.icon}</span>${it.label}`;
+    // タップでチェック切替
+    chip.addEventListener('click',()=>toggleChip(it.label));
     missionList.appendChild(chip);
   });
-
   // 全クリア判定
   if(checkedLabels.length>=ALL_ITEMS.length){
     allDoneBanner.classList.add('visible');
-    btn.disabled=true;
-    btn.textContent='🎊 ぜんぶクリア！';
+    btn.disabled=true;btn.textContent='🎊 ぜんぶクリア！';
   } else {
     allDoneBanner.classList.remove('visible');
-    btn.disabled=false;
+    if(!rolling) btn.disabled=false;
   }
 }
 renderList();
+
+// チップをタップしたときの切替処理
+function toggleChip(label){
+  if(rolling) return;
+  const idx=checkedLabels.indexOf(label);
+  if(idx===-1){
+    // 未チェック→チェック
+    checkedLabels.push(label);
+    playCheck();
+    launchConfetti(15);
+    // currentLabelと一致していたらボタンも更新
+    if(label===currentLabel){
+      checkBtn.classList.add('done');
+      checkBtn.textContent='✔ チェック済み！';
+      checkBtn.disabled=true;
+    }
+  } else {
+    // チェック済み→解除
+    checkedLabels.splice(idx,1);
+    if(label===currentLabel){
+      checkBtn.classList.remove('done');
+      checkBtn.textContent='✅ おわった！';
+      checkBtn.disabled=false;
+    }
+  }
+  saveChecked(checkedLabels);
+  renderList();
+  if(checkedLabels.length>=ALL_ITEMS.length){
+    setTimeout(()=>{playAllClear();launchConfetti(80);},300);
+  }
+}
 
 // ============================================================
 // ロール
 // ============================================================
 function startRoll(){
   if(rolling) return;
-
   const pool=remaining();
-  if(pool.length===0){
-    btn.textContent='🎊 ぜんぶクリア！';
-    btn.disabled=true;
-    return;
-  }
+  if(pool.length===0){btn.textContent='🎊 ぜんぶクリア！';btn.disabled=true;return;}
 
-  rolling=true;
-  btn.disabled=true;
-  btn.textContent='🌀 まわってるよ…';
-  checkBtn.classList.remove('visible'); // チェックボタン隠す
+  rolling=true;btn.disabled=true;btn.textContent='🌀 まわってるよ…';
+  // チェックボタンを隠す
+  checkBtn.classList.remove('visible','done');
+  checkBtn.disabled=false;
+  checkBtn.textContent='✅ おわった！';
 
   playStart();
-
-  // 次のミッションを pool から選ぶ
   const chosen=pool[Math.floor(Math.random()*pool.length)];
-  const nextIdx=ALL_ITEMS.indexOf(chosen); // 0〜10
+  const nextIdx=ALL_ITEMS.indexOf(chosen);
+  const finalIdx=LOOP_LEN*3+nextIdx+LOOP_LEN*2;
+  const startY=itemY(LOOP_LEN*2+stripIndex);
+  const endY=itemY(finalIdx);
+  const dist=endY-startY;
+  const DURATION=3200,startTime=performance.now();
+  let lastTickY=startY,landOk=true;
 
-  const finalIdx  = LOOP_LEN*3 + nextIdx + LOOP_LEN*2;
-  const startY    = itemY(LOOP_LEN*2 + stripIndex);
-  const endY      = itemY(finalIdx);
-  const dist      = endY - startY;
-  const DURATION  = 3200;
-  const startTime = performance.now();
-  let lastTickY   = startY;
-  let landSoundOk = true;
-
-  function easeOutBack(t){ const c1=1.70158,c3=c1+1; return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2); }
-  function ease(t){ return t<.35?(t/.35)*(t/.35)*.35:easeOutBack(t); }
+  function easeOutBack(t){const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);}
+  function ease(t){return t<.35?(t/.35)*(t/.35)*.35:easeOutBack(t);}
 
   function tick(now){
     const t=Math.min((now-startTime)/DURATION,1);
     const y=startY+dist*ease(t);
     strip.style.transform=`translateY(${y}px)`;
-    if(Math.abs(y-lastTickY)>=ITEM_H){ playRollTick(Math.min(t*1.5,1)); lastTickY=y; }
-    if(t>.88&&landSoundOk){ playLand(); landSoundOk=false; }
+    if(Math.abs(y-lastTickY)>=ITEM_H){playRollTick(Math.min(t*1.5,1));lastTickY=y;}
+    if(t>.88&&landOk){playLand();landOk=false;}
+    if(t<1){requestAnimationFrame(tick);return;}
 
-    if(t<1){ requestAnimationFrame(tick); return; }
-
-    // 着地
     stripIndex=nextIdx;
     strip.style.transition='none';
     strip.style.transform=`translateY(${itemY(LOOP_LEN*2+nextIdx)}px)`;
-
     currentLabel=chosen.label;
-    resultIcon.textContent=chosen.icon;
-    resultText.textContent=chosen.label;
-    resultBox.classList.remove('pop');
-    void resultBox.offsetWidth;
-    resultBox.classList.add('pop');
-
-    rollCount++; countEl.textContent=rollCount; saveRolls(rollCount);
 
     playFanfare();
     launchConfetti();
 
-    // チェックボタン表示
+    // チェックボタン表示（すでにチェック済みの場合は済み状態で）
+    const alreadyDone=checkedLabels.includes(currentLabel);
     checkBtn.classList.add('visible');
-    checkBtn.classList.remove('done');
-    checkBtn.textContent='✅ おわった！チェック！';
-    checkBtn.disabled=false;
+    if(alreadyDone){
+      checkBtn.classList.add('done');
+      checkBtn.textContent='✔ チェック済み！';
+      checkBtn.disabled=true;
+    }
 
-    btn.textContent='🎲 もういちど！';
-    btn.disabled=false;
+    rollCount++;countEl.textContent=rollCount;saveRolls(rollCount);
+    btn.textContent='🎲 もういちど！';btn.disabled=false;
     rolling=false;
   }
   requestAnimationFrame(tick);
 }
 
 // ============================================================
-// チェック処理
+// チェックボタン（ドラム結果に対して）
 // ============================================================
 function checkMission(){
-  if(!currentLabel || checkedLabels.includes(currentLabel)) return;
-
+  if(!currentLabel||checkedLabels.includes(currentLabel)) return;
   checkedLabels.push(currentLabel);
   saveChecked(checkedLabels);
-
-  playCheck();
-  launchConfetti(20);
-
-  // ボタンを「チェック済み」状態に
-  checkBtn.classList.add('done');
-  checkBtn.textContent='✔ チェック済み！';
-  checkBtn.disabled=true;
-
+  playCheck();launchConfetti(20);
+  checkBtn.classList.add('done');checkBtn.textContent='✔ チェック済み！';checkBtn.disabled=true;
   renderList();
-
-  // 全クリアだったら大ファンファーレ
   if(checkedLabels.length>=ALL_ITEMS.length){
-    setTimeout(()=>{ playAllClear(); launchConfetti(80); },300);
+    setTimeout(()=>{playAllClear();launchConfetti(80);},300);
   }
 }
 
 // ============================================================
-// リセット（当日分クリア）
+// リセット
 // ============================================================
 function resetAll(){
   if(!confirm('きょうのチェックをリセットするよ？')) return;
-  checkedLabels=[];
-  saveChecked([]);
+  checkedLabels=[];saveChecked([]);
   currentLabel=null;
-  checkBtn.classList.remove('visible');
-  resultIcon.textContent='🎀';
-  resultText.textContent='ボタンをおしてね！';
+  checkBtn.classList.remove('visible','done');
+  checkBtn.textContent='✅ おわった！';
+  btn.disabled=false;btn.textContent='🎲 まわす！';
   renderList();
 }
 
@@ -546,15 +530,12 @@ function resetAll(){
 const COLORS=['#ff7eb3','#ffb3d1','#c97ef7','#ffe066','#7ee8c8','#ff9de2'];
 function launchConfetti(n=55){
   for(let i=0;i<n;i++){
-    const el=document.createElement('div');
-    el.className='confetti-piece';
-    el.style.cssText=`
-      left:${Math.random()*100}vw;top:${Math.random()*20}vh;
+    const el=document.createElement('div');el.className='confetti-piece';
+    el.style.cssText=`left:${Math.random()*100}vw;top:${Math.random()*20}vh;
       background:${COLORS[Math.floor(Math.random()*COLORS.length)]};
       border-radius:${Math.random()>.5?'50%':'2px'};
       width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;
-      animation-duration:${1.2+Math.random()*.9}s;
-      animation-delay:${Math.random()*.3}s;`;
+      animation-duration:${1.2+Math.random()*.9}s;animation-delay:${Math.random()*.3}s;`;
     document.body.appendChild(el);
     el.addEventListener('animationend',()=>el.remove());
   }
@@ -565,12 +546,8 @@ function launchConfetti(n=55){
 // ============================================================
 ['⭐','✨','💫','🌸','💕','🎀'].forEach(e=>{
   for(let j=0;j<3;j++){
-    const s=document.createElement('div');
-    s.className='star';s.textContent=e;
-    s.style.cssText=`left:${Math.random()*100}vw;
-      animation-duration:${8+Math.random()*10}s;
-      animation-delay:${Math.random()*12}s;
-      font-size:${.9+Math.random()*.9}rem;`;
+    const s=document.createElement('div');s.className='star';s.textContent=e;
+    s.style.cssText=`left:${Math.random()*100}vw;animation-duration:${8+Math.random()*10}s;animation-delay:${Math.random()*12}s;font-size:${.9+Math.random()*.9}rem;`;
     document.getElementById('stars').appendChild(s);
   }
 });
