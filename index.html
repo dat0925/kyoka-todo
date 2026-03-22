@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>今日の一言</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;700;900&family=Space+Mono&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --accent: #c8a96e;
+      --accent2: #e8d5b0;
+      --text: #f0ece4;
+      --muted: #5a5550;
+      --glow: rgba(200, 169, 110, 0.15);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Serif JP', serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* background noise texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.4;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* radial glow */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 60px;
+    }
+
+    /* header */
+    .header {
+      text-align: center;
+    }
+
+    .header-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      opacity: 0.8;
+    }
+
+    .header-title {
+      font-size: clamp(14px, 2vw, 16px);
+      font-weight: 300;
+      letter-spacing: 0.5em;
+      color: var(--muted);
+    }
+
+    /* main word display */
+    .word-stage {
+      position: relative;
+      width: clamp(300px, 80vw, 560px);
+      height: clamp(200px, 40vh, 300px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* decorative corner lines */
+    .word-stage::before,
+    .word-stage::after {
+      content: '';
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border-color: var(--accent);
+      border-style: solid;
+      opacity: 0.4;
+    }
+    .word-stage::before {
+      top: 0; left: 0;
+      border-width: 1px 0 0 1px;
+    }
+    .word-stage::after {
+      bottom: 0; right: 0;
+      border-width: 0 1px 1px 0;
+    }
+
+    .word-inner::before,
+    .word-inner::after {
+      content: '';
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border-color: var(--accent);
+      border-style: solid;
+      opacity: 0.4;
+    }
+    .word-inner::before {
+      top: 0; right: 0;
+      border-width: 1px 1px 0 0;
+    }
+    .word-inner::after {
+      bottom: 0; left: 0;
+      border-width: 0 0 1px 1px;
+    }
+
+    .word-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #word-display {
+      font-size: clamp(52px, 12vw, 88px);
+      font-weight: 900;
+      letter-spacing: 0.15em;
+      color: var(--text);
+      text-shadow:
+        0 0 40px rgba(200, 169, 110, 0.3),
+        0 0 80px rgba(200, 169, 110, 0.1);
+      transition: opacity 0.15s ease;
+      user-select: none;
+    }
+
+    #word-display.flash-out {
+      opacity: 0;
+      transform: scale(0.96);
+      transition: opacity 0.12s ease, transform 0.12s ease;
+    }
+    #word-display.flash-in {
+      opacity: 1;
+      transform: scale(1);
+      transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* rolling animation preview */
+    .roll-container {
+      position: relative;
+      height: clamp(52px, 12vw, 88px);
+      overflow: hidden;
+      display: none;
+    }
+    .roll-container.rolling {
+      display: flex;
+    }
+    .roll-strip {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      animation: rollStrip 0.6s cubic-bezier(0.2, 0, 0.3, 1) forwards;
+    }
+    @keyframes rollStrip {
+      from { transform: translateY(0); }
+      to { transform: translateY(-100%); }
+    }
+
+    /* button */
+    .btn-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    #roll-btn {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent2);
+      font-family: 'Noto Serif JP', serif;
+      font-size: 15px;
+      font-weight: 300;
+      letter-spacing: 0.4em;
+      padding: 18px 56px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    #roll-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--accent);
+      transform: translateX(-102%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: -1;
+    }
+
+    #roll-btn:hover::before {
+      transform: translateX(0);
+    }
+
+    #roll-btn:hover {
+      color: var(--bg);
+      border-color: var(--accent);
+    }
+
+    #roll-btn:active {
+      transform: scale(0.98);
+    }
+
+    #roll-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-hint {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+    }
+
+    /* word list pills */
+    .word-list {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 480px;
+    }
+
+    .word-pill {
+      font-size: 12px;
+      font-weight: 300;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      padding: 5px 14px;
+      border: 1px solid #2a2a35;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .word-pill.active {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: rgba(200, 169, 110, 0.08);
+    }
+
+    /* count display */
+    .count-display {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      color: var(--muted);
+    }
+
+    .count-display span {
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="header">
+      <div class="header-label">Random Selector</div>
+      <div class="header-title">今日 の 一 言</div>
+    </div>
+
+    <div class="word-stage">
+      <div class="word-inner">
+        <div id="word-display">ピアノ</div>
+      </div>
+    </div>
+
+    <div class="btn-wrap">
+      <button id="roll-btn" onclick="rollWord()">ロ ー ル</button>
+      <div class="btn-hint">press to roll · space key also works</div>
+    </div>
+
+    <div class="word-list" id="word-list"></div>
+
+    <div class="count-display">rolled <span id="roll-count">0</span> times</div>
+
+  </div>
+
+  <script>
+    const words = ['ピアノ', '日記', '勉強', '修行', '新体操'];
+    let current = words[0];
+    let rollCount = 0;
+    let isRolling = false;
+
+    const display = document.getElementById('word-display');
+    const countEl = document.getElementById('roll-count');
+    const listEl = document.getElementById('word-list');
+
+    // render word pills
+    function renderPills() {
+      listEl.innerHTML = '';
+      words.forEach(w => {
+        const pill = document.createElement('div');
+        pill.className = 'word-pill' + (w === current ? ' active' : '');
+        pill.textContent = w;
+        listEl.appendChild(pill);
+      });
+    }
+    renderPills();
+
+    function rollWord() {
+      if (isRolling) return;
+      isRolling = true;
+
+      const btn = document.getElementById('roll-btn');
+      btn.disabled = true;
+
+      // pick a different word
+      let candidates = words.filter(w => w !== current);
+      let next = candidates[Math.floor(Math.random() * candidates.length)];
+
+      // flash-out
+      display.classList.add('flash-out');
+
+      // rapid cycling effect
+      let cycles = 0;
+      const maxCycles = 8;
+      const interval = setInterval(() => {
+        const temp = words[Math.floor(Math.random() * words.length)];
+        display.textContent = temp;
+        cycles++;
+        if (cycles >= maxCycles) {
+          clearInterval(interval);
+          display.textContent = next;
+          current = next;
+          display.classList.remove('flash-out');
+          display.classList.add('flash-in');
+          rollCount++;
+          countEl.textContent = rollCount;
+          renderPills();
+          setTimeout(() => {
+            display.classList.remove('flash-in');
+            isRolling = false;
+            btn.disabled = false;
+          }, 400);
+        }
+      }, 60);
+
+      // remove flash-out after first frame
+      setTimeout(() => display.classList.remove('flash-out'), 150);
+    }
+
+    // space key
+    document.addEventListener('keydown', e => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        rollWord();
+      }
+    });
+  </script>
+</body>
+</html>
