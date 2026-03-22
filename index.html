@@ -1530,219 +1530,457 @@ updateStickyProgress();
 applyGameLockState();
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&currentTab===0){e.preventDefault();startRoll();}});
 
+
 // ══════════════════════════════════════════════════
-// アルカノイド
+// アルカノイド（強化版）
 // ══════════════════════════════════════════════════
 const canvas=document.getElementById('game-canvas');
 const ctx2=canvas.getContext('2d');
-const COLS=8,ROWS=5;
+
+// ── 定数 ──
+const COLS=10, ROWS=7;
 const LIVES_MAX=3;
-const BRICK_COLORS=['#ff7eb3','#ff9de2','#c97ef7','#74b9ff','#7ee8c8'];
-const BLOCK_SCORE=10;
+const BRICK_COLORS=['#ff7eb3','#ff6b9d','#c97ef7','#a855f7','#74b9ff','#38bdf8','#7ee8c8','#34d399'];
+// アイテム種別
+const ITEM_TYPES={
+  MULTI: {icon:'🔵', color:'#74b9ff', label:'マルチボール'},
+  WIDE:  {icon:'🟢', color:'#7ee8c8', label:'パドル拡大'},
+  FAST:  {icon:'🔴', color:'#ff7eb3', label:'スピードUP'},
+  SCORE2:{icon:'⭐', color:'#ffe066', label:'2倍スコア'},
+  SLOW:  {icon:'🟡', color:'#ffd600', label:'スピードDOWN'},
+};
 
 let gW,gH,bW,bH,padW,padH,ballR;
-let gScore=0,gHi=parseInt(localStorage.getItem('arkanoid_hi')||'0'),gLives=LIVES_MAX;
-let ball={x:0,y:0,vx:0,vy:0};
+let gScore=0,gHi=parseInt(localStorage.getItem('arkanoid_hi2')||'0');
+let gLives=LIVES_MAX,gLevel=1,gScoreMult=1;
+let balls=[]; // マルチボール対応
 let pad={x:0};
 let bricks=[];
-let gState='idle'; // idle / playing / dead / clear
+let items=[]; // 落下アイテム
+let gState='idle';
 let gRaf=null;
 let padTarget=0;
+let wideTimer=0, slowTimer=0;
+let levelUpFlash=0;
 
-// タッチ操作（ゲームペイン内）
+// ── タッチ操作 ──
 let gameTouchX=null;
-document.getElementById('pane-game').addEventListener('touchstart',e=>{
+const gamePane=document.getElementById('pane-game');
+gamePane.addEventListener('touchstart',e=>{
   if(gState!=='playing')return;
   gameTouchX=e.touches[0].clientX;
 },{passive:true});
-document.getElementById('pane-game').addEventListener('touchmove',e=>{
+gamePane.addEventListener('touchmove',e=>{
   if(gState!=='playing'||gameTouchX===null)return;
   e.stopPropagation();
   const dx=e.touches[0].clientX-gameTouchX;
-  padTarget=Math.max(padW/2, Math.min(gW-padW/2, pad.x+dx*1.4));
+  padTarget=Math.max(padW/2,Math.min(gW-padW/2,pad.x+dx*1.6));
   gameTouchX=e.touches[0].clientX;
 },{passive:true});
-// ゲームペイン内タップ：左右で操作
-document.getElementById('pane-game').addEventListener('click',e=>{
-  if(gState!=='playing') return;
+gamePane.addEventListener('click',e=>{
+  if(gState!=='playing')return;
   const rect=canvas.getBoundingClientRect();
   padTarget=Math.max(padW/2,Math.min(gW-padW/2,(e.clientX-rect.left)/rect.width*gW));
 });
 
-// キーボード
-const keys={};
+// ── キーボード ──
+const keys2={};
 document.addEventListener('keydown',e=>{
-  keys[e.key]=true;
+  keys2[e.key]=true;
   if(['ArrowLeft','ArrowRight'].includes(e.key))e.preventDefault();
 });
-document.addEventListener('keyup',e=>{keys[e.key]=false;});
+document.addEventListener('keyup',e=>{keys2[e.key]=false;});
 
+// ── キャンバスリサイズ ──
 function resizeCanvas(){
   const wrap=document.querySelector('.game-wrap');
   if(!wrap)return;
   gW=wrap.clientWidth-6;
-  gH=Math.round(gW*1.2);
+  gH=Math.round(gW*1.25);
   canvas.width=gW;canvas.height=gH;
   canvas.style.width=gW+'px';canvas.style.height=gH+'px';
-  bW=Math.floor(gW/COLS*0.88);bH=Math.floor(gH*0.04);
-  padW=Math.floor(gW*0.22);padH=Math.floor(gH*0.025);
-  ballR=Math.max(7,Math.floor(gW*0.025));
+  bW=Math.floor((gW-(COLS+1)*3)/COLS);
+  bH=Math.floor(gH*0.038);
+  padW=Math.floor(gW*0.2);
+  padH=Math.floor(gH*0.022);
+  ballR=Math.max(6,Math.floor(gW*0.022));
   if(gState==='playing') resetBallPad();
   else drawIdle();
 }
 
-function resetBallPad(){
-  pad.x=gW/2;padTarget=gW/2;
-  ball.x=gW/2;ball.y=gH-padH*2-ballR-10;
-  const spd=gW*0.007;
-  const angle=(Math.random()*60+60)*Math.PI/180;
-  ball.vx=spd*Math.cos(angle)*(Math.random()<.5?1:-1);
-  ball.vy=-spd*Math.sin(angle);
+// ── ボール初期化 ──
+function makeBall(x,y,angle){
+  const spd=baseSpeed();
+  return {
+    x:x||gW/2,y:y||(gH-padH*3-ballR),
+    vx:spd*Math.cos(angle||((Math.random()*60+60)*Math.PI/180))*(Math.random()<.5?1:-1),
+    vy:-spd*Math.sin(angle||((Math.random()*60+60)*Math.PI/180)),
+    trail:[]
+  };
+}
+function baseSpeed(){
+  // レベルが上がるごとに速くなる
+  return gW*(0.0075+gLevel*0.0012);
 }
 
-function initBricks(){
+function resetBallPad(){
+  pad.x=gW/2;padTarget=gW/2;
+  balls=[makeBall()];
+}
+
+// ── ブロック生成 ──
+function initBricks(lv){
   bricks=[];
-  for(let r=0;r<ROWS;r++){
+  const gapX=3,gapY=4;
+  const totalW=COLS*(bW+gapX)-gapX;
+  const startX=(gW-totalW)/2;
+  const rows=Math.min(ROWS+Math.floor(lv/2),ROWS+4); // レベルで行数増加
+  for(let r=0;r<rows;r++){
     for(let c=0;c<COLS;c++){
-      const bx=(gW/COLS)*c+(gW/COLS-bW)/2;
-      const by=gH*0.08+r*(bH+4);
-      bricks.push({x:bx,y:by,w:bW,h:bH,alive:true,color:BRICK_COLORS[r%BRICK_COLORS.length]});
+      // レベル3以降：2hitブロックをランダムに混ぜる
+      const hp=(lv>=3&&Math.random()<0.25)?2:1;
+      bricks.push({
+        x:startX+c*(bW+gapX),
+        y:gH*0.06+r*(bH+gapY),
+        w:bW,h:bH,
+        hp,maxHp:hp,
+        alive:true,
+        color:BRICK_COLORS[(r+c)%BRICK_COLORS.length],
+        flash:0
+      });
     }
   }
 }
 
+// ── アイテムドロップ ──
+function dropItem(bx,by){
+  if(Math.random()>0.18)return; // 18%でドロップ
+  const types=Object.keys(ITEM_TYPES);
+  const type=types[Math.floor(Math.random()*types.length)];
+  items.push({x:bx,y:by,type,vy:gH*0.003,r:ballR*1.3,anim:0});
+}
+
+// ── ゲーム開始 ──
 function gameStart(){
   document.getElementById('game-overlay').classList.add('hidden');
   resizeCanvas();
-  gScore=0;gLives=LIVES_MAX;
+  gScore=0;gLives=LIVES_MAX;gLevel=1;gScoreMult=1;
+  wideTimer=0;slowTimer=0;items=[];
   updateGameUI();
-  initBricks();
+  initBricks(gLevel);
   resetBallPad();
   gState='playing';
   if(gRaf)cancelAnimationFrame(gRaf);
   gRaf=requestAnimationFrame(gameLoop);
 }
 
+function nextLevel(){
+  gLevel++;
+  items=[];
+  initBricks(gLevel);
+  resetBallPad();
+  padW=Math.floor(gW*0.2); // パドル幅リセット
+  wideTimer=0;slowTimer=0;
+  levelUpFlash=60;
+  gSfx('levelup');
+  updateGameUI();
+}
+
+// ── メインループ ──
 function gameLoop(){
-  if(gState!=='playing'){return;}
-  update();draw();
+  if(gState!=='playing')return;
+  update2();draw2();
   gRaf=requestAnimationFrame(gameLoop);
 }
 
-function update(){
-  // パドル移動（キー）
-  const spd=gW*0.018;
-  if(keys['ArrowLeft'])  padTarget=Math.max(padW/2,pad.x-spd);
-  if(keys['ArrowRight']) padTarget=Math.min(gW-padW/2,pad.x+spd);
-  // マウス
-  pad.x+=(padTarget-pad.x)*0.25;
+function update2(){
+  const spd=gW*0.02*(1+(wideTimer>0?0:-0)+(slowTimer>0?-0.4:0));
 
-  // ボール移動
-  ball.x+=ball.vx;ball.y+=ball.vy;
+  // タイマー
+  if(wideTimer>0) wideTimer--;
+  if(slowTimer>0) slowTimer--;
+  if(wideTimer===0&&padW!==Math.floor(gW*0.2)) padW=Math.floor(gW*0.2);
+  if(levelUpFlash>0) levelUpFlash--;
 
-  // 壁反射
-  if(ball.x-ballR<0){ball.x=ballR;ball.vx=Math.abs(ball.vx);}
-  if(ball.x+ballR>gW){ball.x=gW-ballR;ball.vx=-Math.abs(ball.vx);}
-  if(ball.y-ballR<0){ball.y=ballR;ball.vy=Math.abs(ball.vy); gSfx('wall');}
+  // パドル移動
+  if(keys2['ArrowLeft'])  padTarget=Math.max(padW/2,pad.x-spd);
+  if(keys2['ArrowRight']) padTarget=Math.min(gW-padW/2,pad.x+spd);
+  pad.x+=(padTarget-pad.x)*0.28;
 
-  // パドル衝突
-  const py=gH-padH-8;
-  if(ball.vy>0&&
-     ball.y+ballR>=py&&ball.y+ballR<=py+padH+ball.vy&&
-     ball.x>=pad.x-padW/2&&ball.x<=pad.x+padW/2){
-    ball.vy=-Math.abs(ball.vy);
-    const offset=(ball.x-(pad.x))/padW;
-    ball.vx=offset*gW*0.012;
-    gSfx('pad');
-  }
+  // ── ボール更新 ──
+  const speedMod=slowTimer>0?0.5:1.0;
+  let allDead=true;
+  balls.forEach(b=>{
+    if(b.dead)return;
+    allDead=false;
+    // トレイル
+    b.trail.push({x:b.x,y:b.y});
+    if(b.trail.length>8)b.trail.shift();
 
-  // ブロック衝突
-  for(const b of bricks){
-    if(!b.alive)continue;
-    if(ball.x+ballR>b.x&&ball.x-ballR<b.x+b.w&&
-       ball.y+ballR>b.y&&ball.y-ballR<b.y+b.h){
-      b.alive=false;
-      gScore+=BLOCK_SCORE;
-      gSfx('brick');
-      // どの面に当たったか
-      const fromLeft =ball.x<b.x;
-      const fromRight=ball.x>b.x+b.w;
-      if(fromLeft||fromRight) ball.vx*=-1; else ball.vy*=-1;
-      updateGameUI();
-      break;
+    b.x+=b.vx*speedMod;
+    b.y+=b.vy*speedMod;
+
+    // 壁反射
+    if(b.x-ballR<0){b.x=ballR;b.vx=Math.abs(b.vx);gSfx('wall');}
+    if(b.x+ballR>gW){b.x=gW-ballR;b.vx=-Math.abs(b.vx);gSfx('wall');}
+    if(b.y-ballR<0){b.y=ballR;b.vy=Math.abs(b.vy);gSfx('wall');}
+
+    // パドル衝突
+    const py=gH-padH-8;
+    if(b.vy>0&&b.y+ballR>=py&&b.y+ballR<=py+padH+Math.abs(b.vy)&&
+       b.x>=pad.x-padW/2-ballR&&b.x<=pad.x+padW/2+ballR){
+      b.vy=-Math.abs(b.vy);
+      const off=(b.x-pad.x)/(padW/2);
+      b.vx=off*baseSpeed()*1.2;
+      // 速度上限
+      const spMax=baseSpeed()*2.2;
+      const spCur=Math.hypot(b.vx,b.vy);
+      if(spCur>spMax){b.vx=b.vx/spCur*spMax;b.vy=b.vy/spCur*spMax;}
+      gSfx('pad');
     }
-  }
 
-  // 全クリア
-  if(bricks.every(b=>!b.alive)){
-    gState='clear';
-    if(gScore>gHi){gHi=gScore;localStorage.setItem('arkanoid_hi',gHi);}
-    showOverlay('🎊 クリア！','スコア: '+gScore, 'もういちど');
-    gSfx('clear');launchConfetti(60);
-    return;
-  }
+    // ブロック衝突
+    for(const br of bricks){
+      if(!br.alive)continue;
+      if(b.x+ballR>br.x&&b.x-ballR<br.x+br.w&&b.y+ballR>br.y&&b.y-ballR<br.y+br.h){
+        br.hp--;br.flash=8;
+        if(br.hp<=0){
+          br.alive=false;
+          gScore+=BLOCK_SCORE*gScoreMult;
+          dropItem(br.x+br.w/2,br.y+br.h/2);
+          gSfx('brick');
+        } else {
+          gSfx('wall'); // 2ヒットブロックの半壊音
+        }
+        // 反射方向
+        const overlapL=b.x+ballR-br.x,overlapR=br.x+br.w-(b.x-ballR);
+        const overlapT=b.y+ballR-br.y,overlapB=br.y+br.h-(b.y-ballR);
+        const minH=Math.min(overlapL,overlapR),minV=Math.min(overlapT,overlapB);
+        if(minH<minV)b.vx*=-1;else b.vy*=-1;
+        updateGameUI();
+        break;
+      }
+    }
 
-  // ボール落下
-  if(ball.y-ballR>gH){
-    gLives--;gSfx('miss');updateGameUI();
+    // 落下
+    if(b.y-ballR>gH) b.dead=true;
+  });
+
+  // 全ボール消滅
+  if(allDead||balls.every(b=>b.dead)){
+    gLives--;gSfx('miss');
+    balls=balls.filter(b=>!b.dead);
     if(gLives<=0){
       gState='dead';
-      if(gScore>gHi){gHi=gScore;localStorage.setItem('arkanoid_hi',gHi);}
+      if(gScore>gHi){gHi=gScore;localStorage.setItem('arkanoid_hi2',gHi);}
       showOverlay('😢 ゲームオーバー','スコア: '+gScore,'もういちど');
     } else {
       resetBallPad();
     }
+    updateGameUI();
+  }
+
+  // 全クリア
+  if(bricks.length&&bricks.every(b=>!b.alive)){
+    gState='levelclear';
+    if(gScore>gHi){gHi=gScore;localStorage.setItem('arkanoid_hi2',gHi);}
+    // 次のレベルへ自動進行
+    launchConfetti(50);gSfx('clear');
+    setTimeout(()=>{
+      if(gState==='levelclear'){gState='playing';nextLevel();}
+    },1800);
+    updateGameUI();
+  }
+
+  // ── アイテム更新 ──
+  items.forEach(it=>{
+    it.y+=it.vy;
+    it.anim=(it.anim+0.1)%(Math.PI*2);
+    // パドルに当たったか
+    const py=gH-padH-8;
+    if(it.y+it.r>=py&&it.y-it.r<=py+padH&&it.x>=pad.x-padW/2&&it.x<=pad.x+padW/2){
+      applyItem(it.type);
+      it.collected=true;
+    }
+    if(it.y-it.r>gH) it.collected=true;
+  });
+  items=items.filter(it=>!it.collected);
+}
+
+// ── アイテム効果 ──
+function applyItem(type){
+  gSfx('item');
+  launchConfetti(18);
+  const info=ITEM_TYPES[type];
+  showItemLabel(info.label,info.color);
+  if(type==='MULTI'){
+    // ボール追加（最大5個）
+    if(balls.filter(b=>!b.dead).length<5){
+      const b=balls.find(x=>!x.dead);
+      if(b) balls.push(makeBall(b.x,b.y,(Math.random()*Math.PI*2)));
+    }
+  } else if(type==='WIDE'){
+    padW=Math.min(Math.floor(gW*0.36),padW*1.5);
+    wideTimer=600; // 約10秒
+  } else if(type==='FAST'){
+    // ボール全部加速
+    balls.forEach(b=>{if(!b.dead){const m=1.25;b.vx*=m;b.vy*=m;}});
+  } else if(type==='SCORE2'){
+    gScoreMult=2;
+    setTimeout(()=>{gScoreMult=1;},8000);
+  } else if(type==='SLOW'){
+    slowTimer=360;// 約6秒スローモーション
   }
 }
 
-function draw(){
-  // 背景
-  ctx2.fillStyle='#1a0030';ctx2.fillRect(0,0,gW,gH);
-  // グリッド感
-  ctx2.strokeStyle='rgba(100,0,160,.12)';ctx2.lineWidth=1;
-  for(let x=0;x<gW;x+=30){ctx2.beginPath();ctx2.moveTo(x,0);ctx2.lineTo(x,gH);ctx2.stroke();}
-  for(let y=0;y<gH;y+=30){ctx2.beginPath();ctx2.moveTo(0,y);ctx2.lineTo(gW,y);ctx2.stroke();}
+// アイテム取得ラベル表示
+let itemLabelTimer=0,itemLabelText='',itemLabelColor='#fff';
+function showItemLabel(text,color){
+  itemLabelText=text+'GET!';itemLabelColor=color;itemLabelTimer=90;
+}
+
+// ── 描画 ──
+function draw2(){
+  ctx2.fillStyle='#0e0020';ctx2.fillRect(0,0,gW,gH);
+
+  // グリッド
+  ctx2.strokeStyle='rgba(120,0,200,.08)';ctx2.lineWidth=1;
+  for(let x=0;x<gW;x+=24){ctx2.beginPath();ctx2.moveTo(x,0);ctx2.lineTo(x,gH);ctx2.stroke();}
+  for(let y=0;y<gH;y+=24){ctx2.beginPath();ctx2.moveTo(0,y);ctx2.lineTo(gW,y);ctx2.stroke();}
+
+  // レベルアップフラッシュ
+  if(levelUpFlash>0){
+    ctx2.fillStyle=`rgba(255,224,100,${levelUpFlash/60*0.18})`;
+    ctx2.fillRect(0,0,gW,gH);
+  }
 
   // ブロック
   for(const b of bricks){
     if(!b.alive)continue;
-    ctx2.fillStyle=b.color;
-    ctx2.beginPath();roundRect(ctx2,b.x,b.y,b.w,b.h,4);ctx2.fill();
-    ctx2.fillStyle='rgba(255,255,255,.25)';
-    ctx2.beginPath();roundRect(ctx2,b.x+2,b.y+2,b.w-4,b.h*0.4,2);ctx2.fill();
+    const flash=b.flash>0;
+    if(flash)b.flash--;
+    const col=flash?'#fff':b.color;
+    ctx2.fillStyle=col;
+    ctx2.beginPath();roundRect(ctx2,b.x,b.y,b.w,b.h,3);ctx2.fill();
+    // 光沢
+    ctx2.fillStyle=`rgba(255,255,255,${flash?0.6:0.22})`;
+    ctx2.beginPath();roundRect(ctx2,b.x+2,b.y+2,b.w-4,b.h*0.38,2);ctx2.fill();
+    // 2ヒットブロックはヒビ
+    if(b.maxHp===2&&b.hp===1){
+      ctx2.strokeStyle='rgba(0,0,0,.5)';ctx2.lineWidth=1.5;
+      ctx2.beginPath();ctx2.moveTo(b.x+b.w*0.3,b.y);ctx2.lineTo(b.x+b.w*0.5,b.y+b.h);ctx2.stroke();
+      ctx2.beginPath();ctx2.moveTo(b.x+b.w*0.6,b.y);ctx2.lineTo(b.x+b.w*0.4,b.y+b.h);ctx2.stroke();
+    }
   }
+
+  // アイテム
+  items.forEach(it=>{
+    const info=ITEM_TYPES[it.type];
+    const bob=Math.sin(it.anim)*3;
+    // 光るリング
+    ctx2.strokeStyle=info.color;ctx2.lineWidth=2;
+    ctx2.globalAlpha=0.7+Math.sin(it.anim)*0.3;
+    ctx2.beginPath();ctx2.arc(it.x,it.y+bob,it.r+2,0,Math.PI*2);ctx2.stroke();
+    ctx2.globalAlpha=1;
+    // 絵文字
+    ctx2.font=`${it.r*1.6}px serif`;ctx2.textAlign='center';ctx2.textBaseline='middle';
+    ctx2.fillText(info.icon,it.x,it.y+bob);
+  });
 
   // パドル
   const py=gH-padH-8;
-  const pg=ctx2.createLinearGradient(pad.x-padW/2,py,pad.x+padW/2,py);
-  pg.addColorStop(0,'#c97ef7');pg.addColorStop(1,'#ff7eb3');
+  const effPadW=wideTimer>0?padW:padW;
+  const pg=ctx2.createLinearGradient(pad.x-effPadW/2,py,pad.x+effPadW/2,py);
+  if(wideTimer>0){pg.addColorStop(0,'#38d39f');pg.addColorStop(1,'#7ee8c8');}
+  else{pg.addColorStop(0,'#c97ef7');pg.addColorStop(1,'#ff7eb3');}
   ctx2.fillStyle=pg;
-  ctx2.beginPath();roundRect(ctx2,pad.x-padW/2,py,padW,padH,padH/2);ctx2.fill();
-  ctx2.fillStyle='rgba(255,255,255,.35)';
-  ctx2.beginPath();roundRect(ctx2,pad.x-padW/2+4,py+2,padW-8,padH*0.4,padH*0.2);ctx2.fill();
-
-  // ボール
-  const bg=ctx2.createRadialGradient(ball.x-ballR*.3,ball.y-ballR*.3,1,ball.x,ball.y,ballR);
-  bg.addColorStop(0,'#fff');bg.addColorStop(0.5,'#ffb3d1');bg.addColorStop(1,'#c97ef7');
-  ctx2.fillStyle=bg;
-  ctx2.shadowColor='rgba(201,126,247,.8)';ctx2.shadowBlur=10;
-  ctx2.beginPath();ctx2.arc(ball.x,ball.y,ballR,0,Math.PI*2);ctx2.fill();
+  ctx2.shadowColor=wideTimer>0?'rgba(56,211,159,.6)':'rgba(201,126,247,.5)';
+  ctx2.shadowBlur=10;
+  ctx2.beginPath();roundRect(ctx2,pad.x-effPadW/2,py,effPadW,padH,padH/2);ctx2.fill();
   ctx2.shadowBlur=0;
+  // 光沢
+  ctx2.fillStyle='rgba(255,255,255,.3)';
+  ctx2.beginPath();roundRect(ctx2,pad.x-effPadW/2+3,py+2,effPadW-6,padH*0.38,padH*0.2);ctx2.fill();
+
+  // ボール（複数）
+  balls.forEach((b,bi)=>{
+    if(b.dead)return;
+    // トレイル
+    b.trail.forEach((t,i)=>{
+      const a=(i+1)/b.trail.length*0.35;
+      ctx2.globalAlpha=a;
+      ctx2.fillStyle=bi===0?'#ffb3d1':'#b3d1ff';
+      ctx2.beginPath();ctx2.arc(t.x,t.y,ballR*(i+1)/b.trail.length*0.8,0,Math.PI*2);ctx2.fill();
+    });
+    ctx2.globalAlpha=1;
+    // ボール本体
+    const bg2=ctx2.createRadialGradient(b.x-ballR*.3,b.y-ballR*.3,1,b.x,b.y,ballR);
+    if(bi===0){bg2.addColorStop(0,'#fff');bg2.addColorStop(.5,'#ffb3d1');bg2.addColorStop(1,'#c97ef7');}
+    else{bg2.addColorStop(0,'#fff');bg2.addColorStop(.5,'#b3d1ff');bg2.addColorStop(1,'#74b9ff');}
+    ctx2.fillStyle=bg2;
+    ctx2.shadowColor=bi===0?'rgba(201,126,247,.8)':'rgba(116,185,255,.8)';
+    ctx2.shadowBlur=8;
+    ctx2.beginPath();ctx2.arc(b.x,b.y,ballR,0,Math.PI*2);ctx2.fill();
+    ctx2.shadowBlur=0;
+  });
+  ctx2.globalAlpha=1;
+
+  // アイテムラベル
+  if(itemLabelTimer>0){
+    itemLabelTimer--;
+    const a=itemLabelTimer>20?1:itemLabelTimer/20;
+    const y=gH/2-30-((90-itemLabelTimer)*0.5);
+    ctx2.globalAlpha=a;
+    ctx2.font=`bold ${Math.floor(gW*0.055)}px 'Noto Sans JP',sans-serif`;
+    ctx2.textAlign='center';ctx2.textBaseline='middle';
+    ctx2.strokeStyle='rgba(0,0,0,.5)';ctx2.lineWidth=4;ctx2.strokeText(itemLabelText,gW/2,y);
+    ctx2.fillStyle=itemLabelColor;ctx2.fillText(itemLabelText,gW/2,y);
+    ctx2.globalAlpha=1;
+  }
+
+  // レベル表示
+  ctx2.font=`${Math.floor(gW*0.038)}px 'Noto Sans JP',sans-serif`;
+  ctx2.textAlign='right';ctx2.textBaseline='top';
+  ctx2.fillStyle='rgba(200,150,255,.5)';
+  ctx2.fillText(`Lv.${gLevel}`,gW-6,4);
+
+  // 2倍スコア表示
+  if(gScoreMult===2){
+    ctx2.font=`bold ${Math.floor(gW*0.04)}px 'Noto Sans JP',sans-serif`;
+    ctx2.textAlign='left';ctx2.fillStyle='#ffe066';
+    ctx2.fillText('×2',6,4);
+  }
+
+  // レベルクリアテキスト
+  if(gState==='levelclear'){
+    ctx2.fillStyle='rgba(0,0,20,.5)';ctx2.fillRect(0,0,gW,gH);
+    ctx2.font=`bold ${Math.floor(gW*0.1)}px 'Noto Sans JP',sans-serif`;
+    ctx2.textAlign='center';ctx2.textBaseline='middle';
+    ctx2.strokeStyle='rgba(255,200,0,.8)';ctx2.lineWidth=5;
+    ctx2.strokeText(`Lv.${gLevel} クリア！`,gW/2,gH/2);
+    ctx2.fillStyle='#ffe066';ctx2.fillText(`Lv.${gLevel} クリア！`,gW/2,gH/2);
+    ctx2.font=`${Math.floor(gW*0.055)}px 'Noto Sans JP',sans-serif`;
+    ctx2.fillStyle='#fff';ctx2.fillText(`次のレベルへ…`,gW/2,gH/2+gH*0.12);
+  }
 }
 
 function drawIdle(){
   if(!gW||!gH){resizeCanvas();return;}
-  ctx2.fillStyle='#1a0030';ctx2.fillRect(0,0,gW,gH);
-  // ダミーブロック表示
+  ctx2.fillStyle='#0e0020';ctx2.fillRect(0,0,gW,gH);
+  const bW2=Math.floor((gW-(COLS+1)*3)/COLS);
+  const bH2=Math.floor(gH*0.038);
   for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
-    const bx=(gW/COLS)*c+(gW/COLS-bW)/2;
-    const by=gH*0.08+r*(bH+4);
-    ctx2.fillStyle=BRICK_COLORS[r%BRICK_COLORS.length]+'aa';
-    ctx2.beginPath();roundRect(ctx2,bx,by,bW,bH,4);ctx2.fill();
+    const gapX=3,gapY=4;
+    const totalW=COLS*(bW2+gapX)-gapX;
+    const startX=(gW-totalW)/2;
+    const x=startX+c*(bW2+gapX),y=gH*0.06+r*(bH2+gapY);
+    ctx2.fillStyle=BRICK_COLORS[(r+c)%BRICK_COLORS.length]+'99';
+    ctx2.beginPath();roundRect(ctx2,x,y,bW2,bH2,3);ctx2.fill();
   }
 }
 
 function roundRect(c,x,y,w,h,r){
+  c.beginPath();
   c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.arcTo(x+w,y,x+w,y+r,r);
   c.lineTo(x+w,y+h-r);c.arcTo(x+w,y+h,x+w-r,y+h,r);
   c.lineTo(x+r,y+h);c.arcTo(x,y+h,x,y+h-r,r);
@@ -1763,25 +2001,39 @@ function updateGameUI(){
   document.getElementById('g-lives').textContent='❤️'.repeat(Math.max(0,gLives));
 }
 
-// ゲーム効果音
+// ── 効果音 ──
 function gSfx(type){
   const c=getCtx();
-  if(type==='wall'){tone('square',400,.04,c.currentTime,.04);}
-  else if(type==='pad'){tone('sine',600,.08,c.currentTime,.06);tone('sine',800,.05,c.currentTime+.03,.05);}
-  else if(type==='brick'){tone('square',800,.07,c.currentTime,.05);tone('sine',500,.04,c.currentTime+.02,.07);}
-  else if(type==='miss'){[300,250,200].forEach((f,i)=>tone('sine',f,.14,c.currentTime+i*.12,.15));}
-  else if(type==='clear'){[523,659,784,1047,1319].forEach((f,i)=>tone('triangle',f,.2,c.currentTime+i*.1,.2));}
+  if(type==='wall'){
+    tone('square',500,.04,c.currentTime,.035);
+  } else if(type==='pad'){
+    tone('sine',700,.09,c.currentTime,.05);
+    tone('sine',900,.06,c.currentTime+.03,.05);
+  } else if(type==='brick'){
+    tone('square',900,.08,c.currentTime,.04);
+    tone('sine',600,.04,c.currentTime+.02,.06);
+  } else if(type==='miss'){
+    [280,240,200,160].forEach((f,i)=>tone('sine',f,.15,c.currentTime+i*.1,.12));
+  } else if(type==='clear'){
+    [{f:523,t:0},{f:659,t:.1},{f:784,t:.2},{f:1047,t:.32},{f:1319,t:.46}]
+      .forEach(({f,t})=>tone('triangle',f,.22,c.currentTime+t,.22));
+  } else if(type==='item'){
+    [880,1100,1320,1760].forEach((f,i)=>tone('sine',f,.15,c.currentTime+i*.06,.12));
+  } else if(type==='levelup'){
+    [{f:523,t:0},{f:659,t:.08},{f:784,t:.16},{f:1047,t:.26},{f:1319,t:.38},{f:1568,t:.52}]
+      .forEach(({f,t})=>tone('triangle',f,.2,c.currentTime+t,.2));
+  }
 }
 
-// マウス操作
+// ── マウス操作 ──
 canvas.addEventListener('mousemove',e=>{
   if(gState!=='playing')return;
   const rect=canvas.getBoundingClientRect();
   padTarget=Math.max(padW/2,Math.min(gW-padW/2,(e.clientX-rect.left)/rect.width*gW));
 });
 
-// 初期化
+// ── 初期化 ──
+const BLOCK_SCORE=10;
 setTimeout(()=>{resizeCanvas();updateGameUI();},100);
+
 </script>
-</body>
-</html>
