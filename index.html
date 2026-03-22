@@ -210,11 +210,16 @@ body{
   position:fixed;inset:0;z-index:300;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:rgba(10,0,30,.88);
+  -webkit-backdrop-filter:blur(6px);
   backdrop-filter:blur(6px);
-  opacity:0;pointer-events:none;
-  transition:opacity .4s ease;
+  opacity:0;
+  visibility:hidden;        /* pointer-eventsよりも確実に無効化 */
+  transition:opacity .4s ease, visibility .4s ease;
 }
-#secret-overlay.show{opacity:1;pointer-events:auto;}
+#secret-overlay.show{
+  opacity:1;
+  visibility:visible;       /* .showで完全に有効化 */
+}
 
 .secret-badge{
   background:linear-gradient(135deg,#2d0060,#6a0080,#2d0060);
@@ -280,10 +285,10 @@ body{
 #secret-clear{
   position:fixed;inset:0;z-index:400;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  pointer-events:none;opacity:0;
-  transition:opacity .3s;
+  visibility:hidden;opacity:0;
+  transition:opacity .3s, visibility .3s;
 }
-#secret-clear.show{opacity:1;pointer-events:auto;}
+#secret-clear.show{opacity:1;visibility:visible;pointer-events:auto;}
 .secret-clear-inner{
   text-align:center;
   animation:secretClearPop .7s cubic-bezier(.34,1.4,.64,1);
