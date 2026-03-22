@@ -259,6 +259,17 @@ body{
 .secret-start-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(201,126,247,.65);}
 .secret-start-btn:active{transform:scale(.97);}
 
+.secret-skip-btn{
+  padding:12px 20px;border-radius:50px;
+  border:2px solid rgba(201,126,247,.4);
+  background:transparent;color:#c8a0e8;
+  font-family:'Noto Sans JP',sans-serif;
+  font-size:.85rem;font-weight:700;letter-spacing:.1em;
+  cursor:pointer;transition:all .2s;
+}
+.secret-skip-btn:hover{background:rgba(201,126,247,.12);border-color:rgba(201,126,247,.7);}
+.secret-skip-btn:active{transform:scale(.97);}
+
 /* ドラム内 隠しミッション表示 */
 .drum-item.secret .drum-label{
   color:#c97ef7;
@@ -447,7 +458,10 @@ body{
     <div class="secret-title">🤫 かくしミッション 登場！</div>
     <div class="secret-label" id="secret-mission-label">こっそりお手伝い</div>
     <div class="secret-desc">だれにも ないしょ にしてね…！<br>せいこうしたら すごいことが おこるよ👀</div>
-    <button class="secret-start-btn" onclick="closeSecretOverlay()">やってみる！✨</button>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:2px">
+      <button class="secret-start-btn" onclick="closeSecretOverlay(false)">やってみる！✨</button>
+      <button class="secret-skip-btn" onclick="closeSecretOverlay(true)">こんどにする…</button>
+    </div>
   </div>
 </div>
 
@@ -917,8 +931,8 @@ function startRoll(){
   mCheckBtn.disabled=false;mCheckBtn.textContent='✅ おわった！';
   playStart();
 
-  // 20回に1回、隠しミッション発動（チェック済みでなければ）
-  const isSecret = (mRolls % 20 === 19) && !mChecked.includes(SECRET_MISSION.label);
+  // 8%の確率で隠しミッション発動（チェック済みでなければ）
+  const isSecret = (Math.random() < 0.08) && !mChecked.includes(SECRET_MISSION.label);
 
   const chosen = isSecret ? SECRET_MISSION : pool[Math.floor(Math.random()*pool.length)];
   const nextIdx = isSecret ? Math.floor(Math.random()*MISSION_ITEMS.length) : MISSION_ITEMS.indexOf(chosen);
@@ -994,9 +1008,17 @@ function checkMission(){
   }
 }
 
-function closeSecretOverlay(){
+function closeSecretOverlay(skip){
   document.getElementById('secret-overlay').classList.remove('show');
-  playFanfare();launchConfetti();
+  if(skip){
+    // スキップ：チェックボタンを非表示に戻し、通常ロールに見せかける
+    mCurrentIsSecret=false;
+    mCurrentLabel=null;
+    mCheckBtn.classList.remove('visible','done','secret-check');
+    playFanfare();launchConfetti();
+  } else {
+    playFanfare();launchConfetti();
+  }
 }
 
 function closeSecretClear(){
