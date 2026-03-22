@@ -3,386 +3,266 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>今日の一言</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;700;900&family=Space+Mono&display=swap" rel="stylesheet" />
+  <title>✨ きょうのミッション ✨</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --bg: #0a0a0f;
-      --surface: #12121a;
-      --accent: #c8a96e;
-      --accent2: #e8d5b0;
-      --text: #f0ece4;
-      --muted: #5a5550;
-      --glow: rgba(200, 169, 110, 0.15);
+      --pink:#ff7eb3; --pink2:#ffb3d1; --purple:#c97ef7;
+      --yellow:#ffe066; --mint:#7ee8c8; --bg:#fff0f8;
     }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Noto Serif JP', serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      position: relative;
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{
+      font-family:'Noto Sans JP',sans-serif;
+      background:var(--bg);
+      min-height:100vh;
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      overflow:hidden;position:relative;
     }
-
-    /* background noise texture */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      opacity: 0.4;
-      pointer-events: none;
-      z-index: 0;
+    .stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
+    .star{
+      position:absolute;
+      animation:floatStar linear infinite;
+      opacity:0.55;
     }
-
-    /* radial glow */
-    body::after {
-      content: '';
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
+    @keyframes floatStar{
+      0%  {transform:translateY(110vh) rotate(0deg);  opacity:0;}
+      10% {opacity:0.55;}
+      90% {opacity:0.55;}
+      100%{transform:translateY(-10vh) rotate(360deg);opacity:0;}
     }
-
-    .container {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 60px;
+    .card{
+      position:relative;z-index:1;
+      background:#fff;
+      border-radius:36px;
+      padding:36px 32px 32px;
+      width:min(420px,92vw);
+      box-shadow:0 8px 40px rgba(255,126,179,.18);
+      border:3px solid var(--pink2);
+      display:flex;flex-direction:column;align-items:center;gap:20px;
     }
-
-    /* header */
-    .header {
-      text-align: center;
+    .title{
+      font-size:1.25rem;font-weight:900;
+      color:var(--purple);letter-spacing:.12em;
     }
-
-    .header-label {
-      font-family: 'Space Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 0.3em;
-      color: var(--accent);
-      text-transform: uppercase;
-      margin-bottom: 12px;
-      opacity: 0.8;
+    .title span{color:var(--pink);}
+    .drum-wrap{width:100%;display:flex;flex-direction:column;align-items:center;}
+    .pointer{
+      width:0;height:0;
+      border-left:16px solid transparent;
+      border-right:16px solid transparent;
+      border-top:28px solid var(--purple);
+      filter:drop-shadow(0 2px 4px rgba(201,126,247,.5));
+      margin-bottom:-4px;z-index:3;position:relative;
     }
-
-    .header-title {
-      font-size: clamp(14px, 2vw, 16px);
-      font-weight: 300;
-      letter-spacing: 0.5em;
-      color: var(--muted);
+    .drum-window{
+      width:100%;height:120px;
+      border-radius:24px;
+      border:4px solid var(--pink);
+      background:linear-gradient(135deg,#fff5fb,#fce4f6);
+      overflow:hidden;position:relative;
+      box-shadow:0 4px 24px rgba(255,126,179,.18),inset 0 2px 8px rgba(255,255,255,.8);
     }
-
-    /* main word display */
-    .word-stage {
-      position: relative;
-      width: clamp(300px, 80vw, 560px);
-      height: clamp(200px, 40vh, 300px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .drum-window::before,.drum-window::after{
+      content:'';position:absolute;left:0;right:0;height:36px;z-index:2;pointer-events:none;
     }
-
-    /* decorative corner lines */
-    .word-stage::before,
-    .word-stage::after {
-      content: '';
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      border-color: var(--accent);
-      border-style: solid;
-      opacity: 0.4;
+    .drum-window::before{top:0;background:linear-gradient(to bottom,rgba(255,245,251,.95),transparent);}
+    .drum-window::after{bottom:0;background:linear-gradient(to top,rgba(252,228,246,.95),transparent);}
+    .highlight-bar{
+      position:absolute;left:0;right:0;
+      top:50%;transform:translateY(-50%);
+      height:64px;
+      background:linear-gradient(90deg,rgba(255,224,102,.35),rgba(255,126,179,.18),rgba(255,224,102,.35));
+      border-top:2px dashed var(--yellow);
+      border-bottom:2px dashed var(--yellow);
+      z-index:1;pointer-events:none;
     }
-    .word-stage::before {
-      top: 0; left: 0;
-      border-width: 1px 0 0 1px;
+    .drum-strip{
+      display:flex;flex-direction:column;align-items:center;
+      position:absolute;left:0;right:0;top:0;
+      will-change:transform;
     }
-    .word-stage::after {
-      bottom: 0; right: 0;
-      border-width: 0 1px 1px 0;
+    .drum-item{
+      height:120px;width:100%;
+      display:flex;align-items:center;justify-content:center;gap:14px;
+      flex-shrink:0;
     }
-
-    .word-inner::before,
-    .word-inner::after {
-      content: '';
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      border-color: var(--accent);
-      border-style: solid;
-      opacity: 0.4;
+    .drum-icon{font-size:2.4rem;line-height:1;}
+    .drum-label{font-size:2rem;font-weight:900;color:#e060a0;letter-spacing:.1em;}
+    .result-box{
+      width:100%;border-radius:20px;padding:16px;
+      background:linear-gradient(135deg,#fff0fb,#fce8ff);
+      border:2.5px solid var(--pink2);
+      text-align:center;min-height:64px;
+      display:flex;align-items:center;justify-content:center;gap:10px;
     }
-    .word-inner::before {
-      top: 0; right: 0;
-      border-width: 1px 1px 0 0;
+    .result-icon{font-size:2rem;}
+    .result-text{font-size:1.5rem;font-weight:900;color:var(--purple);letter-spacing:.08em;}
+    .result-box.pop{animation:popIn .4s cubic-bezier(.34,1.56,.64,1);}
+    @keyframes popIn{0%{transform:scale(.85);}100%{transform:scale(1);}}
+    #roll-btn{
+      width:100%;padding:18px;
+      border-radius:50px;border:none;
+      background:linear-gradient(135deg,var(--pink),var(--purple));
+      color:#fff;
+      font-family:'Noto Sans JP',sans-serif;
+      font-size:1.2rem;font-weight:900;letter-spacing:.2em;
+      cursor:pointer;
+      box-shadow:0 6px 24px rgba(255,126,179,.45);
+      transition:transform .15s,box-shadow .15s;
     }
-    .word-inner::after {
-      bottom: 0; left: 0;
-      border-width: 0 0 1px 1px;
+    #roll-btn:hover:not(:disabled){transform:translateY(-3px) scale(1.02);box-shadow:0 10px 32px rgba(255,126,179,.5);}
+    #roll-btn:active:not(:disabled){transform:scale(.97);}
+    #roll-btn:disabled{opacity:.6;cursor:not-allowed;}
+    .confetti-piece{
+      position:fixed;border-radius:2px;pointer-events:none;z-index:100;
+      animation:confettiFall 1.6s ease-in forwards;
     }
-
-    .word-inner {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    @keyframes confettiFall{
+      0%  {transform:translateY(-20px) rotate(0deg);  opacity:1;}
+      100%{transform:translateY(110vh) rotate(720deg);opacity:0;}
     }
-
-    #word-display {
-      font-size: clamp(52px, 12vw, 88px);
-      font-weight: 900;
-      letter-spacing: 0.15em;
-      color: var(--text);
-      text-shadow:
-        0 0 40px rgba(200, 169, 110, 0.3),
-        0 0 80px rgba(200, 169, 110, 0.1);
-      transition: opacity 0.15s ease;
-      user-select: none;
-    }
-
-    #word-display.flash-out {
-      opacity: 0;
-      transform: scale(0.96);
-      transition: opacity 0.12s ease, transform 0.12s ease;
-    }
-    #word-display.flash-in {
-      opacity: 1;
-      transform: scale(1);
-      transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    /* rolling animation preview */
-    .roll-container {
-      position: relative;
-      height: clamp(52px, 12vw, 88px);
-      overflow: hidden;
-      display: none;
-    }
-    .roll-container.rolling {
-      display: flex;
-    }
-    .roll-strip {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      animation: rollStrip 0.6s cubic-bezier(0.2, 0, 0.3, 1) forwards;
-    }
-    @keyframes rollStrip {
-      from { transform: translateY(0); }
-      to { transform: translateY(-100%); }
-    }
-
-    /* button */
-    .btn-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-    }
-
-    #roll-btn {
-      background: transparent;
-      border: 1px solid var(--accent);
-      color: var(--accent2);
-      font-family: 'Noto Serif JP', serif;
-      font-size: 15px;
-      font-weight: 300;
-      letter-spacing: 0.4em;
-      padding: 18px 56px;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s ease;
-    }
-
-    #roll-btn::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: var(--accent);
-      transform: translateX(-102%);
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: -1;
-    }
-
-    #roll-btn:hover::before {
-      transform: translateX(0);
-    }
-
-    #roll-btn:hover {
-      color: var(--bg);
-      border-color: var(--accent);
-    }
-
-    #roll-btn:active {
-      transform: scale(0.98);
-    }
-
-    #roll-btn:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    .btn-hint {
-      font-family: 'Space Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      color: var(--muted);
-    }
-
-    /* word list pills */
-    .word-list {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-      max-width: 480px;
-    }
-
-    .word-pill {
-      font-size: 12px;
-      font-weight: 300;
-      letter-spacing: 0.15em;
-      color: var(--muted);
-      padding: 5px 14px;
-      border: 1px solid #2a2a35;
-      border-radius: 2px;
-      transition: all 0.3s ease;
-    }
-
-    .word-pill.active {
-      color: var(--accent);
-      border-color: var(--accent);
-      background: rgba(200, 169, 110, 0.08);
-    }
-
-    /* count display */
-    .count-display {
-      font-family: 'Space Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 0.25em;
-      color: var(--muted);
-    }
-
-    .count-display span {
-      color: var(--accent);
-    }
+    .count-row{font-size:.75rem;color:#c097d0;letter-spacing:.1em;}
+    .count-row b{color:var(--pink);}
   </style>
 </head>
 <body>
-  <div class="container">
-
-    <div class="header">
-      <div class="header-label">Random Selector</div>
-      <div class="header-title">今日 の 一 言</div>
+<div class="stars" id="stars"></div>
+<div class="card">
+  <div class="title">✨ きょうの <span>ミッション</span> ✨</div>
+  <div class="drum-wrap">
+    <div class="pointer"></div>
+    <div class="drum-window">
+      <div class="highlight-bar"></div>
+      <div class="drum-strip" id="strip"></div>
     </div>
-
-    <div class="word-stage">
-      <div class="word-inner">
-        <div id="word-display">ピアノ</div>
-      </div>
-    </div>
-
-    <div class="btn-wrap">
-      <button id="roll-btn" onclick="rollWord()">ロ ー ル</button>
-      <div class="btn-hint">press to roll · space key also works</div>
-    </div>
-
-    <div class="word-list" id="word-list"></div>
-
-    <div class="count-display">rolled <span id="roll-count">0</span> times</div>
-
   </div>
+  <div class="result-box" id="result-box">
+    <span class="result-icon" id="result-icon">🎀</span>
+    <span class="result-text" id="result-text">ボタンをおしてね！</span>
+  </div>
+  <button id="roll-btn" onclick="startRoll()">🎲 まわす！</button>
+  <div class="count-row">これまで <b id="count">0</b> かいまわしたよ！</div>
+</div>
+<script>
+const items=[
+  {label:'ピアノ',  icon:'🎹'},
+  {label:'日記',    icon:'📔'},
+  {label:'勉強',    icon:'📚'},
+  {label:'修行',    icon:'🥋'},
+  {label:'新体操',  icon:'🎀'},
+];
+let currentIndex=0,rollCount=0,rolling=false;
+const strip=document.getElementById('strip');
+const resultBox=document.getElementById('result-box');
+const resultIcon=document.getElementById('result-icon');
+const resultText=document.getElementById('result-text');
+const countEl=document.getElementById('count');
+const btn=document.getElementById('roll-btn');
 
-  <script>
-    const words = ['ピアノ', '日記', '勉強', '修行', '新体操'];
-    let current = words[0];
-    let rollCount = 0;
-    let isRolling = false;
+const REPEATS=6,ITEM_H=120,LOOP_LEN=items.length;
+const allItems=[];
+for(let r=0;r<REPEATS;r++) items.forEach(it=>allItems.push(it));
+allItems.forEach(it=>{
+  const div=document.createElement('div');
+  div.className='drum-item';
+  div.innerHTML=`<span class="drum-icon">${it.icon}</span><span class="drum-label">${it.label}</span>`;
+  strip.appendChild(div);
+});
 
-    const display = document.getElementById('word-display');
-    const countEl = document.getElementById('roll-count');
-    const listEl = document.getElementById('word-list');
+function itemY(idx){return -(idx*ITEM_H);}
 
-    // render word pills
-    function renderPills() {
-      listEl.innerHTML = '';
-      words.forEach(w => {
-        const pill = document.createElement('div');
-        pill.className = 'word-pill' + (w === current ? ' active' : '');
-        pill.textContent = w;
-        listEl.appendChild(pill);
-      });
+// init: show set #2
+strip.style.transform=`translateY(${itemY(LOOP_LEN*2+currentIndex)}px)`;
+
+function startRoll(){
+  if(rolling)return;
+  rolling=true;btn.disabled=true;
+  btn.textContent='🌀 まわってるよ…';
+
+  let next;
+  do{next=Math.floor(Math.random()*items.length);}
+  while(next===currentIndex&&items.length>1);
+
+  // land on set #3, extra 2 full loops for drama
+  const finalIdx=LOOP_LEN*3+next+LOOP_LEN*2;
+  const startY=itemY(LOOP_LEN*2+currentIndex);
+  const endY=itemY(finalIdx);
+  const dist=endY-startY;
+
+  const DURATION=3000;
+  const startTime=performance.now();
+
+  function easeOutBack(t){
+    const c1=1.70158,c3=c1+1;
+    return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);
+  }
+  function easeInOut(t){
+    // slow start, fast middle, slow-bounce end
+    if(t<0.4) return 2.5*t*t; // ease in
+    return easeOutBack(t);     // bounce out
+  }
+
+  function tick(now){
+    const t=Math.min((now-startTime)/DURATION,1);
+    const ease=easeInOut(t);
+    strip.style.transform=`translateY(${startY+dist*ease}px)`;
+    if(t<1){requestAnimationFrame(tick);}
+    else{
+      currentIndex=next;
+      // wrap back to set #2
+      strip.style.transition='none';
+      strip.style.transform=`translateY(${itemY(LOOP_LEN*2+next)}px)`;
+
+      const chosen=items[next];
+      resultIcon.textContent=chosen.icon;
+      resultText.textContent=chosen.label;
+      resultBox.classList.remove('pop');
+      void resultBox.offsetWidth;
+      resultBox.classList.add('pop');
+
+      rollCount++;countEl.textContent=rollCount;
+      launchConfetti();
+      btn.textContent='🎲 もういちど！';
+      btn.disabled=false;rolling=false;
     }
-    renderPills();
+  }
+  requestAnimationFrame(tick);
+}
 
-    function rollWord() {
-      if (isRolling) return;
-      isRolling = true;
+const colors=['#ff7eb3','#ffb3d1','#c97ef7','#ffe066','#7ee8c8','#ff9de2'];
+function launchConfetti(){
+  for(let i=0;i<48;i++){
+    const el=document.createElement('div');
+    el.className='confetti-piece';
+    el.style.cssText=`
+      left:${Math.random()*100}vw;
+      top:${Math.random()*20}vh;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      border-radius:${Math.random()>.5?'50%':'2px'};
+      width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;
+      animation-duration:${1.2+Math.random()*.8}s;
+      animation-delay:${Math.random()*.3}s;`;
+    document.body.appendChild(el);
+    el.addEventListener('animationend',()=>el.remove());
+  }
+}
 
-      const btn = document.getElementById('roll-btn');
-      btn.disabled = true;
+const emojis=['⭐','✨','💫','🌸','💕','🎀'];
+const starsEl=document.getElementById('stars');
+emojis.forEach(e=>{
+  for(let j=0;j<3;j++){
+    const s=document.createElement('div');
+    s.className='star';s.textContent=e;
+    s.style.cssText=`left:${Math.random()*100}vw;
+      animation-duration:${8+Math.random()*10}s;
+      animation-delay:${Math.random()*12}s;
+      font-size:${.9+Math.random()*.9}rem;`;
+    starsEl.appendChild(s);
+  }
+});
 
-      // pick a different word
-      let candidates = words.filter(w => w !== current);
-      let next = candidates[Math.floor(Math.random() * candidates.length)];
-
-      // flash-out
-      display.classList.add('flash-out');
-
-      // rapid cycling effect
-      let cycles = 0;
-      const maxCycles = 8;
-      const interval = setInterval(() => {
-        const temp = words[Math.floor(Math.random() * words.length)];
-        display.textContent = temp;
-        cycles++;
-        if (cycles >= maxCycles) {
-          clearInterval(interval);
-          display.textContent = next;
-          current = next;
-          display.classList.remove('flash-out');
-          display.classList.add('flash-in');
-          rollCount++;
-          countEl.textContent = rollCount;
-          renderPills();
-          setTimeout(() => {
-            display.classList.remove('flash-in');
-            isRolling = false;
-            btn.disabled = false;
-          }, 400);
-        }
-      }, 60);
-
-      // remove flash-out after first frame
-      setTimeout(() => display.classList.remove('flash-out'), 150);
-    }
-
-    // space key
-    document.addEventListener('keydown', e => {
-      if (e.code === 'Space') {
-        e.preventDefault();
-        rollWord();
-      }
-    });
-  </script>
+document.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();startRoll();}});
+</script>
 </body>
 </html>
