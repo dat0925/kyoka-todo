@@ -65,6 +65,16 @@ body{
   padding:7px 16px 8px;
   background:#fff;
 }
+/* スマホ：1本 / PC：非表示 */
+.sp-single{display:block;}
+/* PC：2本並列 / スマホ：非表示 */
+.sp-dual{display:none;gap:16px;}
+.sp-dual-item{flex:1;}
+@media(min-width:768px){
+  .sp-single{display:none;}
+  .sp-dual{display:flex;}
+  .sticky-progress{padding:8px 24px 10px;}
+}
 .sp-label{
   display:flex;justify-content:space-between;
   font-size:.68rem;font-weight:700;margin-bottom:4px;
@@ -98,16 +108,19 @@ body{
 /* PC/iPad */
 @media(min-width:768px){
   .tab-bar{display:none;}
-  .sticky-progress{display:none;}/* PC は各カード内に進捗表示 */
+  /* sticky-progressはPC/iPadでも表示する（display:noneを削除） */
   .pane-viewport{overflow:visible;}
   .pane-track{
     display:grid!important;
     grid-template-columns:1fr 1fr;
-    gap:20px;padding:24px 24px 40px;
+    gap:20px;padding:20px 24px 40px;
     width:100%!important;transform:none!important;height:auto!important;
   }
   .pane{width:100%!important;overflow-y:visible;padding:0;}
-  .card-progress{display:flex!important;}/* PC では各カードの進捗を表示 */
+  /* PC では sticky-progress を2カラムのグリッド上部に表示するため padding調整 */
+  .sticky-header{padding:0;}
+  /* カード内進捗はPC不要 */
+  .card-progress{display:none!important;}
 }
 
 /* ═══ カード ═══ */
@@ -262,22 +275,15 @@ body{
 
 /* ── 全リセットボタン ── */
 .all-reset-btn{
-  width:100%;padding:12px;border-radius:50px;border:none;
-  background:linear-gradient(135deg,#ffeaea,#ffd6d6);
-  color:#e05050;font-family:'Noto Sans JP',sans-serif;
-  font-size:.88rem;font-weight:900;letter-spacing:.12em;
-  cursor:pointer;
-  border:2px solid #ffb3b3;
-  box-shadow:0 3px 12px rgba(224,80,80,.12);
-  transition:transform .15s,box-shadow .15s,background .15s;
-  margin-top:4px;
+  font-size:.62rem;color:#e07070;background:none;
+  border:1px solid #ffb3b3;border-radius:8px;
+  padding:3px 9px;cursor:pointer;
+  font-family:'Noto Sans JP',sans-serif;font-weight:700;
+  letter-spacing:.05em;
+  transition:all .2s;
 }
-.all-reset-btn:hover{
-  background:linear-gradient(135deg,#ffd6d6,#ffbaba);
-  box-shadow:0 5px 16px rgba(224,80,80,.22);
-  transform:translateY(-1px);
-}
-.all-reset-btn:active{transform:scale(.97);}
+.all-reset-btn:hover{background:#fff0f0;color:#e05050;border-color:#e05050;}
+.all-reset-btn:active{transform:scale(.96);}
 
 /* ═══ confetti ═══ */
 .confetti-piece{position:fixed;border-radius:2px;pointer-events:none;z-index:200;animation:confettiFall 1.6s ease-in forwards;}
@@ -298,13 +304,33 @@ body{
         <span class="tab-icon">✅</span>習慣チェック
       </button>
     </div>
-    <!-- スマホ用スタック進捗 -->
+    <!-- スマホ：現在タブの進捗 / PC：両方の進捗を並べて表示 -->
     <div class="sticky-progress" id="sticky-progress">
-      <div class="sp-label">
-        <span class="sp-text" id="sp-text">📋 ミッション進捗</span>
-        <span class="sp-count" id="sp-count">0 / 11 完了</span>
+      <!-- スマホ用（1本） -->
+      <div class="sp-single" id="sp-single">
+        <div class="sp-label">
+          <span class="sp-text" id="sp-text">📋 ミッション進捗</span>
+          <span class="sp-count" id="sp-count">0 / 11 完了</span>
+        </div>
+        <div class="sp-bar-bg"><div class="sp-bar-fill" id="sp-bar" style="width:0%"></div></div>
       </div>
-      <div class="sp-bar-bg"><div class="sp-bar-fill" id="sp-bar" style="width:0%"></div></div>
+      <!-- PC用（2本並列） -->
+      <div class="sp-dual" id="sp-dual">
+        <div class="sp-dual-item">
+          <div class="sp-label">
+            <span class="sp-text">📋 ミッション</span>
+            <span class="sp-count" id="sp-m-count">0 / 11 完了</span>
+          </div>
+          <div class="sp-bar-bg"><div class="sp-bar-fill" id="sp-m-bar" style="width:0%"></div></div>
+        </div>
+        <div class="sp-dual-item">
+          <div class="sp-label">
+            <span class="sp-text">✅ 習慣チェック</span>
+            <span class="sp-count" id="sp-h-count">0 / 0 完了</span>
+          </div>
+          <div class="sp-bar-bg"><div class="sp-bar-fill" id="sp-h-bar" style="width:0%"></div></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -399,10 +425,8 @@ body{
 
           <div class="habit-bottom">
             <button class="reset-btn" onclick="resetHabit()">🔄 習慣リセット</button>
+            <button class="all-reset-btn" onclick="resetAll()">🗑️ 全部リセット</button>
           </div>
-
-          <!-- 全リセット -->
-          <button class="all-reset-btn" onclick="resetAll()">🗑️ 全部リセット</button>
         </div>
       </div>
 
@@ -523,32 +547,39 @@ function saveOpen(id,v){try{sessionStorage.setItem('acc_'+id,v?'1':'0');}catch{}
 // スタック進捗バー更新
 // ══════════════════════════════
 function updateStickyProgress(){
-  const isMission=currentTab===0;
+  const mn=mChecked.length,mt=MISSION_ITEMS.length;
+  const hn=hChecked.length;
+
+  // スマホ用（現在のタブ）
+  const isMission=currentTab===0||window.innerWidth>=768;
   const spText=document.getElementById('sp-text');
   const spCount=document.getElementById('sp-count');
   const spBar=document.getElementById('sp-bar');
-  if(isMission){
-    const n=mChecked.length,total=MISSION_ITEMS.length;
+  if(currentTab===0){
     spText.textContent='📋 ミッション進捗';
-    spCount.textContent=`${n} / ${total} 完了`;
-    spBar.style.width=(total?n/total*100:0)+'%';
-    spBar.classList.toggle('full',n>=total);
+    spCount.textContent=`${mn} / ${mt} 完了`;
+    spBar.style.width=(mt?mn/mt*100:0)+'%';
+    spBar.classList.toggle('full',mn>=mt);
   } else {
-    const n=hChecked.length;
     spText.textContent='✅ 習慣進捗';
-    spCount.textContent=`${n} / ${TOTAL_HABITS} 完了`;
-    spBar.style.width=(TOTAL_HABITS?n/TOTAL_HABITS*100:0)+'%';
-    spBar.classList.toggle('full',n>=TOTAL_HABITS);
+    spCount.textContent=`${hn} / ${TOTAL_HABITS} 完了`;
+    spBar.style.width=(TOTAL_HABITS?hn/TOTAL_HABITS*100:0)+'%';
+    spBar.classList.toggle('full',hn>=TOTAL_HABITS);
   }
-  // PC用
-  const mn=mChecked.length,mt=MISSION_ITEMS.length;
-  document.getElementById('m-cp-count').textContent=`${mn} / ${mt} 完了`;
-  const mb=document.getElementById('m-cp-bar');
-  mb.style.width=(mt?mn/mt*100:0)+'%';mb.classList.toggle('full',mn>=mt);
-  const hn=hChecked.length;
-  document.getElementById('h-cp-count').textContent=`${hn} / ${TOTAL_HABITS} 完了`;
-  const hb=document.getElementById('h-cp-bar');
-  hb.style.width=(TOTAL_HABITS?hn/TOTAL_HABITS*100:0)+'%';hb.classList.toggle('full',hn>=TOTAL_HABITS);
+
+  // PC用（2本並列）
+  document.getElementById('sp-m-count').textContent=`${mn} / ${mt} 完了`;
+  const smb=document.getElementById('sp-m-bar');
+  smb.style.width=(mt?mn/mt*100:0)+'%';smb.classList.toggle('full',mn>=mt);
+  document.getElementById('sp-h-count').textContent=`${hn} / ${TOTAL_HABITS} 完了`;
+  const shb=document.getElementById('sp-h-bar');
+  shb.style.width=(TOTAL_HABITS?hn/TOTAL_HABITS*100:0)+'%';shb.classList.toggle('full',hn>=TOTAL_HABITS);
+
+  // PC用カード内進捗（念のため更新）
+  const mcp=document.getElementById('m-cp-count');if(mcp)mcp.textContent=`${mn} / ${mt} 完了`;
+  const mb=document.getElementById('m-cp-bar');if(mb){mb.style.width=(mt?mn/mt*100:0)+'%';mb.classList.toggle('full',mn>=mt);}
+  const hcp=document.getElementById('h-cp-count');if(hcp)hcp.textContent=`${hn} / ${TOTAL_HABITS} 完了`;
+  const hb=document.getElementById('h-cp-bar');if(hb){hb.style.width=(TOTAL_HABITS?hn/TOTAL_HABITS*100:0)+'%';hb.classList.toggle('full',hn>=TOTAL_HABITS);}
 }
 
 // ══════════════════════════════
