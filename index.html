@@ -108,18 +108,15 @@ body{
 /* PC/iPad */
 @media(min-width:768px){
   .tab-bar{display:none;}
-  /* sticky-progressはPC/iPadでも表示する（display:noneを削除） */
   .pane-viewport{overflow:visible;}
   .pane-track{
     display:grid!important;
-    grid-template-columns:1fr 1fr;
-    gap:20px;padding:20px 24px 40px;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:16px;padding:20px 20px 40px;
     width:100%!important;transform:none!important;height:auto!important;
   }
   .pane{width:100%!important;overflow-y:visible;padding:0;}
-  /* PC では sticky-progress を2カラムのグリッド上部に表示するため padding調整 */
   .sticky-header{padding:0;}
-  /* カード内進捗はPC不要 */
   .card-progress{display:none!important;}
 }
 
@@ -165,14 +162,13 @@ body{
 #roll-btn:active:not(:disabled){transform:scale(.97);}
 #roll-btn:disabled{opacity:.6;cursor:not-allowed;}
 
-/* チェックボタン：目立つ大型デザイン */
+/* チェックボタン */
 #m-check-btn{
   flex:0 0 auto;border:none;border-radius:50px;
   background:linear-gradient(135deg,#ff9de2,#ff6bb5);
   color:#fff;font-family:'Noto Sans JP',sans-serif;
-  font-size:.92rem;font-weight:900;letter-spacing:.08em;
+  font-size:.78rem;font-weight:900;letter-spacing:.04em;
   cursor:pointer;white-space:nowrap;
-  /* アニメーションで出現 */
   max-width:0;overflow:hidden;
   padding-top:11px;padding-bottom:11px;
   padding-left:0;padding-right:0;
@@ -184,24 +180,77 @@ body{
   box-shadow:0 0 0 rgba(255,107,181,0);
 }
 #m-check-btn.visible{
-  max-width:180px;padding-left:18px;padding-right:18px;
+  max-width:160px;padding-left:14px;padding-right:14px;
   opacity:1;pointer-events:auto;
   box-shadow:0 5px 20px rgba(255,107,181,.45), 0 0 0 3px rgba(255,157,226,.3);
   animation:checkBtnPop .4s cubic-bezier(.34,1.56,.64,1);
 }
 @keyframes checkBtnPop{
-  0%{transform:scale(.6);}
-  60%{transform:scale(1.1);}
-  100%{transform:scale(1);}
+  0%{transform:scale(.6);}60%{transform:scale(1.1);}100%{transform:scale(1);}
 }
-#m-check-btn:hover:not(:disabled){
-  transform:translateY(-3px) scale(1.05);
-  box-shadow:0 8px 24px rgba(255,107,181,.55);
-}
+#m-check-btn:hover:not(:disabled){transform:translateY(-3px) scale(1.04);box-shadow:0 8px 24px rgba(255,107,181,.55);}
 #m-check-btn:active:not(:disabled){transform:scale(.96);}
-#m-check-btn.done{
-  background:linear-gradient(135deg,#b2e8d8,#a0d8ee);
-  box-shadow:none;cursor:default;opacity:.7;
+#m-check-btn.done{background:linear-gradient(135deg,#b2e8d8,#a0d8ee);box-shadow:none;cursor:default;opacity:.7;}
+#m-check-btn.secret-check{
+  background:linear-gradient(135deg,#9b00e0,#e040fb,#c97ef7);
+  box-shadow:0 5px 24px rgba(201,126,247,.6),0 0 0 3px rgba(201,126,247,.25);
+  animation:secretCheckPulse 1.5s ease-in-out infinite,checkBtnPop .4s cubic-bezier(.34,1.56,.64,1);
+  font-size:.72rem;
+}
+@keyframes secretCheckPulse{
+  0%,100%{box-shadow:0 5px 24px rgba(201,126,247,.6),0 0 0 3px rgba(201,126,247,.25),0 0 20px rgba(201,126,247,.3);}
+  50%{box-shadow:0 5px 32px rgba(201,126,247,.8),0 0 0 6px rgba(201,126,247,.2),0 0 40px rgba(201,126,247,.4);}
+}
+
+/* ═══ ゲームタブ ═══ */
+.game-card{padding:16px 14px!important;}
+.game-info-row{
+  display:flex;gap:8px;width:100%;justify-content:space-between;
+}
+.game-stat{
+  flex:1;text-align:center;font-size:.72rem;color:#a080c0;
+  background:#fff5fb;border:1.5px solid var(--pink2);
+  border-radius:10px;padding:5px 4px;
+}
+.game-stat b{display:block;font-size:.9rem;color:var(--purple);margin-top:1px;}
+.game-wrap{
+  width:100%;position:relative;
+  border-radius:16px;overflow:hidden;
+  border:3px solid var(--pink2);
+  background:#1a0030;
+  touch-action:none;
+}
+#game-canvas{display:block;width:100%;height:auto;}
+.game-overlay{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(20,0,40,.82);
+  -webkit-backdrop-filter:blur(4px);
+  backdrop-filter:blur(4px);
+  border-radius:13px;
+  transition:opacity .3s,visibility .3s;
+}
+.game-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+.game-overlay-content{text-align:center;}
+.overlay-title{
+  font-size:1.3rem;font-weight:900;color:#fff;
+  letter-spacing:.1em;margin-bottom:6px;
+  text-shadow:0 0 20px rgba(201,126,247,.8);
+}
+.overlay-sub{font-size:.78rem;color:#c8a0e8;margin-bottom:16px;letter-spacing:.05em;}
+.overlay-btn{
+  padding:11px 30px;border-radius:50px;border:none;
+  background:linear-gradient(135deg,var(--purple),#e040fb);
+  color:#fff;font-family:'Noto Sans JP',sans-serif;
+  font-size:.95rem;font-weight:900;letter-spacing:.14em;
+  cursor:pointer;box-shadow:0 5px 18px rgba(201,126,247,.5);
+  transition:transform .15s,box-shadow .15s;
+}
+.overlay-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(201,126,247,.65);}
+.overlay-btn:active{transform:scale(.97);}
+.game-ctrl-hint{
+  font-size:.66rem;color:#c097d0;letter-spacing:.05em;
+  text-align:center;margin-top:2px;
 }
 
 /* ── 隠しミッション ── */
@@ -486,6 +535,9 @@ body{
       <button class="tab-btn" id="tab-habit" onclick="switchTab(1)">
         <span class="tab-icon">✅</span>習慣チェック
       </button>
+      <button class="tab-btn" id="tab-game" onclick="switchTab(2)">
+        <span class="tab-icon">🎮</span>ゲーム
+      </button>
     </div>
     <!-- スマホ：現在タブの進捗 / PC：両方の進捗を並べて表示 -->
     <div class="sticky-progress" id="sticky-progress">
@@ -612,6 +664,29 @@ body{
           </div>
         </div>
       </div>
+
+      <!-- ゲームペイン -->
+      <div class="pane" id="pane-game">
+        <div class="card game-card">
+          <div class="card-title">🎮 <span>アルカノイド</span></div>
+          <div class="game-info-row">
+            <div class="game-stat">スコア <b id="g-score">0</b></div>
+            <div class="game-stat">ハイスコア <b id="g-hi">0</b></div>
+            <div class="game-stat">残機 <span id="g-lives">❤️❤️❤️</span></div>
+          </div>
+          <div class="game-wrap">
+            <canvas id="game-canvas"></canvas>
+            <div class="game-overlay" id="game-overlay">
+              <div class="game-overlay-content">
+                <div class="overlay-title" id="overlay-title">🎮 アルカノイド</div>
+                <div class="overlay-sub" id="overlay-sub">タップ or スワイプで操作</div>
+                <button class="overlay-btn" id="overlay-btn" onclick="gameStart()">▶ スタート</button>
+              </div>
+            </div>
+          </div>
+          <div class="game-ctrl-hint">スマホ：左右タップ / PC：← → キー or マウス</div>
+        </div>
+      </div><!-- /pane-game -->
 
     </div>
   </div>
@@ -775,12 +850,15 @@ let currentTab=0;
 const track=document.getElementById('pane-track');
 const viewport=document.getElementById('pane-viewport');
 
+const TAB_COUNT=3;
+
 function initTrack(){
   if(window.innerWidth>=768)return;
   const w=viewport.clientWidth;
-  track.style.width=(w*2)+'px';
+  track.style.width=(w*TAB_COUNT)+'px';
   document.getElementById('pane-mission').style.width=w+'px';
   document.getElementById('pane-habit').style.width=w+'px';
+  document.getElementById('pane-game').style.width=w+'px';
   setTrackX(currentTab*w,false);
 }
 function setTrackX(x,animate){
@@ -791,9 +869,12 @@ function switchTab(idx,animate=true){
   if(window.innerWidth>=768)return;
   currentTab=idx;
   setTrackX(idx*viewport.clientWidth,animate);
-  document.getElementById('tab-mission').classList.toggle('active',idx===0);
-  document.getElementById('tab-habit').classList.toggle('active',idx===1);
+  ['mission','habit','game'].forEach((id,i)=>{
+    document.getElementById(`tab-${id}`).classList.toggle('active',i===idx);
+  });
   updateStickyProgress();
+  // ゲームタブに来たらキャンバスサイズ確定
+  if(idx===2) setTimeout(resizeCanvas,50);
 }
 
 let touchStartX=0,touchStartY=0,touchCurX=0,touchLastX=0,touchLastT=0;
@@ -823,7 +904,7 @@ viewport.addEventListener('touchmove',e=>{
   if(dt>0)touchVelX=(t.clientX-touchLastX)/dt*1000;
   touchLastX=t.clientX;touchLastT=now;touchCurX=t.clientX;
   let off=trackStartOff-(t.clientX-touchStartX);
-  const max=(2-1)*viewport.clientWidth;
+  const max=(TAB_COUNT-1)*viewport.clientWidth;
   if(off<0)off*=0.22;else if(off>max)off=max+(off-max)*0.22;
   track.style.transform=`translateX(${-off}px)`;
 },{passive:false});
@@ -833,7 +914,7 @@ viewport.addEventListener('touchend',e=>{
   isDragging=false;
   const dx=touchCurX-touchStartX,w=viewport.clientWidth;
   let next=currentTab;
-  if(touchVelX<-280||dx<-w*0.33)next=Math.min(currentTab+1,1);
+  if(touchVelX<-280||dx<-w*0.33)next=Math.min(currentTab+1,TAB_COUNT-1);
   else if(touchVelX>280||dx>w*0.33)next=Math.max(currentTab-1,0);
   switchTab(next,true);
 },{passive:true});
@@ -841,9 +922,9 @@ viewport.addEventListener('touchend',e=>{
 window.addEventListener('resize',()=>{
   if(window.innerWidth>=768){
     track.style.width='';track.style.transform='';track.style.transition='';
-    document.getElementById('pane-mission').style.width='';
-    document.getElementById('pane-habit').style.width='';
+    ['mission','habit','game'].forEach(id=>{document.getElementById('pane-'+id).style.width='';});
   } else initTrack();
+  resizeCanvas();
 });
 initTrack();
 
@@ -1213,6 +1294,259 @@ function launchConfetti(n=50,extra){
 
 updateStickyProgress();
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&currentTab===0){e.preventDefault();startRoll();}});
+
+// ══════════════════════════════════════════════════
+// アルカノイド
+// ══════════════════════════════════════════════════
+const canvas=document.getElementById('game-canvas');
+const ctx2=canvas.getContext('2d');
+const COLS=8,ROWS=5;
+const LIVES_MAX=3;
+const BRICK_COLORS=['#ff7eb3','#ff9de2','#c97ef7','#74b9ff','#7ee8c8'];
+const BLOCK_SCORE=10;
+
+let gW,gH,bW,bH,padW,padH,ballR;
+let gScore=0,gHi=parseInt(localStorage.getItem('arkanoid_hi')||'0'),gLives=LIVES_MAX;
+let ball={x:0,y:0,vx:0,vy:0};
+let pad={x:0};
+let bricks=[];
+let gState='idle'; // idle / playing / dead / clear
+let gRaf=null;
+let padTarget=0;
+
+// タッチ操作（ゲームペイン内）
+let gameTouchX=null;
+document.getElementById('pane-game').addEventListener('touchstart',e=>{
+  if(gState!=='playing')return;
+  gameTouchX=e.touches[0].clientX;
+},{passive:true});
+document.getElementById('pane-game').addEventListener('touchmove',e=>{
+  if(gState!=='playing'||gameTouchX===null)return;
+  e.stopPropagation();
+  const dx=e.touches[0].clientX-gameTouchX;
+  padTarget=Math.max(padW/2, Math.min(gW-padW/2, pad.x+dx*1.4));
+  gameTouchX=e.touches[0].clientX;
+},{passive:true});
+// ゲームペイン内タップ：左右で操作
+document.getElementById('pane-game').addEventListener('click',e=>{
+  if(gState!=='playing') return;
+  const rect=canvas.getBoundingClientRect();
+  padTarget=Math.max(padW/2,Math.min(gW-padW/2,(e.clientX-rect.left)/rect.width*gW));
+});
+
+// キーボード
+const keys={};
+document.addEventListener('keydown',e=>{
+  keys[e.key]=true;
+  if(['ArrowLeft','ArrowRight'].includes(e.key))e.preventDefault();
+});
+document.addEventListener('keyup',e=>{keys[e.key]=false;});
+
+function resizeCanvas(){
+  const wrap=document.querySelector('.game-wrap');
+  if(!wrap)return;
+  gW=wrap.clientWidth-6;
+  gH=Math.round(gW*1.2);
+  canvas.width=gW;canvas.height=gH;
+  canvas.style.width=gW+'px';canvas.style.height=gH+'px';
+  bW=Math.floor(gW/COLS*0.88);bH=Math.floor(gH*0.04);
+  padW=Math.floor(gW*0.22);padH=Math.floor(gH*0.025);
+  ballR=Math.max(7,Math.floor(gW*0.025));
+  if(gState==='playing') resetBallPad();
+  else drawIdle();
+}
+
+function resetBallPad(){
+  pad.x=gW/2;padTarget=gW/2;
+  ball.x=gW/2;ball.y=gH-padH*2-ballR-10;
+  const spd=gW*0.007;
+  const angle=(Math.random()*60+60)*Math.PI/180;
+  ball.vx=spd*Math.cos(angle)*(Math.random()<.5?1:-1);
+  ball.vy=-spd*Math.sin(angle);
+}
+
+function initBricks(){
+  bricks=[];
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const bx=(gW/COLS)*c+(gW/COLS-bW)/2;
+      const by=gH*0.08+r*(bH+4);
+      bricks.push({x:bx,y:by,w:bW,h:bH,alive:true,color:BRICK_COLORS[r%BRICK_COLORS.length]});
+    }
+  }
+}
+
+function gameStart(){
+  document.getElementById('game-overlay').classList.add('hidden');
+  resizeCanvas();
+  gScore=0;gLives=LIVES_MAX;
+  updateGameUI();
+  initBricks();
+  resetBallPad();
+  gState='playing';
+  if(gRaf)cancelAnimationFrame(gRaf);
+  gRaf=requestAnimationFrame(gameLoop);
+}
+
+function gameLoop(){
+  if(gState!=='playing'){return;}
+  update();draw();
+  gRaf=requestAnimationFrame(gameLoop);
+}
+
+function update(){
+  // パドル移動（キー）
+  const spd=gW*0.018;
+  if(keys['ArrowLeft'])  padTarget=Math.max(padW/2,pad.x-spd);
+  if(keys['ArrowRight']) padTarget=Math.min(gW-padW/2,pad.x+spd);
+  // マウス
+  pad.x+=(padTarget-pad.x)*0.25;
+
+  // ボール移動
+  ball.x+=ball.vx;ball.y+=ball.vy;
+
+  // 壁反射
+  if(ball.x-ballR<0){ball.x=ballR;ball.vx=Math.abs(ball.vx);}
+  if(ball.x+ballR>gW){ball.x=gW-ballR;ball.vx=-Math.abs(ball.vx);}
+  if(ball.y-ballR<0){ball.y=ballR;ball.vy=Math.abs(ball.vy); gSfx('wall');}
+
+  // パドル衝突
+  const py=gH-padH-8;
+  if(ball.vy>0&&
+     ball.y+ballR>=py&&ball.y+ballR<=py+padH+ball.vy&&
+     ball.x>=pad.x-padW/2&&ball.x<=pad.x+padW/2){
+    ball.vy=-Math.abs(ball.vy);
+    const offset=(ball.x-(pad.x))/padW;
+    ball.vx=offset*gW*0.012;
+    gSfx('pad');
+  }
+
+  // ブロック衝突
+  for(const b of bricks){
+    if(!b.alive)continue;
+    if(ball.x+ballR>b.x&&ball.x-ballR<b.x+b.w&&
+       ball.y+ballR>b.y&&ball.y-ballR<b.y+b.h){
+      b.alive=false;
+      gScore+=BLOCK_SCORE;
+      gSfx('brick');
+      // どの面に当たったか
+      const fromLeft =ball.x<b.x;
+      const fromRight=ball.x>b.x+b.w;
+      if(fromLeft||fromRight) ball.vx*=-1; else ball.vy*=-1;
+      updateGameUI();
+      break;
+    }
+  }
+
+  // 全クリア
+  if(bricks.every(b=>!b.alive)){
+    gState='clear';
+    if(gScore>gHi){gHi=gScore;localStorage.setItem('arkanoid_hi',gHi);}
+    showOverlay('🎊 クリア！','スコア: '+gScore, 'もういちど');
+    gSfx('clear');launchConfetti(60);
+    return;
+  }
+
+  // ボール落下
+  if(ball.y-ballR>gH){
+    gLives--;gSfx('miss');updateGameUI();
+    if(gLives<=0){
+      gState='dead';
+      if(gScore>gHi){gHi=gScore;localStorage.setItem('arkanoid_hi',gHi);}
+      showOverlay('😢 ゲームオーバー','スコア: '+gScore,'もういちど');
+    } else {
+      resetBallPad();
+    }
+  }
+}
+
+function draw(){
+  // 背景
+  ctx2.fillStyle='#1a0030';ctx2.fillRect(0,0,gW,gH);
+  // グリッド感
+  ctx2.strokeStyle='rgba(100,0,160,.12)';ctx2.lineWidth=1;
+  for(let x=0;x<gW;x+=30){ctx2.beginPath();ctx2.moveTo(x,0);ctx2.lineTo(x,gH);ctx2.stroke();}
+  for(let y=0;y<gH;y+=30){ctx2.beginPath();ctx2.moveTo(0,y);ctx2.lineTo(gW,y);ctx2.stroke();}
+
+  // ブロック
+  for(const b of bricks){
+    if(!b.alive)continue;
+    ctx2.fillStyle=b.color;
+    ctx2.beginPath();roundRect(ctx2,b.x,b.y,b.w,b.h,4);ctx2.fill();
+    ctx2.fillStyle='rgba(255,255,255,.25)';
+    ctx2.beginPath();roundRect(ctx2,b.x+2,b.y+2,b.w-4,b.h*0.4,2);ctx2.fill();
+  }
+
+  // パドル
+  const py=gH-padH-8;
+  const pg=ctx2.createLinearGradient(pad.x-padW/2,py,pad.x+padW/2,py);
+  pg.addColorStop(0,'#c97ef7');pg.addColorStop(1,'#ff7eb3');
+  ctx2.fillStyle=pg;
+  ctx2.beginPath();roundRect(ctx2,pad.x-padW/2,py,padW,padH,padH/2);ctx2.fill();
+  ctx2.fillStyle='rgba(255,255,255,.35)';
+  ctx2.beginPath();roundRect(ctx2,pad.x-padW/2+4,py+2,padW-8,padH*0.4,padH*0.2);ctx2.fill();
+
+  // ボール
+  const bg=ctx2.createRadialGradient(ball.x-ballR*.3,ball.y-ballR*.3,1,ball.x,ball.y,ballR);
+  bg.addColorStop(0,'#fff');bg.addColorStop(0.5,'#ffb3d1');bg.addColorStop(1,'#c97ef7');
+  ctx2.fillStyle=bg;
+  ctx2.shadowColor='rgba(201,126,247,.8)';ctx2.shadowBlur=10;
+  ctx2.beginPath();ctx2.arc(ball.x,ball.y,ballR,0,Math.PI*2);ctx2.fill();
+  ctx2.shadowBlur=0;
+}
+
+function drawIdle(){
+  if(!gW||!gH){resizeCanvas();return;}
+  ctx2.fillStyle='#1a0030';ctx2.fillRect(0,0,gW,gH);
+  // ダミーブロック表示
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const bx=(gW/COLS)*c+(gW/COLS-bW)/2;
+    const by=gH*0.08+r*(bH+4);
+    ctx2.fillStyle=BRICK_COLORS[r%BRICK_COLORS.length]+'aa';
+    ctx2.beginPath();roundRect(ctx2,bx,by,bW,bH,4);ctx2.fill();
+  }
+}
+
+function roundRect(c,x,y,w,h,r){
+  c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.arcTo(x+w,y,x+w,y+r,r);
+  c.lineTo(x+w,y+h-r);c.arcTo(x+w,y+h,x+w-r,y+h,r);
+  c.lineTo(x+r,y+h);c.arcTo(x,y+h,x,y+h-r,r);
+  c.lineTo(x,y+r);c.arcTo(x,y,x+r,y,r);c.closePath();
+}
+
+function showOverlay(title,sub,btn){
+  document.getElementById('overlay-title').textContent=title;
+  document.getElementById('overlay-sub').textContent=sub;
+  document.getElementById('overlay-btn').textContent='▶ '+btn;
+  document.getElementById('game-overlay').classList.remove('hidden');
+  updateGameUI();
+}
+
+function updateGameUI(){
+  document.getElementById('g-score').textContent=gScore;
+  document.getElementById('g-hi').textContent=gHi;
+  document.getElementById('g-lives').textContent='❤️'.repeat(Math.max(0,gLives));
+}
+
+// ゲーム効果音
+function gSfx(type){
+  const c=getCtx();
+  if(type==='wall'){tone('square',400,.04,c.currentTime,.04);}
+  else if(type==='pad'){tone('sine',600,.08,c.currentTime,.06);tone('sine',800,.05,c.currentTime+.03,.05);}
+  else if(type==='brick'){tone('square',800,.07,c.currentTime,.05);tone('sine',500,.04,c.currentTime+.02,.07);}
+  else if(type==='miss'){[300,250,200].forEach((f,i)=>tone('sine',f,.14,c.currentTime+i*.12,.15));}
+  else if(type==='clear'){[523,659,784,1047,1319].forEach((f,i)=>tone('triangle',f,.2,c.currentTime+i*.1,.2));}
+}
+
+// マウス操作
+canvas.addEventListener('mousemove',e=>{
+  if(gState!=='playing')return;
+  const rect=canvas.getBoundingClientRect();
+  padTarget=Math.max(padW/2,Math.min(gW-padW/2,(e.clientX-rect.left)/rect.width*gW));
+});
+
+// 初期化
+setTimeout(()=>{resizeCanvas();updateGameUI();},100);
 </script>
 </body>
 </html>
