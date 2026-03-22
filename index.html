@@ -16,288 +16,280 @@
 :root{
   --pink:#ff7eb3;--pink2:#ffb3d1;--purple:#c97ef7;
   --yellow:#ffe066;--mint:#7ee8c8;--bg:#fff0f8;
+  --orange:#fdcb6e;--blue:#74b9ff;--navy:#1a6fa8;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 
 body{
   font-family:'Noto Sans JP',sans-serif;
   background:var(--bg);min-height:100vh;
-  overflow-x:hidden;position:relative;
+  overflow-x:hidden;
 }
 .stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
-.star{position:absolute;animation:floatStar linear infinite;opacity:.5;}
+.star{position:absolute;animation:floatStar linear infinite;opacity:.45;}
 @keyframes floatStar{
   0%  {transform:translateY(110vh) rotate(0deg);opacity:0;}
-  10%,90%{opacity:.5;}
+  10%,90%{opacity:.45;}
   100%{transform:translateY(-10vh) rotate(360deg);opacity:0;}
 }
 
 /* ═══ アプリシェル ═══ */
 #app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;}
 
-/* ── タブバー ── */
-.tab-bar{
-  display:flex;position:sticky;top:0;z-index:50;
-  background:#fff;border-bottom:3px solid var(--pink2);
-  box-shadow:0 2px 12px rgba(255,126,179,.15);
+/* ── 固定ヘッダー（タブ＋進捗） ── */
+.sticky-header{
+  position:sticky;top:0;z-index:50;
+  background:#fff;
+  box-shadow:0 2px 14px rgba(255,126,179,.13);
   flex-shrink:0;
 }
+
+/* タブバー */
+.tab-bar{
+  display:flex;
+  border-bottom:2.5px solid var(--pink2);
+}
 .tab-btn{
-  flex:1;padding:13px 8px 11px;border:none;background:transparent;
-  font-family:'Noto Sans JP',sans-serif;font-size:.82rem;font-weight:700;
+  flex:1;padding:11px 8px 9px;border:none;background:transparent;
+  font-family:'Noto Sans JP',sans-serif;font-size:.8rem;font-weight:700;
   letter-spacing:.05em;color:#c097d0;cursor:pointer;
-  border-bottom:3px solid transparent;margin-bottom:-3px;
+  border-bottom:3px solid transparent;margin-bottom:-2.5px;
   transition:color .2s,border-color .2s;
   display:flex;flex-direction:column;align-items:center;gap:2px;
 }
-.tab-btn .tab-icon{font-size:1.2rem;}
+.tab-btn .tab-icon{font-size:1.15rem;}
 .tab-btn.active{color:var(--pink);border-bottom-color:var(--pink);}
+
+/* スタック進捗バー */
+.sticky-progress{
+  padding:7px 16px 8px;
+  background:#fff;
+}
+.sp-label{
+  display:flex;justify-content:space-between;
+  font-size:.68rem;font-weight:700;margin-bottom:4px;
+}
+.sp-label .sp-text{color:var(--purple);}
+.sp-label .sp-count{color:var(--pink);}
+.sp-bar-bg{height:9px;border-radius:99px;background:#f0e0f8;overflow:hidden;}
+.sp-bar-fill{
+  height:100%;border-radius:99px;
+  background:linear-gradient(90deg,var(--pink),var(--purple));
+  transition:width .5s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 1px 6px rgba(255,126,179,.2);
+}
+.sp-bar-fill.full{background:linear-gradient(90deg,var(--mint),#38d39f);box-shadow:0 1px 6px rgba(126,232,200,.3);}
 
 /* ── スワイプ領域 ── */
 .pane-viewport{
   flex:1;overflow:hidden;position:relative;
-  /* ネイティブスクロールと競合しないように */
   touch-action:pan-y;
 }
 .pane-track{
-  display:flex;
-  /* JS で width と transform を管理 */
-  height:100%;
-  will-change:transform;
-  /* transition は JS で動的に付け外し */
+  display:flex;height:100%;will-change:transform;
 }
 .pane{
-  flex-shrink:0;
-  overflow-y:auto;
+  flex-shrink:0;overflow-y:auto;
   -webkit-overflow-scrolling:touch;
-  padding:18px 0 60px;
+  padding:16px 0 60px;
   display:flex;flex-direction:column;align-items:center;
 }
 
-/* ═══ PC / iPad ═══ */
+/* PC/iPad */
 @media(min-width:768px){
   .tab-bar{display:none;}
+  .sticky-progress{display:none;}/* PC は各カード内に進捗表示 */
   .pane-viewport{overflow:visible;}
   .pane-track{
     display:grid!important;
     grid-template-columns:1fr 1fr;
     gap:20px;padding:24px 24px 40px;
-    width:100%!important;
-    transform:none!important;
-    height:auto!important;
+    width:100%!important;transform:none!important;height:auto!important;
   }
   .pane{width:100%!important;overflow-y:visible;padding:0;}
+  .card-progress{display:flex!important;}/* PC では各カードの進捗を表示 */
 }
 
 /* ═══ カード ═══ */
 .card{
-  background:#fff;border-radius:32px;
-  padding:20px 18px;
+  background:#fff;border-radius:28px;
+  padding:18px 16px;
   width:min(440px,92vw);
-  box-shadow:0 6px 30px rgba(255,126,179,.14);
+  box-shadow:0 5px 26px rgba(255,126,179,.13);
   border:3px solid var(--pink2);
-  display:flex;flex-direction:column;align-items:center;gap:13px;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
 }
 @media(min-width:768px){.card{width:100%;}}
 
-.card-title{font-size:1.05rem;font-weight:900;color:var(--purple);letter-spacing:.1em;}
+.card-title{font-size:1.02rem;font-weight:900;color:var(--purple);letter-spacing:.1em;}
 .card-title span{color:var(--pink);}
 
-/* ─── 進捗 ─── */
-.progress-wrap{width:100%;}
-.progress-label{
-  display:flex;justify-content:space-between;align-items:center;
-  font-size:.76rem;font-weight:700;margin-bottom:5px;
-}
-.prog-text{color:var(--purple);}
-.prog-count{color:var(--pink);font-size:.88rem;}
-.progress-bar-bg{width:100%;height:11px;border-radius:99px;background:#f0e0f8;overflow:hidden;}
-.progress-bar-fill{
-  height:100%;border-radius:99px;
-  background:linear-gradient(90deg,var(--pink),var(--purple));
-  transition:width .5s cubic-bezier(.4,0,.2,1);
-  box-shadow:0 2px 8px rgba(255,126,179,.25);
-}
-.progress-bar-fill.full{background:linear-gradient(90deg,var(--mint),#38d39f);box-shadow:0 2px 8px rgba(126,232,200,.35);}
+/* PC用カード内進捗（スマホでは sticky-progress を使うので非表示） */
+.card-progress{display:none;width:100%;flex-direction:column;gap:4px;}
+.cp-label{display:flex;justify-content:space-between;font-size:.7rem;font-weight:700;}
+.cp-text{color:var(--purple);}.cp-count{color:var(--pink);}
+.cp-bar-bg{height:9px;border-radius:99px;background:#f0e0f8;overflow:hidden;}
+.cp-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--pink),var(--purple));transition:width .5s cubic-bezier(.4,0,.2,1);}
+.cp-bar-fill.full{background:linear-gradient(90deg,var(--mint),#38d39f);}
 
 /* ═══ ドラム ═══ */
 .drum-wrap{width:100%;display:flex;flex-direction:column;align-items:center;}
-.pointer{
-  width:0;height:0;
-  border-left:13px solid transparent;border-right:13px solid transparent;
-  border-top:21px solid var(--purple);
-  filter:drop-shadow(0 2px 4px rgba(201,126,247,.5));
-  margin-bottom:-3px;z-index:3;position:relative;
-}
-.drum-window{
-  width:100%;height:96px;border-radius:20px;
-  border:4px solid var(--pink);
-  background:linear-gradient(135deg,#fff5fb,#fce4f6);
-  overflow:hidden;position:relative;
-  box-shadow:0 4px 18px rgba(255,126,179,.14),inset 0 2px 6px rgba(255,255,255,.8);
-}
-.drum-window::before,.drum-window::after{
-  content:'';position:absolute;left:0;right:0;height:24px;z-index:2;pointer-events:none;
-}
+.pointer{width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:20px solid var(--purple);filter:drop-shadow(0 2px 4px rgba(201,126,247,.45));margin-bottom:-3px;z-index:3;position:relative;}
+.drum-window{width:100%;height:92px;border-radius:18px;border:3.5px solid var(--pink);background:linear-gradient(135deg,#fff5fb,#fce4f6);overflow:hidden;position:relative;box-shadow:0 3px 16px rgba(255,126,179,.13),inset 0 2px 5px rgba(255,255,255,.8);}
+.drum-window::before,.drum-window::after{content:'';position:absolute;left:0;right:0;height:22px;z-index:2;pointer-events:none;}
 .drum-window::before{top:0;background:linear-gradient(to bottom,rgba(255,245,251,.95),transparent);}
 .drum-window::after{bottom:0;background:linear-gradient(to top,rgba(252,228,246,.95),transparent);}
-.highlight-bar{
-  position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:50px;
-  background:linear-gradient(90deg,rgba(255,224,102,.3),rgba(255,126,179,.14),rgba(255,224,102,.3));
-  border-top:2px dashed var(--yellow);border-bottom:2px dashed var(--yellow);
-  z-index:1;pointer-events:none;
-}
+.highlight-bar{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:48px;background:linear-gradient(90deg,rgba(255,224,102,.3),rgba(255,126,179,.13),rgba(255,224,102,.3));border-top:2px dashed var(--yellow);border-bottom:2px dashed var(--yellow);z-index:1;pointer-events:none;}
 .drum-strip{display:flex;flex-direction:column;align-items:center;position:absolute;left:0;right:0;top:0;will-change:transform;}
-.drum-item{height:96px;width:100%;display:flex;align-items:center;justify-content:center;gap:10px;flex-shrink:0;padding:0 14px;}
-.drum-icon{font-size:1.85rem;line-height:1;flex-shrink:0;}
-.drum-label{font-size:clamp(.9rem,3.6vw,1.55rem);font-weight:900;color:#e060a0;letter-spacing:.07em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.drum-item{height:92px;width:100%;display:flex;align-items:center;justify-content:center;gap:10px;flex-shrink:0;padding:0 13px;}
+.drum-icon{font-size:1.75rem;line-height:1;flex-shrink:0;}
+.drum-label{font-size:clamp(.88rem,3.5vw,1.5rem);font-weight:900;color:#e060a0;letter-spacing:.07em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 /* ── ボタン行 ── */
-.btn-row{width:100%;display:flex;gap:9px;align-items:stretch;}
-#roll-btn{
-  flex:1;padding:12px 10px;border-radius:50px;border:none;
-  background:linear-gradient(135deg,var(--pink),var(--purple));
-  color:#fff;font-family:'Noto Sans JP',sans-serif;
-  font-size:.95rem;font-weight:900;letter-spacing:.13em;
-  cursor:pointer;box-shadow:0 5px 16px rgba(255,126,179,.38);
-  transition:transform .15s,box-shadow .15s;
-}
+.btn-row{width:100%;display:flex;gap:8px;align-items:stretch;}
+#roll-btn{flex:1;padding:11px 9px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;font-family:'Noto Sans JP',sans-serif;font-size:.9rem;font-weight:900;letter-spacing:.12em;cursor:pointer;box-shadow:0 4px 14px rgba(255,126,179,.35);transition:transform .15s,box-shadow .15s;}
 #roll-btn:hover:not(:disabled){transform:translateY(-2px);}
 #roll-btn:active:not(:disabled){transform:scale(.97);}
 #roll-btn:disabled{opacity:.6;cursor:not-allowed;}
-#m-check-btn{
-  flex:0 0 auto;padding:12px 15px;border-radius:50px;border:none;
-  background:linear-gradient(135deg,var(--mint),#5ec8f0);
-  color:#fff;font-family:'Noto Sans JP',sans-serif;
-  font-size:.88rem;font-weight:900;letter-spacing:.07em;
-  cursor:pointer;box-shadow:0 4px 13px rgba(94,200,240,.32);
-  transition:transform .15s,max-width .28s,opacity .28s,padding .28s;
-  white-space:nowrap;max-width:0;overflow:hidden;
-  padding-left:0;padding-right:0;opacity:0;pointer-events:none;
-}
-#m-check-btn.visible{max-width:160px;padding-left:15px;padding-right:15px;opacity:1;pointer-events:auto;}
+#m-check-btn{flex:0 0 auto;padding:11px 14px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--mint),#5ec8f0);color:#fff;font-family:'Noto Sans JP',sans-serif;font-size:.84rem;font-weight:900;letter-spacing:.06em;cursor:pointer;box-shadow:0 3px 12px rgba(94,200,240,.3);transition:transform .15s,max-width .28s,opacity .28s,padding .28s;white-space:nowrap;max-width:0;overflow:hidden;padding-left:0;padding-right:0;opacity:0;pointer-events:none;}
+#m-check-btn.visible{max-width:150px;padding-left:14px;padding-right:14px;opacity:1;pointer-events:auto;}
 #m-check-btn:hover{transform:translateY(-2px);}
-#m-check-btn:active{transform:scale(.97);}
 #m-check-btn.done{background:linear-gradient(135deg,#b2e8d8,#a0d8ee);box-shadow:none;cursor:default;opacity:.7;}
 
 /* ── ミッションチップ ── */
-.mission-list-title{font-size:.68rem;font-weight:700;color:#c097d0;letter-spacing:.1em;margin-bottom:6px;text-align:center;}
-.mission-chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(102px,1fr));gap:6px;width:100%;}
-.m-chip{
-  display:flex;align-items:center;gap:4px;
-  padding:6px 9px;border-radius:13px;
-  font-size:.74rem;font-weight:700;letter-spacing:.02em;
-  border:2px solid var(--pink2);color:#d070a8;background:#fff5fb;
-  transition:all .2s;cursor:pointer;user-select:none;
-  -webkit-tap-highlight-color:transparent;
-}
+.mission-list-title{font-size:.66rem;font-weight:700;color:#c097d0;letter-spacing:.08em;margin-bottom:5px;text-align:center;}
+.mission-chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:5px;width:100%;}
+.m-chip{display:flex;align-items:center;gap:4px;padding:5px 8px;border-radius:11px;font-size:.72rem;font-weight:700;letter-spacing:.02em;border:2px solid var(--pink2);color:#d070a8;background:#fff5fb;transition:all .18s;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;}
 .m-chip:hover{border-color:var(--pink);background:#ffe8f5;transform:scale(1.04);}
 .m-chip:active{transform:scale(.96);}
 .m-chip.checked{background:linear-gradient(135deg,#e8faf4,#d4f4ea);border-color:var(--mint);color:#2a9e7a;text-decoration:line-through;opacity:.72;}
-.m-chip-icon{font-size:.88rem;flex-shrink:0;}
+.m-chip-icon{font-size:.85rem;flex-shrink:0;}
 
-/* ── 全完了バナー ── */
-.all-done-banner{
-  display:none;width:100%;border-radius:14px;padding:10px;
-  background:linear-gradient(135deg,#fff8e1,#fff3e0);
-  border:2.5px solid var(--yellow);
-  text-align:center;font-size:.85rem;font-weight:900;color:#e0900a;
-}
+/* 全完了バナー */
+.all-done-banner{display:none;width:100%;border-radius:12px;padding:9px;background:linear-gradient(135deg,#fff8e1,#fff3e0);border:2.5px solid var(--yellow);text-align:center;font-size:.82rem;font-weight:900;color:#e0900a;}
 .all-done-banner.visible{display:block;}
 
-/* ── 下部行 ── */
 .bottom-row{display:flex;align-items:center;justify-content:space-between;width:100%;}
-.count-row{font-size:.66rem;color:#c097d0;letter-spacing:.05em;}
+.count-row{font-size:.64rem;color:#c097d0;letter-spacing:.04em;}
 .count-row b{color:var(--pink);}
-.reset-btn{
-  font-size:.64rem;color:#c097d0;background:none;
-  border:1px solid #e8d0f0;border-radius:9px;padding:3px 9px;
-  cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all .2s;
-}
+.reset-btn{font-size:.62rem;color:#c097d0;background:none;border:1px solid #e8d0f0;border-radius:8px;padding:3px 8px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all .2s;}
 .reset-btn:hover{background:#fff0fb;color:var(--purple);border-color:var(--purple);}
 
-/* ═══ 習慣タブ ═══ */
-.habit-section{width:100%;margin-bottom:4px;}
+/* ═══ 習慣 ═══ */
+
+/* ─── アコーディオンセクション ─── */
+.habit-section{width:100%;margin-bottom:5px;}
+
 .section-header{
   display:flex;align-items:center;justify-content:space-between;
-  padding:7px 12px;border-radius:13px;
-  font-size:.8rem;font-weight:900;letter-spacing:.07em;margin-bottom:7px;
-}
-.section-header.morning{background:linear-gradient(135deg,#fff3cd,#ffe8a0);color:#b8860b;}
-.section-header.school{background:linear-gradient(135deg,#d4eeff,#b3daff);color:#1a6fa8;}
-.section-header-left{display:flex;align-items:center;gap:6px;}
-.section-icon{font-size:1rem;}
-
-/* 一括チェックボタン */
-.bulk-btn{
-  font-size:.68rem;font-weight:700;
-  padding:4px 10px;border-radius:10px;border:none;cursor:pointer;
-  font-family:'Noto Sans JP',sans-serif;transition:all .2s;
+  padding:8px 12px;border-radius:13px;
+  font-size:.78rem;font-weight:900;letter-spacing:.06em;
+  cursor:pointer;user-select:none;
   -webkit-tap-highlight-color:transparent;
+  transition:opacity .15s;
 }
-.bulk-btn.check-all{
-  background:linear-gradient(135deg,var(--mint),#5ec8f0);color:#fff;
-  box-shadow:0 2px 8px rgba(94,200,240,.3);
-}
-.bulk-btn.check-all:hover{transform:scale(1.05);}
-.bulk-btn.uncheck-all{
-  background:#f0e0f8;color:var(--purple);
-}
-.bulk-btn.uncheck-all:hover{background:#e8d0f0;}
+.section-header:active{opacity:.75;}
+.section-header.morning{background:linear-gradient(135deg,#fff3cd,#ffe8a0);color:#b8860b;}
+.section-header.school {background:linear-gradient(135deg,#d4eeff,#b3daff);color:var(--navy);}
+.section-header.after  {background:linear-gradient(135deg,#ffe0f0,#ffc8e8);color:#c04080;}
 
-.habit-list{display:flex;flex-direction:column;gap:5px;width:100%;}
+.section-header-left{display:flex;align-items:center;gap:7px;}
+.section-icon{font-size:.95rem;}
+
+.section-header-right{display:flex;align-items:center;gap:7px;}
+
+/* 一括ボタン */
+.bulk-btn{
+  font-size:.65rem;font-weight:700;padding:3px 9px;border-radius:9px;
+  border:none;cursor:pointer;font-family:'Noto Sans JP',sans-serif;
+  transition:all .18s;-webkit-tap-highlight-color:transparent;
+}
+.bulk-btn.check-all{background:rgba(255,255,255,.7);color:inherit;}
+.bulk-btn.check-all:hover{background:rgba(255,255,255,.9);}
+.bulk-btn.uncheck-all{background:rgba(0,0,0,.08);color:inherit;}
+.bulk-btn.uncheck-all:hover{background:rgba(0,0,0,.14);}
+
+/* 開閉矢印 */
+.chevron{
+  font-size:.75rem;transition:transform .28s cubic-bezier(.4,0,.2,1);
+  display:inline-block;opacity:.7;
+}
+.section-header.open .chevron{transform:rotate(180deg);}
+
+/* アコーディオン本体 */
+.accordion-body{
+  overflow:hidden;
+  max-height:0;
+  transition:max-height .35s cubic-bezier(.4,0,.2,1), opacity .28s ease;
+  opacity:0;
+}
+.accordion-body.open{
+  max-height:2000px;/* 十分大きい値 */
+  opacity:1;
+}
+
+/* サブセクション */
+.sub-section{margin:6px 0 2px;}
+.sub-section-title{
+  font-size:.68rem;font-weight:900;color:#999;
+  letter-spacing:.08em;padding:0 2px 4px;
+  border-bottom:1px dashed #e8d0f0;
+  margin-bottom:5px;
+}
+
+.habit-list{display:flex;flex-direction:column;gap:4px;width:100%;padding-top:6px;}
 .habit-item{
-  display:flex;align-items:center;gap:9px;
-  padding:9px 13px;border-radius:13px;
+  display:flex;align-items:center;gap:8px;
+  padding:8px 11px;border-radius:11px;
   background:#fff;border:2px solid #f0e0f8;
   cursor:pointer;user-select:none;
   -webkit-tap-highlight-color:transparent;
-  transition:background .18s,border-color .18s,transform .12s;
+  transition:background .16s,border-color .16s,transform .1s;
 }
-.habit-item:hover{border-color:var(--pink2);background:#fff5fb;transform:translateX(3px);}
+.habit-item:hover{border-color:var(--pink2);background:#fff5fb;transform:translateX(2px);}
 .habit-item:active{transform:scale(.98);}
 .habit-item.checked{background:linear-gradient(135deg,#f0faf6,#e4f8f0);border-color:var(--mint);}
-.habit-check-box{
-  width:24px;height:24px;flex-shrink:0;border-radius:7px;
-  border:2.5px solid var(--pink2);
-  display:flex;align-items:center;justify-content:center;
-  transition:all .18s;background:#fff;
-}
+.habit-check-box{width:22px;height:22px;flex-shrink:0;border-radius:6px;border:2.5px solid var(--pink2);display:flex;align-items:center;justify-content:center;transition:all .16s;background:#fff;}
 .habit-item.checked .habit-check-box{background:linear-gradient(135deg,var(--mint),#38d39f);border-color:var(--mint);}
-.habit-check-mark{font-size:.92rem;color:#fff;opacity:0;transform:scale(.4);transition:all .2s cubic-bezier(.34,1.56,.64,1);}
+.habit-check-mark{font-size:.82rem;color:#fff;opacity:0;transform:scale(.3);transition:all .2s cubic-bezier(.34,1.56,.64,1);}
 .habit-item.checked .habit-check-mark{opacity:1;transform:scale(1);}
-.habit-label{flex:1;font-size:.82rem;font-weight:700;color:#555;letter-spacing:.02em;}
+.habit-label{flex:1;font-size:.8rem;font-weight:700;color:#555;letter-spacing:.02em;}
 .habit-item.checked .habit-label{color:#2a9e7a;text-decoration:line-through;opacity:.8;}
-.habit-note{font-size:.65rem;color:#bbb;white-space:nowrap;flex-shrink:0;}
+.habit-note{font-size:.62rem;color:#ccc;white-space:nowrap;flex-shrink:0;}
 .habit-item.checked .habit-note{color:var(--mint);}
-.habit-bottom{display:flex;align-items:center;justify-content:flex-end;width:100%;margin-top:2px;}
+
+.habit-bottom{display:flex;align-items:center;justify-content:flex-end;width:100%;margin-top:3px;}
 
 /* ═══ confetti ═══ */
-.confetti-piece{
-  position:fixed;border-radius:2px;pointer-events:none;z-index:200;
-  animation:confettiFall 1.6s ease-in forwards;
-}
-@keyframes confettiFall{
-  0%  {transform:translateY(-20px) rotate(0deg);opacity:1;}
-  100%{transform:translateY(110vh) rotate(720deg);opacity:0;}
-}
+.confetti-piece{position:fixed;border-radius:2px;pointer-events:none;z-index:200;animation:confettiFall 1.6s ease-in forwards;}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(110vh) rotate(720deg);opacity:0;}}
 </style>
 </head>
 <body>
 <div class="stars" id="stars"></div>
 <div id="app">
 
-  <!-- タブバー -->
-  <div class="tab-bar">
-    <button class="tab-btn active" id="tab-mission" onclick="switchTab(0)">
-      <span class="tab-icon">🎲</span>ミッション
-    </button>
-    <button class="tab-btn" id="tab-habit" onclick="switchTab(1)">
-      <span class="tab-icon">✅</span>習慣チェック
-    </button>
+  <!-- ── 固定ヘッダー（タブ＋進捗） ── -->
+  <div class="sticky-header">
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-mission" onclick="switchTab(0)">
+        <span class="tab-icon">🎲</span>ミッション
+      </button>
+      <button class="tab-btn" id="tab-habit" onclick="switchTab(1)">
+        <span class="tab-icon">✅</span>習慣チェック
+      </button>
+    </div>
+    <!-- スマホ用スタック進捗 -->
+    <div class="sticky-progress" id="sticky-progress">
+      <div class="sp-label">
+        <span class="sp-text" id="sp-text">📋 ミッション進捗</span>
+        <span class="sp-count" id="sp-count">0 / 11 完了</span>
+      </div>
+      <div class="sp-bar-bg"><div class="sp-bar-fill" id="sp-bar" style="width:0%"></div></div>
+    </div>
   </div>
 
-  <!-- スワイプ領域 -->
+  <!-- ── スワイプ領域 ── -->
   <div class="pane-viewport" id="pane-viewport">
     <div class="pane-track" id="pane-track">
 
@@ -305,12 +297,10 @@ body{
       <div class="pane" id="pane-mission">
         <div class="card">
           <div class="card-title">✨ きょうの <span>ミッション</span> ✨</div>
-          <div class="progress-wrap">
-            <div class="progress-label">
-              <span class="prog-text">📋 ミッション進捗</span>
-              <span class="prog-count" id="m-prog-count">0 / 11 完了</span>
-            </div>
-            <div class="progress-bar-bg"><div class="progress-bar-fill" id="m-prog-bar" style="width:0%"></div></div>
+          <!-- PC用進捗 -->
+          <div class="card-progress" id="m-card-progress">
+            <div class="cp-label"><span class="cp-text">📋 ミッション進捗</span><span class="cp-count" id="m-cp-count">0 / 11 完了</span></div>
+            <div class="cp-bar-bg"><div class="cp-bar-fill" id="m-cp-bar" style="width:0%"></div></div>
           </div>
           <div class="drum-wrap">
             <div class="pointer"></div>
@@ -339,31 +329,53 @@ body{
       <div class="pane" id="pane-habit">
         <div class="card">
           <div class="card-title">🌟 きょうの <span>習慣チェック</span></div>
-          <div class="progress-wrap">
-            <div class="progress-label">
-              <span class="prog-text">✅ 習慣進捗</span>
-              <span class="prog-count" id="h-prog-count">0 / 21 完了</span>
-            </div>
-            <div class="progress-bar-bg"><div class="progress-bar-fill" id="h-prog-bar" style="width:0%"></div></div>
+          <!-- PC用進捗 -->
+          <div class="card-progress" id="h-card-progress">
+            <div class="cp-label"><span class="cp-text">✅ 習慣進捗</span><span class="cp-count" id="h-cp-count">0 / 0 完了</span></div>
+            <div class="cp-bar-bg"><div class="cp-bar-fill" id="h-cp-bar" style="width:0%"></div></div>
           </div>
           <div class="all-done-banner" id="h-all-done">🌈 けさのルーティン ぜんぶ できたよ！えらい！🌈</div>
 
           <!-- 朝 -->
-          <div class="habit-section">
-            <div class="section-header morning">
-              <div class="section-header-left"><span class="section-icon">🌅</span>朝のルーティン</div>
-              <button class="bulk-btn check-all" id="bulk-morning" onclick="bulkCheck('morning')">まとめてチェック</button>
+          <div class="habit-section" id="sec-morning">
+            <div class="section-header morning open" onclick="toggleSection('morning')">
+              <div class="section-header-left"><span class="section-icon">🌅</span>朝のルーティン<span id="sec-cnt-morning" style="font-size:.7rem;margin-left:4px;opacity:.8"></span></div>
+              <div class="section-header-right">
+                <button class="bulk-btn check-all" id="bulk-morning" onclick.stop="bulkCheck('morning',event)">まとめてチェック</button>
+                <span class="chevron">▼</span>
+              </div>
             </div>
-            <div class="habit-list" id="habit-list-morning"></div>
+            <div class="accordion-body open" id="body-morning">
+              <div class="habit-list" id="habit-list-morning"></div>
+            </div>
           </div>
 
           <!-- 学校準備 -->
-          <div class="habit-section">
-            <div class="section-header school">
-              <div class="section-header-left"><span class="section-icon">🎒</span>学校じゅんび</div>
-              <button class="bulk-btn check-all" id="bulk-school" onclick="bulkCheck('school')">まとめてチェック</button>
+          <div class="habit-section" id="sec-school">
+            <div class="section-header school open" onclick="toggleSection('school')">
+              <div class="section-header-left"><span class="section-icon">🎒</span>学校じゅんび<span id="sec-cnt-school" style="font-size:.7rem;margin-left:4px;opacity:.8"></span></div>
+              <div class="section-header-right">
+                <button class="bulk-btn check-all" id="bulk-school" onclick.stop="bulkCheck('school',event)">まとめてチェック</button>
+                <span class="chevron">▼</span>
+              </div>
             </div>
-            <div class="habit-list" id="habit-list-school"></div>
+            <div class="accordion-body open" id="body-school">
+              <div class="habit-list" id="habit-list-school"></div>
+            </div>
+          </div>
+
+          <!-- 下校後 -->
+          <div class="habit-section" id="sec-after">
+            <div class="section-header after open" onclick="toggleSection('after')">
+              <div class="section-header-left"><span class="section-icon">🌇</span>下校後にやること<span id="sec-cnt-after" style="font-size:.7rem;margin-left:4px;opacity:.8"></span></div>
+              <div class="section-header-right">
+                <button class="bulk-btn check-all" id="bulk-after" onclick.stop="bulkCheck('after',event)">まとめてチェック</button>
+                <span class="chevron">▼</span>
+              </div>
+            </div>
+            <div class="accordion-body open" id="body-after">
+              <div id="habit-list-after-wrap"></div>
+            </div>
           </div>
 
           <div class="habit-bottom">
@@ -374,52 +386,43 @@ body{
 
     </div>
   </div>
-</div><!-- /app -->
+</div>
 
 <script>
-// ══════════════════════════════════════
+// ══════════════════════════════
 // 効果音
-// ══════════════════════════════════════
+// ══════════════════════════════
 let audioCtx=null;
 function getCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
-function tone(type,freq,vol,start,dur){
-  const ctx=getCtx(),o=ctx.createOscillator(),g=ctx.createGain();
-  o.connect(g);g.connect(ctx.destination);o.type=type;o.frequency.value=freq;
-  g.gain.setValueAtTime(0,start);g.gain.linearRampToValueAtTime(vol,start+.02);
-  g.gain.exponentialRampToValueAtTime(.001,start+dur);
-  o.start(start);o.stop(start+dur+.01);
-}
-function playStart(){const c=getCtx();[440,550,660].forEach((f,i)=>tone('triangle',f,.2,c.currentTime+i*.07,.15));}
-function playRollTick(spd){const c=getCtx(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='square';o.frequency.value=500+spd*800;g.gain.setValueAtTime(.06,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.04);o.start(c.currentTime);o.stop(c.currentTime+.04);}
-function playLand(){const c=getCtx(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(200,c.currentTime);o.frequency.exponentialRampToValueAtTime(60,c.currentTime+.3);g.gain.setValueAtTime(.5,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.35);o.start(c.currentTime);o.stop(c.currentTime+.4);}
-function playFanfare(){const c=getCtx();[{f:523,t:0},{f:659,t:.12},{f:784,t:.24},{f:1047,t:.36}].forEach(({f,t})=>tone('triangle',f,.22,c.currentTime+t,.2));}
-function playHabitCheck(){const c=getCtx();tone('sine',660,.16,c.currentTime,.1);tone('sine',880,.12,c.currentTime+.06,.1);}
-function playHabitUncheck(){tone('sine',440,.08,getCtx().currentTime,.1);}
-function playMCheck(){const c=getCtx();[{f:880,t:0},{f:1100,t:.08},{f:1320,t:.16}].forEach(({f,t})=>tone('sine',f,.2,c.currentTime+t,.2));}
-function playAllClear(){const c=getCtx();[{f:523,t:0},{f:659,t:.13},{f:784,t:.26},{f:1047,t:.4},{f:784,t:.54},{f:1047,t:.68}].forEach(({f,t})=>tone('triangle',f,.26,c.currentTime+t,.22));[{f:330,t:.4},{f:440,t:.54},{f:523,t:.68}].forEach(({f,t})=>tone('sine',f,.1,c.currentTime+t,.3));}
-function playHabitAllClear(){const c=getCtx();[523,659,784,880,1047].forEach((f,i)=>tone('triangle',f,.23,c.currentTime+i*.1,.22));}
-function playBulk(n){
-  // 連続チェック音
-  const c=getCtx();
-  for(let i=0;i<Math.min(n,6);i++){
-    const f=660+i*80;tone('sine',f,.13,c.currentTime+i*.07,.12);
-  }
-}
+function tone(type,freq,vol,start,dur){const c=getCtx(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(0,start);g.gain.linearRampToValueAtTime(vol,start+.02);g.gain.exponentialRampToValueAtTime(.001,start+dur);o.start(start);o.stop(start+dur+.01);}
+function playStart(){const c=getCtx();[440,550,660].forEach((f,i)=>tone('triangle',f,.18,c.currentTime+i*.07,.14));}
+function playRollTick(s){const c=getCtx(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='square';o.frequency.value=500+s*800;g.gain.setValueAtTime(.055,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.04);o.start(c.currentTime);o.stop(c.currentTime+.04);}
+function playLand(){const c=getCtx(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(200,c.currentTime);o.frequency.exponentialRampToValueAtTime(60,c.currentTime+.3);g.gain.setValueAtTime(.45,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.35);o.start(c.currentTime);o.stop(c.currentTime+.4);}
+function playFanfare(){const c=getCtx();[{f:523,t:0},{f:659,t:.12},{f:784,t:.24},{f:1047,t:.36}].forEach(({f,t})=>tone('triangle',f,.2,c.currentTime+t,.2));}
+function playHabitCheck(){const c=getCtx();tone('sine',660,.15,c.currentTime,.1);tone('sine',880,.11,c.currentTime+.06,.1);}
+function playHabitUncheck(){tone('sine',440,.08,getCtx().currentTime,.09);}
+function playMCheck(){const c=getCtx();[880,1100,1320].forEach((f,i)=>tone('sine',f,.18,c.currentTime+i*.08,.2));}
+function playAllClear(){const c=getCtx();[{f:523,t:0},{f:659,t:.13},{f:784,t:.26},{f:1047,t:.4},{f:784,t:.54},{f:1047,t:.68}].forEach(({f,t})=>tone('triangle',f,.24,c.currentTime+t,.22));[{f:330,t:.4},{f:440,t:.54},{f:523,t:.68}].forEach(({f,t})=>tone('sine',f,.09,c.currentTime+t,.3));}
+function playHabitAllClear(){const c=getCtx();[523,659,784,880,1047].forEach((f,i)=>tone('triangle',f,.22,c.currentTime+i*.1,.22));}
+function playBulk(n){const c=getCtx();for(let i=0;i<Math.min(n,6);i++)tone('sine',660+i*80,.12,c.currentTime+i*.07,.11);}
 
-// ══════════════════════════════════════
+// ══════════════════════════════
 // データ
-// ══════════════════════════════════════
+// ══════════════════════════════
 const MISSION_ITEMS=[
   {label:'ピアノ',icon:'🎹'},{label:'日記',icon:'📔'},{label:'勉強',icon:'📚'},
   {label:'修行',icon:'🥋'},{label:'新体操',icon:'🎀'},{label:'チャレンジタッチ',icon:'📱'},
   {label:'ストレッチ',icon:'🤸'},{label:'Y字バランス10秒',icon:'⭐'},
   {label:'タッチタイピング',icon:'⌨️'},{label:'ゲーム',icon:'🎮'},{label:'読書',icon:'📖'},
 ];
+
+// 習慣：サブセクション対応の構造
+// type:'sub' = サブセクション見出し
 const HABIT_SECTIONS=[
   {id:'morning',label:'朝のルーティン',cls:'morning',items:[
-    {id:'drug1', label:'薬を飲む：シダキュア',        note:'花粉症',icon:'💊'},
-    {id:'drug2', label:'薬を飲む：オロパタジン',      note:'花粉症',icon:'💊'},
-    {id:'drug3', label:'薬を飲む：フェキソフェナジン',note:'花粉症',icon:'💊'},
+    {id:'drug1', label:'薬：シダキュア',              note:'花粉症',icon:'💊'},
+    {id:'drug2', label:'薬：オロパタジン',            note:'花粉症',icon:'💊'},
+    {id:'drug3', label:'薬：フェキソフェナジン',      note:'花粉症',icon:'💊'},
     {id:'toilet',label:'トイレ',                      note:'',      icon:'🚽'},
     {id:'dress', label:'着替え',                      note:'スパッツはく',icon:'👗'},
     {id:'wash',  label:'顔を洗う',                    note:'',      icon:'🚿'},
@@ -441,124 +444,158 @@ const HABIT_SECTIONS=[
     {id:'cream', label:'ハンドクリーム',    note:'',              icon:'🤲'},
     {id:'mask',  label:'マスク',            note:'',              icon:'😷'},
   ]},
+  {id:'after',label:'下校後にやること',cls:'after',
+   subSections:[
+    {label:'🎒 忘れ物確認',items:[
+      {id:'hw',       label:'宿題',                   note:'',          icon:'📝'},
+      {id:'renbag',   label:'連絡袋を確認',            note:'',          icon:'👝'},
+      {id:'kyusyoku', label:'給食袋',                  note:'',          icon:'🍱'},
+      {id:'uwabaki',  label:'上靴',                   note:'金曜日',    icon:'👟'},
+    ]},
+    {label:'💊 夕食後・寝る前',items:[
+      {id:'drug_eve1',label:'薬：フェキソフェナジン',  note:'アレルギー',icon:'💊'},
+      {id:'drug_eve2',label:'薬：モンテルカストチュアブル',note:'喘息予防',icon:'💊'},
+      {id:'drug_eve3',label:'薬：オロパタジン',        note:'花粉症',    icon:'💊'},
+    ]},
+    {label:'🌙 夜のルーティン',items:[
+      {id:'hagaki2',  label:'歯磨き',                  note:'',          icon:'🪥'},
+      {id:'ofuro',    label:'お風呂',                  note:'',          icon:'🛁'},
+      {id:'moist2',   label:'保湿液',                  note:'',          icon:'🧴'},
+      {id:'cream2',   label:'ハンドクリーム',           note:'',          icon:'🤲'},
+    ]},
+  ]},
 ];
-const TOTAL_HABITS=HABIT_SECTIONS.reduce((s,sec)=>s+sec.items.length,0);
 
-// ══════════════════════════════════════
+// afterセクション全アイテムをフラット化
+function getAfterItems(){
+  return HABIT_SECTIONS.find(s=>s.id==='after').subSections.flatMap(ss=>ss.items);
+}
+function getAllHabitIds(){
+  const flat=[];
+  HABIT_SECTIONS.forEach(sec=>{
+    if(sec.items) sec.items.forEach(it=>flat.push(it.id));
+    if(sec.subSections) sec.subSections.forEach(ss=>ss.items.forEach(it=>flat.push(it.id)));
+  });
+  return flat;
+}
+const TOTAL_HABITS=getAllHabitIds().length;
+
+// ══════════════════════════════
 // localStorage
-// ══════════════════════════════════════
+// ══════════════════════════════
 const TODAY=new Date().toISOString().slice(0,10);
 function loadJSON(k,def){try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(def));}catch{return def;}}
 function saveJSON(k,v){localStorage.setItem(k,JSON.stringify(v));}
+
 let mChecked=loadJSON(`m_checked_${TODAY}`,[]);
 let mRolls=parseInt(localStorage.getItem(`m_rolls_${TODAY}`)||'0',10);
 let hChecked=loadJSON(`h_checked_${TODAY}`,[]);
 let mCurrentLabel=null,mRolling=false;
 function mRemaining(){return MISSION_ITEMS.filter(it=>!mChecked.includes(it.label));}
 
-// ══════════════════════════════════════
-// ── スワイプ（リアルタイム追従 + velocity）──
-// ══════════════════════════════════════
+// アコーディオン開閉状態（sessionStorage）
+function loadOpen(id){try{return sessionStorage.getItem('acc_'+id)!=='0';}catch{return true;}}
+function saveOpen(id,v){try{sessionStorage.setItem('acc_'+id,v?'1':'0');}catch{}}
+
+// ══════════════════════════════
+// スタック進捗バー更新
+// ══════════════════════════════
+function updateStickyProgress(){
+  const isMission=currentTab===0;
+  const spText=document.getElementById('sp-text');
+  const spCount=document.getElementById('sp-count');
+  const spBar=document.getElementById('sp-bar');
+  if(isMission){
+    const n=mChecked.length,total=MISSION_ITEMS.length;
+    spText.textContent='📋 ミッション進捗';
+    spCount.textContent=`${n} / ${total} 完了`;
+    spBar.style.width=(total?n/total*100:0)+'%';
+    spBar.classList.toggle('full',n>=total);
+  } else {
+    const n=hChecked.length;
+    spText.textContent='✅ 習慣進捗';
+    spCount.textContent=`${n} / ${TOTAL_HABITS} 完了`;
+    spBar.style.width=(TOTAL_HABITS?n/TOTAL_HABITS*100:0)+'%';
+    spBar.classList.toggle('full',n>=TOTAL_HABITS);
+  }
+  // PC用
+  const mn=mChecked.length,mt=MISSION_ITEMS.length;
+  document.getElementById('m-cp-count').textContent=`${mn} / ${mt} 完了`;
+  const mb=document.getElementById('m-cp-bar');
+  mb.style.width=(mt?mn/mt*100:0)+'%';mb.classList.toggle('full',mn>=mt);
+  const hn=hChecked.length;
+  document.getElementById('h-cp-count').textContent=`${hn} / ${TOTAL_HABITS} 完了`;
+  const hb=document.getElementById('h-cp-bar');
+  hb.style.width=(TOTAL_HABITS?hn/TOTAL_HABITS*100:0)+'%';hb.classList.toggle('full',hn>=TOTAL_HABITS);
+}
+
+// ══════════════════════════════
+// タブ切替 & スワイプ
+// ══════════════════════════════
 let currentTab=0;
 const track=document.getElementById('pane-track');
 const viewport=document.getElementById('pane-viewport');
 
-function getTabCount(){return 2;}
-function paneWidth(){return viewport.clientWidth;}
-
-/* トラックの幅を設定（JS管理） */
 function initTrack(){
   if(window.innerWidth>=768)return;
-  const w=paneWidth();
-  track.style.width=(w*getTabCount())+'px';
-  // pane幅
+  const w=viewport.clientWidth;
+  track.style.width=(w*2)+'px';
   document.getElementById('pane-mission').style.width=w+'px';
   document.getElementById('pane-habit').style.width=w+'px';
   setTrackX(currentTab*w,false);
 }
-
 function setTrackX(x,animate){
-  if(animate){
-    track.style.transition='transform .35s cubic-bezier(.25,.46,.45,.94)';
-  } else {
-    track.style.transition='none';
-  }
+  track.style.transition=animate?'transform .35s cubic-bezier(.25,.46,.45,.94)':'none';
   track.style.transform=`translateX(${-x}px)`;
 }
-
 function switchTab(idx,animate=true){
   if(window.innerWidth>=768)return;
   currentTab=idx;
-  setTrackX(idx*paneWidth(),animate);
+  setTrackX(idx*viewport.clientWidth,animate);
   document.getElementById('tab-mission').classList.toggle('active',idx===0);
   document.getElementById('tab-habit').classList.toggle('active',idx===1);
+  updateStickyProgress();
 }
 
-/* タッチ変数 */
-let touchStartX=0,touchStartY=0;
-let touchCurX=0,touchLastX=0,touchLastT=0;
-let touchVelX=0;
-let isDragging=false,isDecided=false,isHorizontal=false;
-let trackStartOffset=0;
+let touchStartX=0,touchStartY=0,touchCurX=0,touchLastX=0,touchLastT=0;
+let touchVelX=0,isDragging=false,isDecided=false,isHorizontal=false,trackStartOff=0;
 
 viewport.addEventListener('touchstart',e=>{
   if(window.innerWidth>=768)return;
   const t=e.touches[0];
-  touchStartX=t.clientX;touchStartY=t.clientY;
-  touchCurX=t.clientX;touchLastX=t.clientX;touchLastT=Date.now();
-  touchVelX=0;isDragging=true;isDecided=false;isHorizontal=false;
-  trackStartOffset=currentTab*paneWidth();
+  touchStartX=touchCurX=touchLastX=t.clientX;touchStartY=t.clientY;
+  touchLastT=Date.now();touchVelX=0;
+  isDragging=true;isDecided=false;isHorizontal=false;
+  trackStartOff=currentTab*viewport.clientWidth;
   track.style.transition='none';
 },{passive:true});
 
 viewport.addEventListener('touchmove',e=>{
   if(!isDragging||window.innerWidth>=768)return;
   const t=e.touches[0];
-  const dx=t.clientX-touchStartX;
-  const dy=t.clientY-touchStartY;
-
+  const dx=t.clientX-touchStartX,dy=t.clientY-touchStartY;
   if(!isDecided){
-    if(Math.abs(dx)<5&&Math.abs(dy)<5)return;
-    isDecided=true;
-    isHorizontal=Math.abs(dx)>Math.abs(dy);
+    if(Math.abs(dx)<4&&Math.abs(dy)<4)return;
+    isDecided=true;isHorizontal=Math.abs(dx)>Math.abs(dy);
   }
   if(!isHorizontal)return;
-
-  // 水平スクロールを乗っ取る
   e.preventDefault();
-
-  // velocity計算（直近フレームとの差分）
-  const now=Date.now();
-  const dt=now-touchLastT;
-  if(dt>0)touchVelX=(t.clientX-touchLastX)/dt*1000;// px/s
-  touchLastX=t.clientX;touchLastT=now;
-  touchCurX=t.clientX;
-
-  // トラックをリアルタイム移動（端は rubber-band）
-  let offset=trackStartOffset-dx;
-  const maxOffset=(getTabCount()-1)*paneWidth();
-  if(offset<0){
-    offset=offset*0.25;// 左端バウンド
-  } else if(offset>maxOffset){
-    offset=maxOffset+(offset-maxOffset)*0.25;// 右端バウンド
-  }
-  track.style.transform=`translateX(${-offset}px)`;
+  const now=Date.now(),dt=now-touchLastT;
+  if(dt>0)touchVelX=(t.clientX-touchLastX)/dt*1000;
+  touchLastX=t.clientX;touchLastT=now;touchCurX=t.clientX;
+  let off=trackStartOff-(t.clientX-touchStartX);
+  const max=(2-1)*viewport.clientWidth;
+  if(off<0)off*=0.22;else if(off>max)off=max+(off-max)*0.22;
+  track.style.transform=`translateX(${-off}px)`;
 },{passive:false});
 
 viewport.addEventListener('touchend',e=>{
   if(!isDragging||!isHorizontal||window.innerWidth>=768){isDragging=false;return;}
   isDragging=false;
-  const dx=touchCurX-touchStartX;
-  const w=paneWidth();
-  const FLICK_VEL=300;// px/s 以上でフリック判定
-  const DRAG_THR=w*0.35;// 35%以上でページ切替
-
+  const dx=touchCurX-touchStartX,w=viewport.clientWidth;
   let next=currentTab;
-  if(touchVelX<-FLICK_VEL||dx<-DRAG_THR){
-    next=Math.min(currentTab+1,getTabCount()-1);
-  } else if(touchVelX>FLICK_VEL||dx>DRAG_THR){
-    next=Math.max(currentTab-1,0);
-  }
+  if(touchVelX<-280||dx<-w*0.33)next=Math.min(currentTab+1,1);
+  else if(touchVelX>280||dx>w*0.33)next=Math.max(currentTab-1,0);
   switchTab(next,true);
 },{passive:true});
 
@@ -567,16 +604,43 @@ window.addEventListener('resize',()=>{
     track.style.width='';track.style.transform='';track.style.transition='';
     document.getElementById('pane-mission').style.width='';
     document.getElementById('pane-habit').style.width='';
-  } else {
-    initTrack();
-  }
+  } else initTrack();
 });
 initTrack();
 
-// ══════════════════════════════════════
+// ══════════════════════════════
+// アコーディオン
+// ══════════════════════════════
+function toggleSection(id,e){
+  if(e)e.stopPropagation();
+  const header=document.querySelector(`#sec-${id} .section-header`);
+  const body=document.getElementById(`body-${id}`);
+  const isOpen=body.classList.contains('open');
+  header.classList.toggle('open',!isOpen);
+  body.classList.toggle('open',!isOpen);
+  saveOpen(id,!isOpen);
+}
+// セクションヘッダーのクリック（一括ボタンのバブル防止）
+document.querySelectorAll('.section-header').forEach(h=>{
+  h.addEventListener('click',function(e){
+    if(e.target.closest('.bulk-btn'))e.stopPropagation();
+  });
+});
+
+function initAccordions(){
+  ['morning','school','after'].forEach(id=>{
+    const open=loadOpen(id);
+    const header=document.querySelector(`#sec-${id} .section-header`);
+    const body=document.getElementById(`body-${id}`);
+    header.classList.toggle('open',open);
+    body.classList.toggle('open',open);
+  });
+}
+
+// ══════════════════════════════
 // ミッション：ドラム
-// ══════════════════════════════════════
-const REPEATS=6,ITEM_H=96,LOOP_LEN=MISSION_ITEMS.length;
+// ══════════════════════════════
+const REPEATS=6,ITEM_H=92,LOOP_LEN=MISSION_ITEMS.length;
 const strip=document.getElementById('strip');
 for(let r=0;r<REPEATS;r++) MISSION_ITEMS.forEach(it=>{
   const d=document.createElement('div');d.className='drum-item';
@@ -587,20 +651,10 @@ let stripIdx=0;
 function itemY(i){return -(i*ITEM_H);}
 strip.style.transform=`translateY(${itemY(LOOP_LEN*2+stripIdx)}px)`;
 
-// ミッション 進捗・チップ描画
 const rollBtn=document.getElementById('roll-btn');
 const mCheckBtn=document.getElementById('m-check-btn');
-const mAllDone=document.getElementById('m-all-done');
-const mProgBar=document.getElementById('m-prog-bar');
-const mProgCount=document.getElementById('m-prog-count');
 document.getElementById('m-roll-count').textContent=mRolls;
 
-function updateMProgress(){
-  const n=mChecked.length,total=MISSION_ITEMS.length;
-  mProgCount.textContent=`${n} / ${total} 完了`;
-  mProgBar.style.width=(total?n/total*100:0)+'%';
-  mProgBar.classList.toggle('full',n>=total);
-}
 function renderMChips(){
   const chips=document.getElementById('mission-chips');chips.innerHTML='';
   MISSION_ITEMS.forEach(it=>{
@@ -610,25 +664,25 @@ function renderMChips(){
     c.addEventListener('click',()=>toggleMChip(it.label));chips.appendChild(c);
   });
   const allDone=mChecked.length>=MISSION_ITEMS.length;
-  mAllDone.classList.toggle('visible',allDone);
+  document.getElementById('m-all-done').classList.toggle('visible',allDone);
   rollBtn.disabled=allDone;
   if(allDone)rollBtn.textContent='🎊 ぜんぶクリア！';
   else if(!mRolling)rollBtn.textContent=mRolls>0?'🎲 もういちど！':'🎲 まわす！';
-  updateMProgress();
+  updateStickyProgress();
 }
 renderMChips();
 
 function toggleMChip(label){
   if(mRolling)return;
   const i=mChecked.indexOf(label);
-  if(i===-1){mChecked.push(label);playMCheck();launchConfetti(16);
+  if(i===-1){mChecked.push(label);playMCheck();launchConfetti(14);
     if(label===mCurrentLabel){mCheckBtn.classList.add('done');mCheckBtn.textContent='✔ チェック済み！';mCheckBtn.disabled=true;}
   } else {
     mChecked.splice(i,1);
     if(label===mCurrentLabel){mCheckBtn.classList.remove('done');mCheckBtn.textContent='✅ おわった！';mCheckBtn.disabled=false;}
   }
   saveJSON(`m_checked_${TODAY}`,mChecked);renderMChips();
-  if(mChecked.length>=MISSION_ITEMS.length)setTimeout(()=>{playAllClear();launchConfetti(80);},200);
+  if(mChecked.length>=MISSION_ITEMS.length)setTimeout(()=>{playAllClear();launchConfetti(75);},200);
 }
 
 function startRoll(){
@@ -663,10 +717,10 @@ function startRoll(){
 function checkMission(){
   if(!mCurrentLabel||mChecked.includes(mCurrentLabel))return;
   mChecked.push(mCurrentLabel);saveJSON(`m_checked_${TODAY}`,mChecked);
-  playMCheck();launchConfetti(20);
+  playMCheck();launchConfetti(18);
   mCheckBtn.classList.add('done');mCheckBtn.textContent='✔ チェック済み！';mCheckBtn.disabled=true;
   renderMChips();
-  if(mChecked.length>=MISSION_ITEMS.length)setTimeout(()=>{playAllClear();launchConfetti(80);},200);
+  if(mChecked.length>=MISSION_ITEMS.length)setTimeout(()=>{playAllClear();launchConfetti(75);},200);
 }
 function resetMission(){
   if(!confirm('ミッションのチェックをリセットするよ？'))return;
@@ -675,96 +729,119 @@ function resetMission(){
   renderMChips();
 }
 
-// ══════════════════════════════════════
+// ══════════════════════════════
 // 習慣：描画
-// ══════════════════════════════════════
-const hProgBar=document.getElementById('h-prog-bar');
-const hProgCount=document.getElementById('h-prog-count');
-const hAllDone=document.getElementById('h-all-done');
+// ══════════════════════════════
+function secCheckedCount(secId){
+  const sec=HABIT_SECTIONS.find(s=>s.id===secId);
+  let ids=[];
+  if(sec.items)ids=sec.items.map(it=>it.id);
+  if(sec.subSections)sec.subSections.forEach(ss=>ss.items.forEach(it=>ids.push(it.id)));
+  return ids.filter(id=>hChecked.includes(id)).length+'/'+ids.length;
+}
 
-function updateHProgress(){
-  const n=hChecked.length;
-  hProgCount.textContent=`${n} / ${TOTAL_HABITS} 完了`;
-  hProgBar.style.width=(TOTAL_HABITS?n/TOTAL_HABITS*100:0)+'%';
-  hProgBar.classList.toggle('full',n>=TOTAL_HABITS);
-  hAllDone.classList.toggle('visible',n>=TOTAL_HABITS);
-}
 function renderHabits(){
-  HABIT_SECTIONS.forEach(sec=>{
-    const list=document.getElementById(`habit-list-${sec.id}`);list.innerHTML='';
-    const allChecked=sec.items.every(it=>hChecked.includes(it.id));
-    // 一括ボタンの状態切替
-    const bulkBtn=document.getElementById(`bulk-${sec.id}`);
-    if(allChecked){
-      bulkBtn.textContent='チェックを外す';bulkBtn.className='bulk-btn uncheck-all';
-      bulkBtn.onclick=()=>bulkUncheck(sec.id);
-    } else {
-      bulkBtn.textContent='まとめてチェック';bulkBtn.className='bulk-btn check-all';
-      bulkBtn.onclick=()=>bulkCheck(sec.id);
-    }
-    sec.items.forEach(item=>{
-      const done=hChecked.includes(item.id);
-      const el=document.createElement('div');el.className='habit-item'+(done?' checked':'');
-      el.innerHTML=`
-        <div class="habit-check-box"><span class="habit-check-mark">✓</span></div>
-        <span style="font-size:1rem;flex-shrink:0">${item.icon}</span>
-        <span class="habit-label">${item.label}</span>
-        ${item.note?`<span class="habit-note">${item.note}</span>`:''}
-      `;
-      el.addEventListener('click',()=>toggleHabit(item.id));
-      list.appendChild(el);
-    });
+  // 朝 / 学校
+  ['morning','school'].forEach(secId=>{
+    const sec=HABIT_SECTIONS.find(s=>s.id===secId);
+    const list=document.getElementById(`habit-list-${secId}`);list.innerHTML='';
+    const allDone=sec.items.every(it=>hChecked.includes(it.id));
+    const bulk=document.getElementById(`bulk-${secId}`);
+    bulk.textContent=allDone?'チェックを外す':'まとめてチェック';
+    bulk.className='bulk-btn '+(allDone?'uncheck-all':'check-all');
+    bulk.onclick=(e)=>{e.stopPropagation();allDone?bulkUncheck(secId):bulkCheck(secId);};
+    sec.items.forEach(item=>list.appendChild(makeHabitItem(item)));
+    const cnt=document.getElementById(`sec-cnt-${secId}`);
+    if(cnt)cnt.textContent='('+secCheckedCount(secId)+')';
   });
-  updateHProgress();
+
+  // 下校後（サブセクション）
+  const afterSec=HABIT_SECTIONS.find(s=>s.id==='after');
+  const wrap=document.getElementById('habit-list-after-wrap');wrap.innerHTML='';
+  const allAfterIds=getAfterItems().map(it=>it.id);
+  const allAfterDone=allAfterIds.every(id=>hChecked.includes(id));
+  const bulkAfter=document.getElementById('bulk-after');
+  bulkAfter.textContent=allAfterDone?'チェックを外す':'まとめてチェック';
+  bulkAfter.className='bulk-btn '+(allAfterDone?'uncheck-all':'check-all');
+  bulkAfter.onclick=(e)=>{e.stopPropagation();allAfterDone?bulkUncheck('after'):bulkCheck('after');};
+  afterSec.subSections.forEach(ss=>{
+    const subDiv=document.createElement('div');subDiv.className='sub-section';
+    const title=document.createElement('div');title.className='sub-section-title';title.textContent=ss.label;
+    subDiv.appendChild(title);
+    const list=document.createElement('div');list.className='habit-list';
+    ss.items.forEach(item=>list.appendChild(makeHabitItem(item)));
+    subDiv.appendChild(list);wrap.appendChild(subDiv);
+  });
+  const cnt=document.getElementById('sec-cnt-after');
+  if(cnt)cnt.textContent='('+secCheckedCount('after')+')';
+
+  // 全完了
+  const allDone=hChecked.length>=TOTAL_HABITS;
+  document.getElementById('h-all-done').classList.toggle('visible',allDone);
+  updateStickyProgress();
 }
+
+function makeHabitItem(item){
+  const done=hChecked.includes(item.id);
+  const el=document.createElement('div');
+  el.className='habit-item'+(done?' checked':'');
+  el.innerHTML=`
+    <div class="habit-check-box"><span class="habit-check-mark">✓</span></div>
+    <span style="font-size:.95rem;flex-shrink:0">${item.icon}</span>
+    <span class="habit-label">${item.label}</span>
+    ${item.note?`<span class="habit-note">${item.note}</span>`:''}
+  `;
+  el.addEventListener('click',()=>toggleHabit(item.id));
+  return el;
+}
+
 renderHabits();
+initAccordions();
 
 function toggleHabit(id){
   const wasAll=hChecked.length>=TOTAL_HABITS;
   const i=hChecked.indexOf(id);
-  if(i===-1){hChecked.push(id);playHabitCheck();launchConfetti(8,'#7ee8c8');}
+  if(i===-1){hChecked.push(id);playHabitCheck();launchConfetti(7,'#7ee8c8');}
   else{hChecked.splice(i,1);playHabitUncheck();}
   saveJSON(`h_checked_${TODAY}`,hChecked);renderHabits();
-  if(!wasAll&&hChecked.length>=TOTAL_HABITS)setTimeout(()=>{playHabitAllClear();launchConfetti(65);},200);
+  if(!wasAll&&hChecked.length>=TOTAL_HABITS)setTimeout(()=>{playHabitAllClear();launchConfetti(60);},200);
 }
 
-// 一括チェック
 function bulkCheck(secId){
-  const sec=HABIT_SECTIONS.find(s=>s.id===secId);if(!sec)return;
+  const sec=HABIT_SECTIONS.find(s=>s.id===secId);
   const wasAll=hChecked.length>=TOTAL_HABITS;
-  const newItems=sec.items.filter(it=>!hChecked.includes(it.id));
-  newItems.forEach(it=>hChecked.push(it.id));
+  let allIds=[];
+  if(sec.items)allIds=sec.items.map(it=>it.id);
+  if(sec.subSections)sec.subSections.forEach(ss=>ss.items.forEach(it=>allIds.push(it.id)));
+  const newIds=allIds.filter(id=>!hChecked.includes(id));
+  newIds.forEach(id=>hChecked.push(id));
   saveJSON(`h_checked_${TODAY}`,hChecked);
-  if(newItems.length){playBulk(newItems.length);launchConfetti(20,'#7ee8c8');}
+  if(newIds.length){playBulk(newIds.length);launchConfetti(18,'#7ee8c8');}
   renderHabits();
-  if(!wasAll&&hChecked.length>=TOTAL_HABITS)setTimeout(()=>{playHabitAllClear();launchConfetti(65);},200);
+  if(!wasAll&&hChecked.length>=TOTAL_HABITS)setTimeout(()=>{playHabitAllClear();launchConfetti(60);},200);
 }
-// 一括解除
 function bulkUncheck(secId){
-  const sec=HABIT_SECTIONS.find(s=>s.id===secId);if(!sec)return;
-  const ids=sec.items.map(it=>it.id);
-  hChecked=hChecked.filter(id=>!ids.includes(id));
+  const sec=HABIT_SECTIONS.find(s=>s.id===secId);
+  let allIds=[];
+  if(sec.items)allIds=sec.items.map(it=>it.id);
+  if(sec.subSections)sec.subSections.forEach(ss=>ss.items.forEach(it=>allIds.push(it.id)));
+  hChecked=hChecked.filter(id=>!allIds.includes(id));
   saveJSON(`h_checked_${TODAY}`,hChecked);renderHabits();
 }
-
 function resetHabit(){
   if(!confirm('習慣チェックをリセットするよ？'))return;
   hChecked=[];saveJSON(`h_checked_${TODAY}`,[]);renderHabits();
 }
 
-// ══════════════════════════════════════
+// ══════════════════════════════
 // confetti
-// ══════════════════════════════════════
+// ══════════════════════════════
 const COLORS=['#ff7eb3','#ffb3d1','#c97ef7','#ffe066','#7ee8c8','#ff9de2','#74b9ff'];
-function launchConfetti(n=55,extra){
+function launchConfetti(n=50,extra){
   const colors=extra?[extra,...COLORS]:COLORS;
   for(let i=0;i<n;i++){
     const el=document.createElement('div');el.className='confetti-piece';
-    el.style.cssText=`left:${Math.random()*100}vw;top:${Math.random()*20}vh;
-      background:${colors[Math.floor(Math.random()*colors.length)]};
-      border-radius:${Math.random()>.5?'50%':'2px'};
-      width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;
-      animation-duration:${1.2+Math.random()*.9}s;animation-delay:${Math.random()*.3}s;`;
+    el.style.cssText=`left:${Math.random()*100}vw;top:${Math.random()*20}vh;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'2px'};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;animation-duration:${1.2+Math.random()*.9}s;animation-delay:${Math.random()*.3}s;`;
     document.body.appendChild(el);el.addEventListener('animationend',()=>el.remove());
   }
 }
@@ -773,11 +850,12 @@ function launchConfetti(n=55,extra){
 ['⭐','✨','💫','🌸','💕','🎀'].forEach(e=>{
   for(let j=0;j<3;j++){
     const s=document.createElement('div');s.className='star';s.textContent=e;
-    s.style.cssText=`left:${Math.random()*100}vw;animation-duration:${8+Math.random()*10}s;animation-delay:${Math.random()*12}s;font-size:${.9+Math.random()*.9}rem;`;
+    s.style.cssText=`left:${Math.random()*100}vw;animation-duration:${8+Math.random()*10}s;animation-delay:${Math.random()*12}s;font-size:${.88+Math.random()*.85}rem;`;
     document.getElementById('stars').appendChild(s);
   }
 });
 
+updateStickyProgress();
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&currentTab===0){e.preventDefault();startRoll();}});
 </script>
 </body>
