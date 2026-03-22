@@ -164,10 +164,152 @@ body{
 #roll-btn:hover:not(:disabled){transform:translateY(-2px);}
 #roll-btn:active:not(:disabled){transform:scale(.97);}
 #roll-btn:disabled{opacity:.6;cursor:not-allowed;}
-#m-check-btn{flex:0 0 auto;padding:11px 14px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--mint),#5ec8f0);color:#fff;font-family:'Noto Sans JP',sans-serif;font-size:.84rem;font-weight:900;letter-spacing:.06em;cursor:pointer;box-shadow:0 3px 12px rgba(94,200,240,.3);transition:transform .15s,max-width .28s,opacity .28s,padding .28s;white-space:nowrap;max-width:0;overflow:hidden;padding-left:0;padding-right:0;opacity:0;pointer-events:none;}
-#m-check-btn.visible{max-width:150px;padding-left:14px;padding-right:14px;opacity:1;pointer-events:auto;}
-#m-check-btn:hover{transform:translateY(-2px);}
-#m-check-btn.done{background:linear-gradient(135deg,#b2e8d8,#a0d8ee);box-shadow:none;cursor:default;opacity:.7;}
+
+/* チェックボタン：目立つ大型デザイン */
+#m-check-btn{
+  flex:0 0 auto;border:none;border-radius:50px;
+  background:linear-gradient(135deg,#ff9de2,#ff6bb5);
+  color:#fff;font-family:'Noto Sans JP',sans-serif;
+  font-size:.92rem;font-weight:900;letter-spacing:.08em;
+  cursor:pointer;white-space:nowrap;
+  /* アニメーションで出現 */
+  max-width:0;overflow:hidden;
+  padding-top:11px;padding-bottom:11px;
+  padding-left:0;padding-right:0;
+  opacity:0;pointer-events:none;
+  transition:max-width .3s cubic-bezier(.34,1.2,.64,1),
+             opacity .25s ease,
+             padding .3s cubic-bezier(.34,1.2,.64,1),
+             transform .15s,box-shadow .15s;
+  box-shadow:0 0 0 rgba(255,107,181,0);
+}
+#m-check-btn.visible{
+  max-width:180px;padding-left:18px;padding-right:18px;
+  opacity:1;pointer-events:auto;
+  box-shadow:0 5px 20px rgba(255,107,181,.45), 0 0 0 3px rgba(255,157,226,.3);
+  animation:checkBtnPop .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes checkBtnPop{
+  0%{transform:scale(.6);}
+  60%{transform:scale(1.1);}
+  100%{transform:scale(1);}
+}
+#m-check-btn:hover:not(:disabled){
+  transform:translateY(-3px) scale(1.05);
+  box-shadow:0 8px 24px rgba(255,107,181,.55);
+}
+#m-check-btn:active:not(:disabled){transform:scale(.96);}
+#m-check-btn.done{
+  background:linear-gradient(135deg,#b2e8d8,#a0d8ee);
+  box-shadow:none;cursor:default;opacity:.7;
+}
+
+/* ── 隠しミッション ── */
+/* オーバーレイ */
+#secret-overlay{
+  position:fixed;inset:0;z-index:300;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(10,0,30,.88);
+  backdrop-filter:blur(6px);
+  opacity:0;pointer-events:none;
+  transition:opacity .4s ease;
+}
+#secret-overlay.show{opacity:1;pointer-events:auto;}
+
+.secret-badge{
+  background:linear-gradient(135deg,#2d0060,#6a0080,#2d0060);
+  border:3px solid #c97ef7;
+  border-radius:28px;padding:28px 32px;
+  text-align:center;
+  box-shadow:0 0 60px rgba(201,126,247,.5), 0 0 120px rgba(201,126,247,.2);
+  animation:secretBadgePop .6s cubic-bezier(.34,1.4,.64,1);
+  max-width:min(360px,88vw);
+}
+@keyframes secretBadgePop{
+  0%{transform:scale(.4) rotate(-8deg);opacity:0;}
+  70%{transform:scale(1.08) rotate(2deg);}
+  100%{transform:scale(1) rotate(0deg);opacity:1;}
+}
+.secret-stars{font-size:2rem;letter-spacing:.2em;margin-bottom:8px;}
+.secret-title{
+  font-size:1.05rem;font-weight:900;letter-spacing:.18em;
+  color:#e0aaff;margin-bottom:6px;
+  text-shadow:0 0 20px rgba(201,126,247,.8);
+}
+.secret-label{
+  font-size:1.6rem;font-weight:900;color:#fff;letter-spacing:.06em;
+  margin:10px 0 6px;
+  text-shadow:0 0 30px rgba(255,200,255,.6);
+}
+.secret-desc{font-size:.78rem;color:#c8a0e8;margin-bottom:18px;letter-spacing:.05em;}
+.secret-start-btn{
+  padding:12px 32px;border-radius:50px;border:none;
+  background:linear-gradient(135deg,var(--purple),#e040fb);
+  color:#fff;font-family:'Noto Sans JP',sans-serif;
+  font-size:.95rem;font-weight:900;letter-spacing:.15em;
+  cursor:pointer;
+  box-shadow:0 5px 20px rgba(201,126,247,.5);
+  transition:transform .15s,box-shadow .15s;
+}
+.secret-start-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(201,126,247,.65);}
+.secret-start-btn:active{transform:scale(.97);}
+
+/* ドラム内 隠しミッション表示 */
+.drum-item.secret .drum-label{
+  color:#c97ef7;
+  text-shadow:0 0 12px rgba(201,126,247,.6);
+}
+.drum-item.secret .drum-icon{
+  filter:drop-shadow(0 0 6px rgba(201,126,247,.7));
+}
+
+/* 隠しミッション チェックボタン（超豪華版） */
+#m-check-btn.secret-check{
+  background:linear-gradient(135deg,#9b00e0,#e040fb,#c97ef7);
+  box-shadow:0 5px 24px rgba(201,126,247,.6),
+             0 0 0 3px rgba(201,126,247,.25),
+             0 0 20px rgba(201,126,247,.3);
+  animation:secretCheckPulse 1.5s ease-in-out infinite, checkBtnPop .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes secretCheckPulse{
+  0%,100%{box-shadow:0 5px 24px rgba(201,126,247,.6),0 0 0 3px rgba(201,126,247,.25),0 0 20px rgba(201,126,247,.3);}
+  50%{box-shadow:0 5px 32px rgba(201,126,247,.8),0 0 0 6px rgba(201,126,247,.2),0 0 40px rgba(201,126,247,.4);}
+}
+
+/* 隠しミッション完了エフェクト */
+#secret-clear{
+  position:fixed;inset:0;z-index:400;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  pointer-events:none;opacity:0;
+  transition:opacity .3s;
+}
+#secret-clear.show{opacity:1;pointer-events:auto;}
+.secret-clear-inner{
+  text-align:center;
+  animation:secretClearPop .7s cubic-bezier(.34,1.4,.64,1);
+}
+@keyframes secretClearPop{0%{transform:scale(.3);opacity:0;}100%{transform:scale(1);opacity:1;}}
+.secret-clear-emoji{font-size:4rem;display:block;margin-bottom:8px;}
+.secret-clear-text{
+  font-size:1.4rem;font-weight:900;color:#fff;
+  text-shadow:0 0 30px rgba(201,126,247,1), 0 2px 0 rgba(0,0,0,.5);
+  letter-spacing:.08em;
+}
+.secret-clear-sub{
+  font-size:.85rem;color:#e0aaff;margin-top:6px;letter-spacing:.06em;
+  text-shadow:0 0 10px rgba(201,126,247,.8);
+}
+.secret-clear-bg{
+  position:fixed;inset:0;z-index:-1;
+  background:radial-gradient(circle at center, rgba(100,0,160,.7) 0%, rgba(20,0,40,.85) 70%);
+}
+.secret-clear-close{
+  margin-top:20px;padding:10px 28px;border-radius:50px;border:2px solid #c97ef7;
+  background:transparent;color:#e0aaff;font-family:'Noto Sans JP',sans-serif;
+  font-size:.88rem;font-weight:700;cursor:pointer;letter-spacing:.1em;
+  transition:all .2s;pointer-events:auto;
+}
+.secret-clear-close:hover{background:rgba(201,126,247,.2);}
 
 /* ── ミッションチップ ── */
 .mission-list-title{font-size:.66rem;font-weight:700;color:#c097d0;letter-spacing:.08em;margin-bottom:5px;text-align:center;}
@@ -292,6 +434,28 @@ body{
 </head>
 <body>
 <div class="stars" id="stars"></div>
+
+<!-- 隠しミッション登場オーバーレイ -->
+<div id="secret-overlay">
+  <div class="secret-badge">
+    <div class="secret-stars">⭐🌟✨🌟⭐</div>
+    <div class="secret-title">🤫 かくしミッション 登場！</div>
+    <div class="secret-label" id="secret-mission-label">こっそりお手伝い</div>
+    <div class="secret-desc">だれにも ないしょ にしてね…！<br>せいこうしたら すごいことが おこるよ👀</div>
+    <button class="secret-start-btn" onclick="closeSecretOverlay()">やってみる！✨</button>
+  </div>
+</div>
+
+<!-- 隠しミッション完了エフェクト -->
+<div id="secret-clear">
+  <div class="secret-clear-bg"></div>
+  <div class="secret-clear-inner">
+    <span class="secret-clear-emoji">🎉✨🌟</span>
+    <div class="secret-clear-text">かくしミッション クリア！！</div>
+    <div class="secret-clear-sub">すごい！！ないしょのことだから<br>だれにもおしえないでね🤫💜</div>
+    <button class="secret-clear-close" onclick="closeSecretClear()">とじる</button>
+  </div>
+</div>
 <div id="app">
 
   <!-- ── 固定ヘッダー（タブ＋進捗） ── -->
@@ -461,6 +625,9 @@ const MISSION_ITEMS=[
   {label:'ストレッチ',icon:'🤸'},{label:'Y字バランス10秒',icon:'⭐'},
   {label:'タッチタイピング',icon:'⌨️'},{label:'ゲーム',icon:'🎮'},{label:'読書',icon:'📖'},
 ];
+
+// 隠しミッション（ドラムには含まれない）
+const SECRET_MISSION={label:'こっそりお手伝い',icon:'🤫',secret:true};
 
 // 習慣：サブセクション対応の構造
 // type:'sub' = サブセクション見出し
@@ -741,10 +908,16 @@ function toggleMChip(label){
 function startRoll(){
   if(mRolling)return;const pool=mRemaining();if(!pool.length)return;
   mRolling=true;rollBtn.disabled=true;rollBtn.textContent='🌀 まわってるよ…';
-  mCheckBtn.classList.remove('visible','done');mCheckBtn.disabled=false;mCheckBtn.textContent='✅ おわった！';
+  mCheckBtn.classList.remove('visible','done','secret-check');
+  mCheckBtn.disabled=false;mCheckBtn.textContent='✅ おわった！';
   playStart();
-  const chosen=pool[Math.floor(Math.random()*pool.length)];
-  const nextIdx=MISSION_ITEMS.indexOf(chosen);
+
+  // 20回に1回、隠しミッション発動（チェック済みでなければ）
+  const isSecret = (mRolls % 20 === 19) && !mChecked.includes(SECRET_MISSION.label);
+
+  const chosen = isSecret ? SECRET_MISSION : pool[Math.floor(Math.random()*pool.length)];
+  const nextIdx = isSecret ? Math.floor(Math.random()*MISSION_ITEMS.length) : MISSION_ITEMS.indexOf(chosen);
+
   const finalIdx=LOOP_LEN*3+nextIdx+LOOP_LEN*2;
   const sy=itemY(LOOP_LEN*2+stripIdx),dist=itemY(finalIdx)-sy;
   const DUR=3200,st=performance.now();let lastY=sy,landOk=true;
@@ -756,24 +929,102 @@ function startRoll(){
     if(Math.abs(y-lastY)>=ITEM_H){playRollTick(Math.min(t*1.5,1));lastY=y;}
     if(t>.88&&landOk){playLand();landOk=false;}
     if(t<1){requestAnimationFrame(tick);return;}
+
     stripIdx=nextIdx;strip.style.transition='none';
     strip.style.transform=`translateY(${itemY(LOOP_LEN*2+nextIdx)}px)`;
-    mCurrentLabel=chosen.label;playFanfare();launchConfetti();
-    const alreadyDone=mChecked.includes(mCurrentLabel);
+    mCurrentLabel=chosen.label;
+    mCurrentIsSecret=isSecret;
+
+    if(isSecret){
+      // ドラム表示を隠しミッションに書き換え
+      const centerItem=strip.querySelectorAll('.drum-item')[LOOP_LEN*2+nextIdx];
+      if(centerItem){
+        centerItem.querySelector('.drum-icon').textContent=SECRET_MISSION.icon;
+        centerItem.querySelector('.drum-label').textContent=SECRET_MISSION.label;
+        centerItem.classList.add('secret');
+      }
+      // 少し待ってから登場演出
+      setTimeout(()=>{
+        playSecretAppear();
+        document.getElementById('secret-overlay').classList.add('show');
+      },400);
+    } else {
+      playFanfare();launchConfetti();
+    }
+
+    const alreadyDone=mChecked.includes(chosen.label);
     mCheckBtn.classList.add('visible');
-    if(alreadyDone){mCheckBtn.classList.add('done');mCheckBtn.textContent='✔ チェック済み！';mCheckBtn.disabled=true;}
+    if(isSecret&&!alreadyDone){
+      mCheckBtn.classList.add('secret-check');
+      mCheckBtn.textContent='🤫 ひみつのミッション！';
+    } else if(alreadyDone){
+      mCheckBtn.classList.add('done');mCheckBtn.textContent='✔ チェック済み！';mCheckBtn.disabled=true;
+    }
+
     mRolls++;document.getElementById('m-roll-count').textContent=mRolls;localStorage.setItem(`m_rolls_${TODAY}`,mRolls);
     rollBtn.textContent='🎲 もういちど！';rollBtn.disabled=false;mRolling=false;
   }
   requestAnimationFrame(tick);
 }
+let mCurrentIsSecret=false;
+
 function checkMission(){
   if(!mCurrentLabel||mChecked.includes(mCurrentLabel))return;
   mChecked.push(mCurrentLabel);saveJSON(`m_checked_${TODAY}`,mChecked);
-  playMCheck();launchConfetti(18);
+  mCheckBtn.classList.remove('secret-check');
   mCheckBtn.classList.add('done');mCheckBtn.textContent='✔ チェック済み！';mCheckBtn.disabled=true;
+
+  if(mCurrentIsSecret){
+    // 隠しミッション完了の超豪華演出
+    playSecretClear();
+    setTimeout(()=>{
+      launchConfetti(120);
+      launchSecretStars();
+      document.getElementById('secret-clear').classList.add('show');
+    },100);
+  } else {
+    playMCheck();launchConfetti(18);
+    renderMChips();
+    if(mChecked.length>=MISSION_ITEMS.length)setTimeout(()=>{playAllClear();launchConfetti(75);},200);
+  }
+}
+
+function closeSecretOverlay(){
+  document.getElementById('secret-overlay').classList.remove('show');
+  playFanfare();launchConfetti();
+}
+
+function closeSecretClear(){
+  document.getElementById('secret-clear').classList.remove('show');
   renderMChips();
-  if(mChecked.length>=MISSION_ITEMS.length)setTimeout(()=>{playAllClear();launchConfetti(75);},200);
+}
+
+// 隠しミッション登場音（神秘的）
+function playSecretAppear(){
+  const ctx=getCtx();
+  // 低音から高音へゆっくり上昇
+  [{f:220,t:0,d:.4},{f:330,t:.25,d:.4},{f:440,t:.5,d:.4},{f:660,t:.75,d:.5},{f:880,t:1.0,d:.6}]
+    .forEach(({f,t,d})=>tone('sine',f,.18,ctx.currentTime+t,d));
+  // きらきら高音
+  [{f:1320,t:1.3},{f:1760,t:1.5},{f:2093,t:1.7}]
+    .forEach(({f,t})=>tone('triangle',f,.12,ctx.currentTime+t,.3));
+}
+
+// 隠しミッション完了音（超豪華）
+function playSecretClear(){
+  const ctx=getCtx();
+  // ファンファーレ
+  [{f:523,t:0},{f:659,t:.1},{f:784,t:.2},{f:1047,t:.3},
+   {f:1319,t:.45},{f:1047,t:.6},{f:1319,t:.75},{f:1568,t:.9}]
+    .forEach(({f,t})=>tone('triangle',f,.26,ctx.currentTime+t,.25));
+  // ベース
+  [{f:131,t:.3},{f:165,t:.6},{f:196,t:.9}]
+    .forEach(({f,t})=>tone('sine',f,.18,ctx.currentTime+t,.4));
+  // きらきら
+  for(let i=0;i<8;i++){
+    const f=800+Math.random()*1200;
+    tone('sine',f,.08,ctx.currentTime+.5+i*.15,.2);
+  }
 }
 function resetMission(){
   if(!confirm('ミッションのチェックをリセットするよ？'))return;
@@ -895,9 +1146,25 @@ function resetAll(){
   hChecked=[];saveJSON(`h_checked_${TODAY}`,[]);renderHabits();
 }
 
-// ══════════════════════════════
+// 隠しミッション用 紫の星エフェクト
+function launchSecretStars(){
+  const emojis=['🌟','✨','💫','⭐','🎊','💜','🔮'];
+  for(let i=0;i<30;i++){
+    const el=document.createElement('div');
+    el.style.cssText=`
+      position:fixed;font-size:${1.5+Math.random()*1.5}rem;
+      left:${Math.random()*100}vw;top:${-5+Math.random()*20}vh;
+      pointer-events:none;z-index:401;
+      animation:confettiFall ${1.5+Math.random()}s ease-in forwards;
+      animation-delay:${Math.random()*.5}s;
+    `;
+    el.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    document.body.appendChild(el);
+    el.addEventListener('animationend',()=>el.remove());
+  }
+}
+
 // confetti
-// ══════════════════════════════
 const COLORS=['#ff7eb3','#ffb3d1','#c97ef7','#ffe066','#7ee8c8','#ff9de2','#74b9ff'];
 function launchConfetti(n=50,extra){
   const colors=extra?[extra,...COLORS]:COLORS;
