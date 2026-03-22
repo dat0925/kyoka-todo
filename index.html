@@ -18,6 +18,7 @@
       display:flex;flex-direction:column;
       align-items:center;justify-content:center;
       overflow:hidden;position:relative;
+      padding:20px 0;
     }
     .stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
     .star{position:absolute;animation:floatStar linear infinite;opacity:0.55;}
@@ -29,14 +30,16 @@
     .card{
       position:relative;z-index:1;
       background:#fff;border-radius:36px;
-      padding:36px 32px 32px;
+      padding:32px 28px 28px;
       width:min(440px,92vw);
       box-shadow:0 8px 40px rgba(255,126,179,.18);
       border:3px solid var(--pink2);
-      display:flex;flex-direction:column;align-items:center;gap:20px;
+      display:flex;flex-direction:column;align-items:center;gap:18px;
     }
     .title{font-size:1.25rem;font-weight:900;color:var(--purple);letter-spacing:.12em;}
     .title span{color:var(--pink);}
+
+    /* ---- ドラム ---- */
     .drum-wrap{width:100%;display:flex;flex-direction:column;align-items:center;}
     .pointer{
       width:0;height:0;
@@ -75,21 +78,44 @@
     }
     .drum-icon{font-size:2.2rem;line-height:1;flex-shrink:0;}
     .drum-label{
-      font-size:clamp(1.1rem,4vw,1.8rem);font-weight:900;
+      font-size:clamp(1rem,4vw,1.75rem);font-weight:900;
       color:#e060a0;letter-spacing:.08em;
       white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
     }
+
+    /* ---- 結果 ---- */
     .result-box{
-      width:100%;border-radius:20px;padding:16px;
+      width:100%;border-radius:20px;padding:14px 16px;
       background:linear-gradient(135deg,#fff0fb,#fce8ff);
       border:2.5px solid var(--pink2);
-      text-align:center;min-height:64px;
       display:flex;align-items:center;justify-content:center;gap:10px;
+      min-height:64px;
     }
-    .result-icon{font-size:2rem;flex-shrink:0;}
-    .result-text{font-size:clamp(1.1rem,4vw,1.5rem);font-weight:900;color:var(--purple);letter-spacing:.06em;}
+    .result-icon{font-size:1.9rem;flex-shrink:0;}
+    .result-text{font-size:clamp(1rem,4vw,1.45rem);font-weight:900;color:var(--purple);letter-spacing:.06em;}
     .result-box.pop{animation:popIn .4s cubic-bezier(.34,1.56,.64,1);}
     @keyframes popIn{0%{transform:scale(.85);}100%{transform:scale(1);}}
+
+    /* ---- チェックボタン ---- */
+    #check-btn{
+      width:100%;padding:14px;border-radius:50px;border:none;
+      background:linear-gradient(135deg,#7ee8c8,#5ec8f0);
+      color:#fff;font-family:'Noto Sans JP',sans-serif;
+      font-size:1.05rem;font-weight:900;letter-spacing:.15em;
+      cursor:pointer;
+      box-shadow:0 4px 18px rgba(94,200,240,.4);
+      transition:transform .15s,box-shadow .15s,opacity .15s;
+      display:none;
+    }
+    #check-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(94,200,240,.5);}
+    #check-btn:active{transform:scale(.97);}
+    #check-btn.visible{display:block;}
+    #check-btn.done{
+      background:linear-gradient(135deg,#ccc,#aaa);
+      box-shadow:none;cursor:default;
+    }
+
+    /* ---- まわすボタン ---- */
     #roll-btn{
       width:100%;padding:18px;border-radius:50px;border:none;
       background:linear-gradient(135deg,var(--pink),var(--purple));
@@ -102,22 +128,76 @@
     #roll-btn:hover:not(:disabled){transform:translateY(-3px) scale(1.02);box-shadow:0 10px 32px rgba(255,126,179,.5);}
     #roll-btn:active:not(:disabled){transform:scale(.97);}
     #roll-btn:disabled{opacity:.6;cursor:not-allowed;}
+
+    /* ---- ミッションリスト ---- */
+    .mission-list-wrap{width:100%;}
+    .mission-list-title{
+      font-size:.75rem;font-weight:700;color:#c097d0;
+      letter-spacing:.12em;margin-bottom:8px;text-align:center;
+    }
+    .mission-list{
+      display:flex;flex-wrap:wrap;gap:6px;justify-content:center;
+    }
+    .mission-chip{
+      display:flex;align-items:center;gap:5px;
+      padding:5px 12px;border-radius:20px;
+      font-size:.78rem;font-weight:700;letter-spacing:.05em;
+      border:2px solid var(--pink2);
+      color:#d070a8;background:#fff5fb;
+      transition:all .25s;cursor:default;
+      user-select:none;
+    }
+    .mission-chip.checked{
+      background:linear-gradient(135deg,#e8faf4,#d4f4ea);
+      border-color:#7ee8c8;color:#2a9e7a;
+      text-decoration:line-through;
+      opacity:.65;
+    }
+    .mission-chip .chip-icon{font-size:1rem;}
+    .mission-chip .chip-check{font-size:.85rem;}
+
+    /* ---- リセット & カウント ---- */
+    .bottom-row{
+      display:flex;align-items:center;justify-content:space-between;
+      width:100%;
+    }
+    .count-row{font-size:.72rem;color:#c097d0;letter-spacing:.08em;}
+    .count-row b{color:var(--pink);}
+    .reset-btn{
+      font-size:.7rem;color:#c097d0;background:none;border:1px solid #e8d0f0;
+      border-radius:12px;padding:4px 10px;cursor:pointer;
+      font-family:'Noto Sans JP',sans-serif;
+      transition:all .2s;
+    }
+    .reset-btn:hover{background:#fff0fb;color:#c97ef7;border-color:#c97ef7;}
+
+    /* ---- 全完了バナー ---- */
+    .all-done-banner{
+      display:none;
+      width:100%;border-radius:20px;padding:16px;
+      background:linear-gradient(135deg,#fff8e1,#fff3e0);
+      border:2.5px solid var(--yellow);
+      text-align:center;font-size:1rem;font-weight:900;color:#e0900a;
+      letter-spacing:.05em;
+    }
+    .all-done-banner.visible{display:block;}
+
+    /* ---- confetti ---- */
     .confetti-piece{
       position:fixed;border-radius:2px;pointer-events:none;z-index:100;
       animation:confettiFall 1.6s ease-in forwards;
     }
     @keyframes confettiFall{
-      0%  {transform:translateY(-20px) rotate(0deg);  opacity:1;}
+      0%  {transform:translateY(-20px) rotate(0deg);opacity:1;}
       100%{transform:translateY(110vh) rotate(720deg);opacity:0;}
     }
-    .count-row{font-size:.75rem;color:#c097d0;letter-spacing:.1em;}
-    .count-row b{color:var(--pink);}
   </style>
 </head>
 <body>
 <div class="stars" id="stars"></div>
 <div class="card">
   <div class="title">✨ きょうの <span>ミッション</span> ✨</div>
+
   <div class="drum-wrap">
     <div class="pointer"></div>
     <div class="drum-window">
@@ -125,113 +205,124 @@
       <div class="drum-strip" id="strip"></div>
     </div>
   </div>
+
   <div class="result-box" id="result-box">
     <span class="result-icon" id="result-icon">🎀</span>
     <span class="result-text" id="result-text">ボタンをおしてね！</span>
   </div>
+
+  <!-- チェックボタン（結果が出たら表示） -->
+  <button id="check-btn" onclick="checkMission()">✅ おわった！チェック！</button>
+
+  <!-- まわすボタン -->
   <button id="roll-btn" onclick="startRoll()">🎲 まわす！</button>
-  <div class="count-row">これまで <b id="count">0</b> かいまわしたよ！</div>
+
+  <!-- 全完了バナー -->
+  <div class="all-done-banner" id="all-done-banner">
+    🎉 きょうのミッション ぜんぶ クリア！すごい！🎉
+  </div>
+
+  <!-- ミッションリスト -->
+  <div class="mission-list-wrap">
+    <div class="mission-list-title">📋 きょうのミッションリスト</div>
+    <div class="mission-list" id="mission-list"></div>
+  </div>
+
+  <div class="bottom-row">
+    <div class="count-row">まわした回数 <b id="count">0</b> かい</div>
+    <button class="reset-btn" onclick="resetAll()">🔄 リセット</button>
+  </div>
 </div>
 
 <script>
 // ============================================================
-// Web Audio API で効果音を生成（外部ファイル不要！）
+// 効果音
 // ============================================================
 let audioCtx = null;
-
-function getCtx() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function getCtx(){
+  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
   return audioCtx;
 }
-
-// ドラムが回っている間のティック音
-function playTick() {
-  const ctx = getCtx();
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.connect(gain); gain.connect(ctx.destination);
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(900, ctx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.04);
-  gain.gain.setValueAtTime(0.18, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
-  osc.start(ctx.currentTime);
-  osc.stop(ctx.currentTime + 0.06);
-}
-
-// スタート音（ドラムロール開始）
-function playStart() {
-  const ctx = getCtx();
-  [440, 550, 660].forEach((freq, i) => {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.type = 'triangle';
-    osc.frequency.value = freq;
-    const t = ctx.currentTime + i * 0.07;
-    gain.gain.setValueAtTime(0, t);
-    gain.gain.linearRampToValueAtTime(0.2, t + 0.03);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
-    osc.start(t); osc.stop(t + 0.16);
+function playStart(){
+  const ctx=getCtx();
+  [440,550,660].forEach((freq,i)=>{
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    o.type='triangle';o.frequency.value=freq;
+    const t=ctx.currentTime+i*.07;
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(.2,t+.03);
+    g.gain.exponentialRampToValueAtTime(.001,t+.15);
+    o.start(t);o.stop(t+.16);
   });
 }
-
-// ドラムロール中の加速するティック
-function playRollTick(speed) { // speed 0~1
-  const ctx = getCtx();
-  const freq = 500 + speed * 800;
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.connect(gain); gain.connect(ctx.destination);
-  osc.type = 'square';
-  osc.frequency.value = freq;
-  gain.gain.setValueAtTime(0.06, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
-  osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.04);
+function playRollTick(speed){
+  const ctx=getCtx();
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.connect(g);g.connect(ctx.destination);
+  o.type='square';o.frequency.value=500+speed*800;
+  g.gain.setValueAtTime(.06,ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.04);
+  o.start(ctx.currentTime);o.stop(ctx.currentTime+.04);
 }
-
-// 着地音（ドーン！）
-function playLand() {
-  const ctx = getCtx();
-  // 低音ドン
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.connect(gain); gain.connect(ctx.destination);
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(200, ctx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(60, ctx.currentTime + 0.3);
-  gain.gain.setValueAtTime(0.5, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
-  osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.4);
+function playLand(){
+  const ctx=getCtx();
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.connect(g);g.connect(ctx.destination);
+  o.type='sine';
+  o.frequency.setValueAtTime(200,ctx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(60,ctx.currentTime+.3);
+  g.gain.setValueAtTime(.5,ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.35);
+  o.start(ctx.currentTime);o.stop(ctx.currentTime+.4);
 }
-
-// ファンファーレ（結果発表！）
-function playFanfare() {
-  const ctx = getCtx();
-  const melody = [
-    {f:523,t:0},    // C5
-    {f:659,t:0.12}, // E5
-    {f:784,t:0.24}, // G5
-    {f:1047,t:0.36},// C6
-  ];
-  melody.forEach(({f, t}) => {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.type = 'triangle';
-    osc.frequency.value = f;
-    const at = ctx.currentTime + t;
-    gain.gain.setValueAtTime(0, at);
-    gain.gain.linearRampToValueAtTime(0.22, at + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.001, at + 0.18);
-    osc.start(at); osc.stop(at + 0.2);
+function playFanfare(){
+  const ctx=getCtx();
+  [{f:523,t:0},{f:659,t:.12},{f:784,t:.24},{f:1047,t:.36}].forEach(({f,t})=>{
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    o.type='triangle';o.frequency.value=f;
+    const at=ctx.currentTime+t;
+    g.gain.setValueAtTime(0,at);
+    g.gain.linearRampToValueAtTime(.22,at+.02);
+    g.gain.exponentialRampToValueAtTime(.001,at+.18);
+    o.start(at);o.stop(at+.2);
+  });
+}
+// チェック音：明るいポーン
+function playCheck(){
+  const ctx=getCtx();
+  [{f:880,t:0},{f:1100,t:.08},{f:1320,t:.16}].forEach(({f,t})=>{
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    o.type='sine';o.frequency.value=f;
+    const at=ctx.currentTime+t;
+    g.gain.setValueAtTime(0,at);
+    g.gain.linearRampToValueAtTime(.25,at+.02);
+    g.gain.exponentialRampToValueAtTime(.001,at+.25);
+    o.start(at);o.stop(at+.3);
+  });
+}
+// 全クリア音
+function playAllClear(){
+  const ctx=getCtx();
+  const melody=[523,659,784,659,1047];
+  melody.forEach((f,i)=>{
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    o.type='triangle';o.frequency.value=f;
+    const at=ctx.currentTime+i*.13;
+    g.gain.setValueAtTime(0,at);
+    g.gain.linearRampToValueAtTime(.28,at+.02);
+    g.gain.exponentialRampToValueAtTime(.001,at+.22);
+    o.start(at);o.stop(at+.25);
   });
 }
 
 // ============================================================
-// アイテム定義
+// ミッション定義
 // ============================================================
-const items = [
+const ALL_ITEMS = [
   {label:'ピアノ',          icon:'🎹'},
   {label:'日記',            icon:'📔'},
   {label:'勉強',            icon:'📚'},
@@ -242,157 +333,239 @@ const items = [
   {label:'Y字バランス10秒', icon:'⭐'},
   {label:'タッチタイピング', icon:'⌨️'},
   {label:'ゲーム',          icon:'🎮'},
+  {label:'読書',            icon:'📖'},
 ];
 
-let currentIndex = 0, rollCount = 0, rolling = false;
-const strip     = document.getElementById('strip');
+// ============================================================
+// localStorage キー（日付付き：毎日リセット）
+// ============================================================
+const TODAY = new Date().toISOString().slice(0,10); // "2026-03-22"
+const STORAGE_KEY  = `mission_checked_${TODAY}`;
+const ROLL_KEY     = `mission_rolls_${TODAY}`;
+
+function loadChecked(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); }catch{return[];} }
+function saveChecked(arr){ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+function loadRolls(){  return parseInt(localStorage.getItem(ROLL_KEY)||'0',10); }
+function saveRolls(n){ localStorage.setItem(ROLL_KEY, n); }
+
+// ============================================================
+// 状態
+// ============================================================
+let checkedLabels = loadChecked();   // チェック済みラベル配列
+let rollCount     = loadRolls();
+let currentLabel  = null;            // 現在ドラムに表示中
+let rolling       = false;
+
+// 残りミッション（チェック済みを除く）
+function remaining(){ return ALL_ITEMS.filter(it=>!checkedLabels.includes(it.label)); }
+
+// ============================================================
+// DOM
+// ============================================================
+const strip      = document.getElementById('strip');
 const resultBox  = document.getElementById('result-box');
 const resultIcon = document.getElementById('result-icon');
 const resultText = document.getElementById('result-text');
-const countEl   = document.getElementById('count');
-const btn       = document.getElementById('roll-btn');
+const countEl    = document.getElementById('count');
+const btn        = document.getElementById('roll-btn');
+const checkBtn   = document.getElementById('check-btn');
+const missionList= document.getElementById('mission-list');
+const allDoneBanner = document.getElementById('all-done-banner');
 
-const REPEATS = 6, ITEM_H = 120, LOOP_LEN = items.length;
-const allItems = [];
-for (let r = 0; r < REPEATS; r++) items.forEach(it => allItems.push(it));
+countEl.textContent = rollCount;
 
-allItems.forEach(it => {
-  const div = document.createElement('div');
-  div.className = 'drum-item';
-  div.innerHTML = `<span class="drum-icon">${it.icon}</span><span class="drum-label">${it.label}</span>`;
+// ============================================================
+// ドラムストリップ構築
+// ============================================================
+const REPEATS=6, ITEM_H=120, LOOP_LEN=ALL_ITEMS.length;
+const allSlots=[];
+for(let r=0;r<REPEATS;r++) ALL_ITEMS.forEach(it=>allSlots.push(it));
+allSlots.forEach(it=>{
+  const div=document.createElement('div');
+  div.className='drum-item';
+  div.innerHTML=`<span class="drum-icon">${it.icon}</span><span class="drum-label">${it.label}</span>`;
   strip.appendChild(div);
 });
 
-function itemY(idx) { return -(idx * ITEM_H); }
+let stripIndex=0; // 現在表示中の ALL_ITEMS インデックス
+function itemY(idx){ return -(idx*ITEM_H); }
+strip.style.transform=`translateY(${itemY(LOOP_LEN*2+stripIndex)}px)`;
 
-// init: set#2 の先頭に合わせる
-strip.style.transform = `translateY(${itemY(LOOP_LEN * 2 + currentIndex)}px)`;
+// ============================================================
+// ミッションリスト描画
+// ============================================================
+function renderList(){
+  missionList.innerHTML='';
+  ALL_ITEMS.forEach(it=>{
+    const chip=document.createElement('div');
+    const done=checkedLabels.includes(it.label);
+    chip.className='mission-chip'+(done?' checked':'');
+    chip.innerHTML=`<span class="chip-icon">${it.icon}</span>${it.label}${done?'<span class="chip-check">✓</span>':''}`;
+    missionList.appendChild(chip);
+  });
 
-function startRoll() {
-  if (rolling) return;
-  rolling = true;
-  btn.disabled = true;
-  btn.textContent = '🌀 まわってるよ…';
+  // 全クリア判定
+  if(checkedLabels.length>=ALL_ITEMS.length){
+    allDoneBanner.classList.add('visible');
+    btn.disabled=true;
+    btn.textContent='🎊 ぜんぶクリア！';
+  } else {
+    allDoneBanner.classList.remove('visible');
+    btn.disabled=false;
+  }
+}
+renderList();
 
-  // スタート音
+// ============================================================
+// ロール
+// ============================================================
+function startRoll(){
+  if(rolling) return;
+
+  const pool=remaining();
+  if(pool.length===0){
+    btn.textContent='🎊 ぜんぶクリア！';
+    btn.disabled=true;
+    return;
+  }
+
+  rolling=true;
+  btn.disabled=true;
+  btn.textContent='🌀 まわってるよ…';
+  checkBtn.classList.remove('visible'); // チェックボタン隠す
+
   playStart();
 
-  let next;
-  do { next = Math.floor(Math.random() * items.length); }
-  while (next === currentIndex && items.length > 1);
+  // 次のミッションを pool から選ぶ
+  const chosen=pool[Math.floor(Math.random()*pool.length)];
+  const nextIdx=ALL_ITEMS.indexOf(chosen); // 0〜10
 
-  const finalIdx  = LOOP_LEN * 3 + next + LOOP_LEN * 2;
-  const startY    = itemY(LOOP_LEN * 2 + currentIndex);
+  const finalIdx  = LOOP_LEN*3 + nextIdx + LOOP_LEN*2;
+  const startY    = itemY(LOOP_LEN*2 + stripIndex);
   const endY      = itemY(finalIdx);
   const dist      = endY - startY;
-
   const DURATION  = 3200;
   const startTime = performance.now();
+  let lastTickY   = startY;
+  let landSoundOk = true;
 
-  // ティック音スケジューリング用
-  let lastTickY = startY;
-  let lastLandSoundPlayed = false;
+  function easeOutBack(t){ const c1=1.70158,c3=c1+1; return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2); }
+  function ease(t){ return t<.35?(t/.35)*(t/.35)*.35:easeOutBack(t); }
 
-  function easeOutBack(t) {
-    const c1 = 1.70158, c3 = c1 + 1;
-    return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
-  }
-  function easeInOut(t) {
-    if (t < 0.35) return (t / 0.35) * (t / 0.35) * 0.35; // slow ease-in
-    return easeOutBack(t);
-  }
+  function tick(now){
+    const t=Math.min((now-startTime)/DURATION,1);
+    const y=startY+dist*ease(t);
+    strip.style.transform=`translateY(${y}px)`;
+    if(Math.abs(y-lastTickY)>=ITEM_H){ playRollTick(Math.min(t*1.5,1)); lastTickY=y; }
+    if(t>.88&&landSoundOk){ playLand(); landSoundOk=false; }
 
-  function tick(now) {
-    const t    = Math.min((now - startTime) / DURATION, 1);
-    const ease = easeInOut(t);
-    const y    = startY + dist * ease;
-    strip.style.transform = `translateY(${y}px)`;
+    if(t<1){ requestAnimationFrame(tick); return; }
 
-    // アイテム境界を通過するたびにティック音
-    const crossed = Math.floor(Math.abs(y - lastTickY) / ITEM_H);
-    if (crossed > 0) {
-      playRollTick(Math.min(t * 1.5, 1));
-      lastTickY = y;
-    }
+    // 着地
+    stripIndex=nextIdx;
+    strip.style.transition='none';
+    strip.style.transform=`translateY(${itemY(LOOP_LEN*2+nextIdx)}px)`;
 
-    // 着地直前（t>0.88）に1回だけドン音
-    if (t > 0.88 && !lastLandSoundPlayed) {
-      playLand();
-      lastLandSoundPlayed = true;
-    }
+    currentLabel=chosen.label;
+    resultIcon.textContent=chosen.icon;
+    resultText.textContent=chosen.label;
+    resultBox.classList.remove('pop');
+    void resultBox.offsetWidth;
+    resultBox.classList.add('pop');
 
-    if (t < 1) {
-      requestAnimationFrame(tick);
-    } else {
-      currentIndex = next;
-      // set#2 に wrap
-      strip.style.transition = 'none';
-      strip.style.transform  = `translateY(${itemY(LOOP_LEN * 2 + next)}px)`;
+    rollCount++; countEl.textContent=rollCount; saveRolls(rollCount);
 
-      const chosen = items[next];
-      resultIcon.textContent = chosen.icon;
-      resultText.textContent = chosen.label;
-      resultBox.classList.remove('pop');
-      void resultBox.offsetWidth;
-      resultBox.classList.add('pop');
+    playFanfare();
+    launchConfetti();
 
-      rollCount++;
-      countEl.textContent = rollCount;
+    // チェックボタン表示
+    checkBtn.classList.add('visible');
+    checkBtn.classList.remove('done');
+    checkBtn.textContent='✅ おわった！チェック！';
+    checkBtn.disabled=false;
 
-      // ファンファーレ & コンフェッティ
-      playFanfare();
-      launchConfetti();
-
-      btn.textContent = '🎲 もういちど！';
-      btn.disabled    = false;
-      rolling         = false;
-    }
+    btn.textContent='🎲 もういちど！';
+    btn.disabled=false;
+    rolling=false;
   }
   requestAnimationFrame(tick);
 }
 
 // ============================================================
+// チェック処理
+// ============================================================
+function checkMission(){
+  if(!currentLabel || checkedLabels.includes(currentLabel)) return;
+
+  checkedLabels.push(currentLabel);
+  saveChecked(checkedLabels);
+
+  playCheck();
+  launchConfetti(20);
+
+  // ボタンを「チェック済み」状態に
+  checkBtn.classList.add('done');
+  checkBtn.textContent='✔ チェック済み！';
+  checkBtn.disabled=true;
+
+  renderList();
+
+  // 全クリアだったら大ファンファーレ
+  if(checkedLabels.length>=ALL_ITEMS.length){
+    setTimeout(()=>{ playAllClear(); launchConfetti(80); },300);
+  }
+}
+
+// ============================================================
+// リセット（当日分クリア）
+// ============================================================
+function resetAll(){
+  if(!confirm('きょうのチェックをリセットするよ？')) return;
+  checkedLabels=[];
+  saveChecked([]);
+  currentLabel=null;
+  checkBtn.classList.remove('visible');
+  resultIcon.textContent='🎀';
+  resultText.textContent='ボタンをおしてね！';
+  renderList();
+}
+
+// ============================================================
 // コンフェッティ
 // ============================================================
-const confettiColors = ['#ff7eb3','#ffb3d1','#c97ef7','#ffe066','#7ee8c8','#ff9de2'];
-function launchConfetti() {
-  for (let i = 0; i < 55; i++) {
-    const el = document.createElement('div');
-    el.className = 'confetti-piece';
-    el.style.cssText = `
-      left:${Math.random()*100}vw;
-      top:${Math.random()*20}vh;
-      background:${confettiColors[Math.floor(Math.random()*confettiColors.length)]};
+const COLORS=['#ff7eb3','#ffb3d1','#c97ef7','#ffe066','#7ee8c8','#ff9de2'];
+function launchConfetti(n=55){
+  for(let i=0;i<n;i++){
+    const el=document.createElement('div');
+    el.className='confetti-piece';
+    el.style.cssText=`
+      left:${Math.random()*100}vw;top:${Math.random()*20}vh;
+      background:${COLORS[Math.floor(Math.random()*COLORS.length)]};
       border-radius:${Math.random()>.5?'50%':'2px'};
       width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;
       animation-duration:${1.2+Math.random()*.9}s;
       animation-delay:${Math.random()*.3}s;`;
     document.body.appendChild(el);
-    el.addEventListener('animationend', () => el.remove());
+    el.addEventListener('animationend',()=>el.remove());
   }
 }
 
 // ============================================================
 // 浮かぶ星
 // ============================================================
-const emojis = ['⭐','✨','💫','🌸','💕','🎀'];
-const starsEl = document.getElementById('stars');
-emojis.forEach(e => {
-  for (let j = 0; j < 3; j++) {
-    const s = document.createElement('div');
-    s.className = 'star'; s.textContent = e;
-    s.style.cssText = `left:${Math.random()*100}vw;
+['⭐','✨','💫','🌸','💕','🎀'].forEach(e=>{
+  for(let j=0;j<3;j++){
+    const s=document.createElement('div');
+    s.className='star';s.textContent=e;
+    s.style.cssText=`left:${Math.random()*100}vw;
       animation-duration:${8+Math.random()*10}s;
       animation-delay:${Math.random()*12}s;
       font-size:${.9+Math.random()*.9}rem;`;
-    starsEl.appendChild(s);
+    document.getElementById('stars').appendChild(s);
   }
 });
 
-// スペースキー
-document.addEventListener('keydown', e => {
-  if (e.code === 'Space') { e.preventDefault(); startRoll(); }
-});
+document.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();startRoll();}});
 </script>
 </body>
 </html>
