@@ -60,6 +60,89 @@ body{
 .tab-btn .tab-icon{font-size:1.15rem;}
 .tab-btn.active{color:var(--pink);border-bottom-color:var(--pink);}
 
+/* ── ロックされたゲームタブ ── */
+.tab-btn.locked{
+  color:#ddd;cursor:not-allowed;opacity:.6;
+  position:relative;
+}
+.tab-btn.locked .tab-icon::after{
+  content:'🔒';
+  position:absolute;
+  font-size:.55rem;
+  top:6px;right:calc(50% - 18px);
+  line-height:1;
+}
+.tab-btn.locked:hover{color:#ddd;}
+
+/* ── ゲームロック画面（ペイン内） ── */
+.game-locked-screen{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;
+  padding:32px 20px;gap:14px;min-height:260px;
+}
+.lock-icon-big{
+  font-size:3.5rem;
+  animation:lockWiggle 3s ease-in-out infinite;
+}
+@keyframes lockWiggle{
+  0%,100%{transform:rotate(0deg);}
+  10%{transform:rotate(-8deg);}
+  20%{transform:rotate(8deg);}
+  30%{transform:rotate(0deg);}
+}
+.lock-title{font-size:1.05rem;font-weight:900;color:#c097d0;letter-spacing:.08em;}
+.lock-hint{font-size:.78rem;color:#d0b0e0;line-height:1.7;letter-spacing:.04em;}
+.lock-progress-wrap{width:100%;max-width:260px;}
+.lock-prog-label{font-size:.72rem;color:#c097d0;margin-bottom:5px;display:flex;justify-content:space-between;}
+.lock-prog-bg{height:11px;border-radius:99px;background:#f0e0f8;overflow:hidden;}
+.lock-prog-fill{
+  height:100%;border-radius:99px;
+  background:linear-gradient(90deg,var(--pink),var(--purple));
+  transition:width .6s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── 解放バナー（全画面オーバーレイ） ── */
+#unlock-overlay{
+  position:fixed;inset:0;z-index:500;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(0,0,20,.9);
+  visibility:hidden;opacity:0;
+  transition:opacity .4s, visibility .4s;
+}
+#unlock-overlay.show{opacity:1;visibility:visible;}
+.unlock-badge{
+  text-align:center;
+  animation:unlockPop .7s cubic-bezier(.34,1.4,.64,1);
+  max-width:min(360px,88vw);
+}
+@keyframes unlockPop{
+  0%{transform:scale(.3) rotate(-10deg);opacity:0;}
+  70%{transform:scale(1.08) rotate(2deg);}
+  100%{transform:scale(1) rotate(0);opacity:1;}
+}
+.unlock-emoji{font-size:4rem;display:block;margin-bottom:8px;
+  animation:unlockFloat 2s ease-in-out infinite;}
+@keyframes unlockFloat{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-10px);}
+}
+.unlock-title{
+  font-size:1.5rem;font-weight:900;color:#fff;
+  letter-spacing:.1em;margin-bottom:6px;
+  text-shadow:0 0 30px rgba(255,180,100,.8);
+}
+.unlock-sub{font-size:.85rem;color:#ffd6a0;line-height:1.7;margin-bottom:18px;}
+.unlock-go-btn{
+  padding:14px 36px;border-radius:50px;border:none;
+  background:linear-gradient(135deg,#ff9800,#ffcc00);
+  color:#7a3000;font-family:'Noto Sans JP',sans-serif;
+  font-size:1.05rem;font-weight:900;letter-spacing:.14em;
+  cursor:pointer;box-shadow:0 5px 24px rgba(255,180,0,.5);
+  transition:transform .15s,box-shadow .15s;
+}
+.unlock-go-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(255,180,0,.65);}
+.unlock-go-btn:active{transform:scale(.97);}
+
 /* スタック進捗バー */
 .sticky-progress{
   padding:7px 16px 8px;
@@ -535,7 +618,7 @@ body{
       <button class="tab-btn" id="tab-habit" onclick="switchTab(1)">
         <span class="tab-icon">✅</span>習慣チェック
       </button>
-      <button class="tab-btn" id="tab-game" onclick="switchTab(2)">
+      <button class="tab-btn locked" id="tab-game" onclick="tryGameTab()">
         <span class="tab-icon">🎮</span>ゲーム
       </button>
     </div>
@@ -667,7 +750,27 @@ body{
 
       <!-- ゲームペイン -->
       <div class="pane" id="pane-game">
-        <div class="card game-card">
+        <!-- ロック中カード -->
+        <div class="card" id="game-locked-card">
+          <div class="game-locked-screen">
+            <span class="lock-icon-big">🔒</span>
+            <div class="lock-title">ゲームはまだ ひみつ…</div>
+            <div class="lock-hint">
+              ミッションを <b style="color:var(--pink)">半分以上</b> クリアすると<br>
+              ゲームがあそべるようになるよ！<br>
+              <span style="font-size:.72rem;color:#c8a0e0">（ひみつのミッションをクリアするとすぐ解放！）</span>
+            </div>
+            <div class="lock-progress-wrap">
+              <div class="lock-prog-label">
+                <span>ミッション進捗</span>
+                <span id="lock-prog-text">0 / 11</span>
+              </div>
+              <div class="lock-prog-bg"><div class="lock-prog-fill" id="lock-prog-fill" style="width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+        <!-- 解放後カード -->
+        <div class="card game-card" id="game-main-card" style="display:none">
           <div class="card-title">🎮 <span>アルカノイド</span></div>
           <div class="game-info-row">
             <div class="game-stat">スコア <b id="g-score">0</b></div>
@@ -689,6 +792,16 @@ body{
       </div><!-- /pane-game -->
 
     </div>
+  </div>
+</div>
+
+<!-- ゲーム解放オーバーレイ -->
+<div id="unlock-overlay">
+  <div class="unlock-badge">
+    <span class="unlock-emoji" id="unlock-emoji">🎮</span>
+    <div class="unlock-title" id="unlock-title">ゲーム かいほう！！</div>
+    <div class="unlock-sub" id="unlock-sub">ミッションたくさんがんばったね！<br>ゲームであそんでいいよ🎉</div>
+    <button class="unlock-go-btn" onclick="closeUnlockOverlay()">あそぶ！ →</button>
   </div>
 </div>
 
@@ -799,6 +912,124 @@ let mRolls=parseInt(localStorage.getItem(`m_rolls_${TODAY}`)||'0',10);
 let hChecked=loadJSON(`h_checked_${TODAY}`,[]);
 let mCurrentLabel=null,mRolling=false;
 function mRemaining(){return MISSION_ITEMS.filter(it=>!mChecked.includes(it.label));}
+
+// ══════════════════════════════
+// ゲーム解放
+// ══════════════════════════════
+const GAME_UNLOCK_KEY=`game_unlocked_${TODAY}`;
+let gameUnlocked=!!localStorage.getItem(GAME_UNLOCK_KEY);
+
+function isGameUnlockable(){
+  return mChecked.length >= Math.ceil(MISSION_ITEMS.length/2);
+}
+
+function applyGameLockState(){
+  const tab=document.getElementById('tab-game');
+  const locked=document.getElementById('game-locked-card');
+  const main=document.getElementById('game-main-card');
+  if(gameUnlocked){
+    tab.classList.remove('locked');
+    tab.onclick=()=>switchTab(2);
+    if(locked) locked.style.display='none';
+    if(main) main.style.display='flex';
+  } else {
+    tab.classList.add('locked');
+    tab.onclick=null;
+    if(locked) locked.style.display='block';
+    if(main) main.style.display='none';
+    updateLockProgress();
+  }
+}
+
+function updateLockProgress(){
+  const n=mChecked.length,total=MISSION_ITEMS.length;
+  const el=document.getElementById('lock-prog-text');
+  const fill=document.getElementById('lock-prog-fill');
+  if(el) el.textContent=`${n} / ${total}`;
+  if(fill) fill.style.width=(total?n/total*100:0)+'%';
+}
+
+function tryGameTab(){
+  if(gameUnlocked){switchTab(2);return;}
+  // ロックされていたら鍵がガチャガチャする軽い演出
+  playLockRattle();
+  shakeLockIcon();
+}
+
+function shakeLockIcon(){
+  const icon=document.querySelector('.lock-icon-big');
+  if(!icon)return;
+  icon.style.animation='none';
+  icon.style.transform='scale(1.3) rotate(-15deg)';
+  setTimeout(()=>{
+    icon.style.transition='transform .4s cubic-bezier(.34,1.56,.64,1)';
+    icon.style.transform='scale(1) rotate(0deg)';
+    setTimeout(()=>{
+      icon.style.transition='';
+      icon.style.animation='lockWiggle 3s ease-in-out infinite';
+    },400);
+  },50);
+}
+
+function playLockRattle(){
+  const c=getCtx();
+  [300,260,220].forEach((f,i)=>tone('square',f,.07,c.currentTime+i*.06,.08));
+}
+
+// ゲーム解放確認（ミッションチェック後に呼ぶ）
+function checkGameUnlock(fromSecret=false){
+  if(gameUnlocked)return;
+  if(fromSecret||isGameUnlockable()){
+    gameUnlocked=true;
+    localStorage.setItem(GAME_UNLOCK_KEY,'1');
+    applyGameLockState();
+    // 演出
+    setTimeout(()=>{
+      showUnlockOverlay(fromSecret);
+    },fromSecret?800:400);
+  }
+}
+
+function showUnlockOverlay(fromSecret){
+  const overlay=document.getElementById('unlock-overlay');
+  const emoji=document.getElementById('unlock-emoji');
+  const title=document.getElementById('unlock-title');
+  const sub=document.getElementById('unlock-sub');
+  if(fromSecret){
+    emoji.textContent='🤫✨🎮';
+    title.textContent='ひみつのちからで かいほう！！';
+    sub.textContent='かくしミッションのごほうびだよ！\nゲームでたくさんあそんでね🎮💜';
+  } else {
+    emoji.textContent='🎮🎉🎊';
+    title.textContent='ゲーム かいほう！！';
+    sub.textContent='ミッションたくさんがんばったね！\nゲームであそんでいいよ✨';
+  }
+  overlay.classList.add('show');
+  playUnlockSound(fromSecret);
+  launchConfetti(fromSecret?120:80);
+  if(fromSecret) launchSecretStars();
+}
+
+function playUnlockSound(fromSecret){
+  const c=getCtx();
+  if(fromSecret){
+    // 神秘的な解放音
+    [{f:220,t:0},{f:330,t:.1},{f:440,t:.2},{f:660,t:.3},{f:880,t:.42},{f:1047,t:.56},{f:1319,t:.72}]
+      .forEach(({f,t})=>tone('triangle',f,.22,c.currentTime+t,.28));
+  } else {
+    // 明るくポップな解放音
+    [{f:523,t:0},{f:659,t:.1},{f:784,t:.2},{f:1047,t:.32},{f:1319,t:.46},{f:1047,t:.6},{f:1319,t:.74},{f:1568,t:.9}]
+      .forEach(({f,t})=>tone('triangle',f,.22,c.currentTime+t,.24));
+    [{f:131,t:.32},{f:196,t:.6},{f:262,t:.9}]
+      .forEach(({f,t})=>tone('sine',f,.12,c.currentTime+t,.35));
+  }
+}
+
+function closeUnlockOverlay(){
+  document.getElementById('unlock-overlay').classList.remove('show');
+  switchTab(2);
+  setTimeout(resizeCanvas,80);
+}
 
 // アコーディオン開閉状態（sessionStorage）
 function loadOpen(id){try{return sessionStorage.getItem('acc_'+id)!=='0';}catch{return true;}}
@@ -989,6 +1220,7 @@ function renderMChips(){
   if(allDone)rollBtn.textContent='🎊 ぜんぶクリア！';
   else if(!mRolling)rollBtn.textContent=mRolls>0?'🎲 もういちど！':'🎲 まわす！';
   updateStickyProgress();
+  updateLockProgress();
 }
 renderMChips();
 
@@ -1003,6 +1235,7 @@ function toggleMChip(label){
   }
   saveJSON(`m_checked_${TODAY}`,mChecked);renderMChips();
   if(mChecked.length>=MISSION_ITEMS.length)setTimeout(()=>{playAllClear();launchConfetti(75);},200);
+  checkGameUnlock(false);
 }
 
 function startRoll(){
@@ -1075,17 +1308,18 @@ function checkMission(){
   mCheckBtn.classList.add('done');mCheckBtn.textContent='✔ チェック済み！';mCheckBtn.disabled=true;
 
   if(mCurrentIsSecret){
-    // 隠しミッション完了の超豪華演出
     playSecretClear();
     setTimeout(()=>{
       launchConfetti(120);
       launchSecretStars();
       document.getElementById('secret-clear').classList.add('show');
     },100);
+    checkGameUnlock(true);
   } else {
     playMCheck();launchConfetti(18);
     renderMChips();
     if(mChecked.length>=MISSION_ITEMS.length)setTimeout(()=>{playAllClear();launchConfetti(75);},200);
+    checkGameUnlock(false);
   }
 }
 
@@ -1293,6 +1527,7 @@ function launchConfetti(n=50,extra){
 });
 
 updateStickyProgress();
+applyGameLockState();
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&currentTab===0){e.preventDefault();startRoll();}});
 
 // ══════════════════════════════════════════════════
