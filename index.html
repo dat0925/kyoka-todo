@@ -1546,25 +1546,28 @@ const SUPABASE_URL = 'https://sfhtvtcmgueystyuhzvd.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmaHR2dGNtZ3VleXN0eXVoenZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3Nzg0MDYsImV4cCI6MjA5MDM1NDQwNn0.qsON2xYdDf22LtU-jGd96Ubaif0xzzswC9KnzWndKNw';
 
 async function sbUpsert(task_id, task_label, task_type, checked) {
+  // date + task_id のユニーク制約を利用してUPSERT
+  // Supabase REST: onConflict でUPDATE
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/task_logs`, {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates',
-      },
-      body: JSON.stringify({
-        date: TODAY,
-        task_id,
-        task_label,
-        task_type,
-        checked,
-      })
+    const headers = {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'resolution=merge-duplicates,return=minimal',
+    };
+    const body = JSON.stringify({
+      date: TODAY,
+      task_id,
+      task_label,
+      task_type,
+      checked,
     });
+    // POST with on_conflict → INSERT or UPDATE
+    await fetch(
+      `${SUPABASE_URL}/rest/v1/task_logs?on_conflict=date,task_id`,
+      { method: 'POST', headers, body }
+    );
   } catch(e) {
-    // オフライン時はlocalStorageのみで動作
     console.warn('Supabase sync failed:', e);
   }
 }
