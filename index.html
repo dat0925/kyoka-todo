@@ -437,7 +437,7 @@ background:linear-gradient(135deg,#e0a020,#ffcc40);
 .diff-btn:hover:not(.active){background:#f8f0ff;border-color:var(--purple);}
 .diff-btn.active{transform:translateY(-2px);}
 /* ── 一時停止ボタン ── */
-.game-ctrl-row{display:flex;align-items:center;justify-content:space-between;width:100%;}
+.game-ctrl-row{display:flex;align-items:center;justify-content:space-between;width:100%;margin:8px 0 4px;}
 .pause-btn{
   padding:5px 12px;border-radius:50px;border:2px solid var(--purple);
   background:transparent;color:var(--purple);
@@ -459,9 +459,10 @@ background:linear-gradient(135deg,#e0a020,#ffcc40);
   width:100%;border-radius:14px;
   background:linear-gradient(135deg,#f8f0ff,#fff5fb);
   border:2px solid var(--purple);
-  padding:14px 14px 12px;
+  padding:16px 16px 14px;
   position:relative;
   display:none;
+  margin-top:6px;
   animation:helpSlideIn .22s cubic-bezier(.34,1.2,.64,1);
 }
 .help-panel.open{display:block;}
@@ -480,27 +481,60 @@ background:linear-gradient(135deg,#e0a020,#ffcc40);
   font-size:.82rem;font-weight:900;color:var(--purple);
   margin-bottom:10px;letter-spacing:.06em;
 }
-.help-body{display:flex;flex-direction:column;gap:7px;}
+.help-body{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
 .help-item{
-  font-size:.74rem;color:#555;line-height:1.5;
-  padding:6px 10px;border-radius:9px;background:#fff;
+  font-size:.74rem;color:#555;line-height:1.6;
+  padding:8px 12px;border-radius:10px;background:#fff;
   border:1.5px solid #f0e0f8;
 }
 .help-item b{color:var(--purple);}
 /* ── マージゲーム ── */
-.merge-board-wrap{width:100%;display:flex;justify-content:center;}
+.merge-board-wrap{
+  width:100%;display:flex;justify-content:center;
+  margin:10px 0 6px;
+  /* タッチがボード外に伝播しないよう制御 */
+  touch-action:none;
+}
 .merge-board{
   display:grid;grid-template-columns:repeat(4,1fr);
-  gap:6px;padding:8px;background:#bbada0;border-radius:10px;
+  gap:7px;padding:10px;background:#bbada0;border-radius:14px;
   width:min(300px,88vw);aspect-ratio:1;
+  touch-action:none;
+  box-shadow:0 4px 18px rgba(0,0,0,.15);
 }
 .merge-cell{
-  border-radius:6px;display:flex;align-items:center;justify-content:center;
+  border-radius:8px;display:flex;align-items:center;justify-content:center;
   font-family:"Noto Sans JP",sans-serif;font-weight:900;
   font-size:clamp(.7rem,3.5vw,1.1rem);
-  transition:transform .1s;
   aspect-ratio:1;
+  transition:transform .12s cubic-bezier(.34,1.3,.64,1), background .1s, opacity .15s;
+  will-change:transform;
+  box-shadow:inset 0 -2px 0 rgba(0,0,0,.08);
 }
+.merge-cell.new{
+  animation:cellPop .18s cubic-bezier(.34,1.56,.64,1);
+}
+.merge-cell.merged{
+  animation:cellMerge .22s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes cellPop{
+  0%{transform:scale(0);opacity:0;}
+  100%{transform:scale(1);opacity:1;}
+}
+@keyframes cellMerge{
+  0%{transform:scale(1);}
+  40%{transform:scale(1.22);}
+  100%{transform:scale(1);}
+}
+/* スワイプ方向フラッシュ */
+.merge-board.swipe-left  { animation: swipeFlashL .15s ease-out; }
+.merge-board.swipe-right { animation: swipeFlashR .15s ease-out; }
+.merge-board.swipe-up    { animation: swipeFlashU .15s ease-out; }
+.merge-board.swipe-down  { animation: swipeFlashD .15s ease-out; }
+@keyframes swipeFlashL  { 0%,100%{transform:translateX(0)} 40%{transform:translateX(-5px)} }
+@keyframes swipeFlashR  { 0%,100%{transform:translateX(0)} 40%{transform:translateX( 5px)} }
+@keyframes swipeFlashU  { 0%,100%{transform:translateY(0)} 40%{transform:translateY(-5px)} }
+@keyframes swipeFlashD  { 0%,100%{transform:translateY(0)} 40%{transform:translateY( 5px)} }
 /* ── スライドパズル ── */
 .slide-board-wrap{width:100%;display:flex;justify-content:center;}
 .slide-board{
@@ -2812,20 +2846,39 @@ function mergeNewGame() {
   mgScore = 0;
   mergeAddRandom(); mergeAddRandom();
   mergeRender();
-  // スワイプ操作
-  const board = document.getElementById('merge-board');
-  let tx, ty;
-  board.ontouchstart = e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; };
-  board.ontouchend = e => {
-    const dx = e.changedTouches[0].clientX - tx;
-    const dy = e.changedTouches[0].clientY - ty;
-    if (Math.abs(dx) > Math.abs(dy)) mergeMove(dx > 0 ? 'right' : 'left');
-    else mergeMove(dy > 0 ? 'down' : 'up');
-  };
+  mergeSetupTouch();
   document.onkeydown = e => {
     const map = { ArrowLeft:'left', ArrowRight:'right', ArrowUp:'up', ArrowDown:'down' };
     if (map[e.key]) { e.preventDefault(); mergeMove(map[e.key]); }
   };
+}
+
+function mergeSetupTouch() {
+  const board = document.getElementById('merge-board');
+  if (!board) return;
+  let tx = null, ty = null;
+
+  board.addEventListener('touchstart', e => {
+    e.preventDefault(); // ← ページスクロールを完全にブロック
+    tx = e.touches[0].clientX;
+    ty = e.touches[0].clientY;
+  }, { passive: false });
+
+  board.addEventListener('touchmove', e => {
+    e.preventDefault(); // ← 移動中もスクロールをブロック
+  }, { passive: false });
+
+  board.addEventListener('touchend', e => {
+    e.preventDefault();
+    if (tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    const dy = e.changedTouches[0].clientY - ty;
+    tx = null; ty = null;
+    const minSwipe = 20;
+    if (Math.abs(dx) < minSwipe && Math.abs(dy) < minSwipe) return;
+    if (Math.abs(dx) > Math.abs(dy)) mergeMove(dx > 0 ? 'right' : 'left');
+    else mergeMove(dy > 0 ? 'down' : 'up');
+  }, { passive: false });
 }
 
 function mergeAddRandom() {
@@ -2840,13 +2893,41 @@ function mergeMove(dir) {
   const prev = JSON.stringify(mgGrid);
   const rotations = { left:0, up:1, right:2, down:3 };
   let g = rotateGrid(mgGrid, rotations[dir]);
-  g = g.map(row => mergeRow(row));
+  const mergedPositions = new Set();
+  g = g.map((row, ri) => mergeRowTracked(row, ri, rotations[dir], mergedPositions));
   mgGrid = rotateGrid(g, (4 - rotations[dir]) % 4);
   if (JSON.stringify(mgGrid) !== prev) {
     mergeAddRandom();
-    mergeRender();
+    mergeRender(mergedPositions, dir);
+    // 方向フラッシュ
+    const board = document.getElementById('merge-board');
+    const cls = 'swipe-' + dir;
+    board.classList.remove('swipe-left','swipe-right','swipe-up','swipe-down');
+    void board.offsetWidth;
+    board.classList.add(cls);
+    setTimeout(() => board.classList.remove(cls), 200);
     tone('sine', 440, .1, getCtx().currentTime, .06);
   }
+}
+
+function mergeRowTracked(row, ri, rotation, mergedSet) {
+  const nums = row.filter(v => v);
+  const merged = [];
+  let i = 0;
+  while (i < nums.length) {
+    if (i + 1 < nums.length && nums[i] === nums[i + 1]) {
+      const val = nums[i] * 2;
+      merged.push(val);
+      mgScore += val;
+      if (mgScore > mgHi) { mgHi = mgScore; localStorage.setItem('merge_hi', mgHi); }
+      mergedSet.add(ri + '-' + merged.length - 1 + '-merged');
+      i += 2;
+    } else {
+      merged.push(nums[i++]);
+    }
+  }
+  while (merged.length < MG_SIZE) merged.push(0);
+  return merged;
 }
 
 function rotateGrid(g, times) {
@@ -2876,19 +2957,24 @@ function mergeRow(row) {
   return merged;
 }
 
-function mergeRender() {
+function mergeRender(mergedPositions, dir) {
   const board = document.getElementById('merge-board');
+  // 既存セルを退場アニメなしで差し替え
+  const prevCells = Array.from(board.children);
   board.innerHTML = '';
   let maxVal = 0;
   mgGrid.forEach(row => row.forEach(v => { if (v > maxVal) maxVal = v; }));
-  mgGrid.forEach(row => {
-    row.forEach(v => {
+  mgGrid.forEach((row, ri) => {
+    row.forEach((v, ci) => {
       const cell = document.createElement('div');
-      cell.className = 'merge-cell';
+      const isNew = v !== 0 && prevCells.length > 0;
+      const isMerged = mergedPositions && mergedPositions.has(ri + '-' + ci + '-merged');
+      cell.className = 'merge-cell' + (isMerged ? ' merged' : (isNew ? ' new' : ''));
       cell.textContent = v || '';
       const bg = MERGE_COLORS[Math.min(v, 2048)] || '#3c3a32';
       const fg = MERGE_TEXT_COLORS[Math.min(v, 2048)] || '#f9f6f2';
-      cell.style.cssText = `background:${bg};color:${fg};`;
+      cell.style.background = bg;
+      cell.style.color = fg;
       if (v >= 1000) cell.style.fontSize = 'clamp(.55rem,2.5vw,.85rem)';
       board.appendChild(cell);
     });
