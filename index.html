@@ -176,7 +176,7 @@ display:flex;height:100%;will-change:transform;
 .pane{
 flex-shrink:0;overflow-y:auto;
 -webkit-overflow-scrolling:touch;
-padding:16px 0 60px;
+padding:16px 0 80px;
 display:flex;flex-direction:column;align-items:center;
 }
 /* PC/iPad */
@@ -818,6 +818,7 @@ transition:all .2s;
 .card-outer-panel{
   width:min(440px,92vw);
   margin:0 auto;
+  /* カードとの隙間なし */
 }
 @media(min-width:768px){.card-outer-panel{width:100%;}}
 .card-outer-toggle{
@@ -830,7 +831,7 @@ transition:all .2s;
   font-family:'Noto Sans JP',sans-serif;
   font-size:.7rem;font-weight:900;color:#b090c8;
   letter-spacing:.06em;
-  margin-top:12px;
+  margin-top:8px;
   transition:all .18s;
   user-select:none;-webkit-tap-highlight-color:transparent;
 }
@@ -851,17 +852,20 @@ transition:all .2s;
   border:1.5px solid #e8d8f0;border-top:none;
   border-radius:0 0 12px 12px;
 }
-.card-outer-body.open{max-height:300px;opacity:1;}
+.card-outer-body.open{max-height:400px;opacity:1;}
 .card-outer-inner{
   padding:10px 12px 12px;
   display:flex;flex-direction:column;gap:8px;
+}
+.card-outer-inner .external-links{
+  width:100%;margin:0;padding:0;
 }
 /* リセットボタン行（アコーディオン内） */
 .reset-row{
   display:flex;gap:6px;width:100%;
 }
-.reset-row .reset-btn{flex:1;}
-.reset-row .all-reset-btn{flex:1;}
+.reset-row .reset-btn{flex:1;font-size:.62rem;padding:3px 6px;}
+.reset-row .all-reset-btn{flex:1;font-size:.62rem;padding:3px 6px;}
 .ext-link-btn{
   flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
   padding:9px 8px;border-radius:12px;
@@ -1411,7 +1415,7 @@ transition:all .2s;
                 <button class="reset-btn" onclick="resetMission()">🔄 ミッションリセット</button>
                 <button class="all-reset-btn" onclick="resetAll()">🗑️ 全リセット</button>
               </div>
-              <div class="external-links" style="margin:0">
+              <div class="external-links" style="margin:4px 0 0">
                 <a class="ext-link-btn parent-link" href="https://dat0925.github.io/kyoka-todo/parent.html" target="_blank">
                   <span class="el-icon">🔐</span>保護者用ページ
                 </a>
