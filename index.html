@@ -761,6 +761,104 @@ transition:all .2s;
 }
 .all-reset-btn:hover{background:#fff0f0;color:#e05050;border-color:#e05050;}
 .all-reset-btn:active{transform:scale(.96);}
+/* ═══ おみくじ ═══ */
+.omikuji-wrap{
+  width:100%;display:flex;flex-direction:column;align-items:center;
+  padding:8px 0 4px;gap:10px;
+}
+.omikuji-intro{
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  width:100%;
+}
+.omikuji-shrine{
+  font-size:3rem;
+  animation:shrineFloat 2.5s ease-in-out infinite;
+}
+@keyframes shrineFloat{
+  0%,100%{transform:translateY(0) scale(1);}
+  50%{transform:translateY(-8px) scale(1.05);}
+}
+.omikuji-title{
+  font-family:'M PLUS Rounded 1c','Noto Sans JP',sans-serif;
+  font-size:1.3rem;font-weight:900;color:var(--dark);letter-spacing:.2em;
+}
+.omikuji-sub{font-size:.78rem;color:#aaa;letter-spacing:.08em;}
+.omikuji-draw-btn{
+  padding:14px 36px;border-radius:50px;border:none;
+  background:linear-gradient(135deg,#e84393,#c97ef7,#ff7eb3);
+  background-size:200% 200%;
+  animation:btnGradient 3s ease infinite;
+  color:#fff;font-family:'Noto Sans JP',sans-serif;
+  font-size:1rem;font-weight:900;letter-spacing:.12em;
+  cursor:pointer;
+  box-shadow:0 5px 22px rgba(232,67,147,.4);
+  transition:transform .15s,box-shadow .15s;
+}
+@keyframes btnGradient{
+  0%,100%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+}
+.omikuji-draw-btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 9px 28px rgba(232,67,147,.5);}
+.omikuji-draw-btn:active{transform:scale(.96);}
+.omikuji-hint{
+  font-size:.65rem;color:#c0a0c0;letter-spacing:.06em;
+}
+/* 結果紙 */
+.omikuji-result{
+  display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;
+}
+.omikuji-paper{
+  width:min(260px,85vw);
+  background:linear-gradient(175deg,#fffaf0,#fff8ec);
+  border:3px solid #e8c870;
+  border-radius:8px 8px 40px 40px;
+  padding:16px 20px 24px;
+  text-align:center;
+  box-shadow:0 8px 32px rgba(200,150,50,.18),inset 0 0 30px rgba(255,220,100,.1);
+  position:relative;
+  animation:paperDrop .6s cubic-bezier(.34,1.3,.64,1);
+}
+@keyframes paperDrop{
+  0%{transform:translateY(-60px) rotate(-5deg) scale(.8);opacity:0;}
+  100%{transform:translateY(0) rotate(0) scale(1);opacity:1;}
+}
+.omikuji-paper::before{
+  content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:4px;height:18px;background:#e8c870;border-radius:0 0 3px 3px;
+}
+.omikuji-paper-top{
+  font-size:.65rem;color:#c8a050;letter-spacing:.15em;margin-bottom:8px;
+  font-weight:700;
+}
+.omikuji-rank{
+  font-family:'M PLUS Rounded 1c','Noto Sans JP',sans-serif;
+  font-size:2.4rem;font-weight:900;
+  letter-spacing:.1em;margin-bottom:10px;
+  line-height:1;
+}
+.omikuji-rank.daikichi{color:#e84393;text-shadow:0 0 20px rgba(232,67,147,.5);}
+.omikuji-rank.kichi   {color:#e07020;}
+.omikuji-rank.chukichi{color:#c05010;}
+.omikuji-rank.shokichi{color:#208040;}
+.omikuji-rank.suekichi{color:#206080;}
+.omikuji-message{
+  font-size:.78rem;color:#555;line-height:1.9;
+  border-top:1px dashed #e0c870;border-bottom:1px dashed #e0c870;
+  padding:10px 0;margin:8px 0;
+}
+.omikuji-lucky{
+  font-size:.68rem;color:#a08040;letter-spacing:.06em;line-height:1.8;
+  margin-top:2px;
+}
+.omikuji-again-btn{
+  padding:10px 28px;border-radius:50px;border:2px solid var(--pink);
+  background:#fff;color:var(--pink);
+  font-family:'Noto Sans JP',sans-serif;
+  font-size:.82rem;font-weight:900;letter-spacing:.1em;
+  cursor:pointer;transition:all .18s;
+}
+.omikuji-again-btn:hover{background:var(--pink);color:#fff;}
+
 /* ═══ confetti ═══ */
 .confetti-piece{position:fixed;border-radius:2px;pointer-events:none;z-index:200;animation:confettiFall 1.6s ease-in forwards;}
 @keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(110vh) rotate(720deg);opacity:0;}}
@@ -986,6 +1084,10 @@ transition:all .2s;
               <span class="gtab-icon">🧩</span>
               <span class="gtab-label">スライドパズル</span>
             </button>
+            <button class="game-tab-btn" id="gtab-omikuji" onclick="switchGame('omikuji')">
+              <span class="gtab-icon">🎋</span>
+              <span class="gtab-label">おみくじ</span>
+            </button>
           </div>
 
           <!-- アルカノイド -->
@@ -1075,6 +1177,28 @@ transition:all .2s;
             </div>
             <div id="slide-clear-msg" style="display:none;text-align:center;font-weight:900;color:var(--pink);font-size:1rem;padding:6px">🎊 クリア！！</div>
           </div>
+
+          <!-- おみくじ -->
+          <div id="game-omikuji" style="display:none">
+            <div class="omikuji-wrap">
+              <div class="omikuji-intro" id="omikuji-intro">
+                <div class="omikuji-shrine">🏮</div>
+                <div class="omikuji-title">おみくじ</div>
+                <div class="omikuji-sub">ひいてみてね！</div>
+                <button class="omikuji-draw-btn" onclick="drawOmikuji()">🎋 おみくじをひく</button>
+                <div class="omikuji-hint">凶・大凶もあるよ…！？</div>
+              </div>
+              <div class="omikuji-result" id="omikuji-result" style="display:none">
+                <div class="omikuji-paper" id="omikuji-paper">
+                  <div class="omikuji-paper-top">✨おみくじ✨</div>
+                  <div class="omikuji-rank" id="omikuji-rank">大吉</div>
+                  <div class="omikuji-message" id="omikuji-message"></div>
+                  <div class="omikuji-lucky" id="omikuji-lucky"></div>
+                </div>
+                <button class="omikuji-again-btn" onclick="resetOmikuji()">🎋 もう一度ひく</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1135,7 +1259,7 @@ const MISSION_ITEMS=[
   {label:'ピアノ',icon:'🎹'},{label:'日記',icon:'📔'},{label:'勉強',icon:'📚'},
   {label:'新体操',icon:'🎀'},{label:'チャレンジタッチ',icon:'📱'},
   {label:'ストレッチ',icon:'🤸'},{label:'Y字バランス10秒',icon:'⭐'},
-  {label:'タッチタイピング',icon:'⌨️'},
+  {label:'タッチタイピング',icon:'⌨️'},{label:'宿題',icon:'📝'},
 ];
 
 // やりたいことアイテム（下部エリア）
@@ -1863,7 +1987,7 @@ function switchGame(name) {
   gState = 'idle';
 
   currentGame = name;
-  ['arkanoid','merge','slide'].forEach(g => {
+  ['arkanoid','merge','slide','omikuji'].forEach(g => {
     document.getElementById('game-' + g).style.display = g === name ? '' : 'none';
     document.getElementById('gtab-' + g).classList.toggle('active', g === name);
   });
@@ -1874,6 +1998,8 @@ function switchGame(name) {
     mergeInit();
   } else if (name === 'slide') {
     slideInit();
+  } else if (name === 'omikuji') {
+    resetOmikuji();
   }
 }
 
@@ -2355,6 +2481,141 @@ function showGameClear() {
   document.getElementById('overlay-title').textContent = '🎊 クリア！！';
   document.getElementById('overlay-sub').textContent = 'スコア: ' + gScore;
   document.getElementById('overlay-btn').textContent = '▶ もう一度';
+}
+
+
+
+// ══════════════════════════════
+// おみくじ
+// ══════════════════════════════
+// ※ 凶・大凶はリストに存在しない（絶対出ない）
+const OMIKUJI_LIST = [
+  {
+    rank: '大吉', cls: 'daikichi',
+    messages: [
+      'きょうはさいこうのいちにちになるよ！✨\nなんでもうまくいくかんじがする！\nじぶんをもっとすきになれる日だよ💕',
+      'あなたのえがおが、まわりのみんなを\nしあわせにしてるよ🌸\nどんどんかがやいていこう！',
+      'すごい才能がどんどんひらいていく日✨\nあたらしいことにチャレンジするのにぴったり！\nおうえんしてるよ💪',
+    ],
+    lucky: ['🌸 ラッキーカラー：ピンク', '⭐ ラッキーアイテム：リボン', '🍀 ラッキーナンバー：7'],
+  },
+  {
+    rank: '吉', cls: 'kichi',
+    messages: [
+      'こつこつがんばってることが\nみんなにみとめられる日だよ🌟\nじぶんのペースで進んでいこう！',
+      'あなたのやさしさが\nだれかをたすけているよ💖\nそのやさしさ、ずっとたいせつにしてね！',
+      'すきなことをたのしむと\nもっとじょうずになれるよ🎀\nわくわくをたいせつにしてね！',
+    ],
+    lucky: ['💛 ラッキーカラー：きいろ', '🌈 ラッキーアイテム：ペン', '🍀 ラッキーナンバー：3'],
+  },
+  {
+    rank: '中吉', cls: 'chukichi',
+    messages: [
+      'ちょっとむずかしいことも\nあきらめなければかならずできるよ💪\nファイトだ！',
+      'まわりのひとのいいところを\nさがしてみてね🌸\nきっとたのしいことがみつかるよ！',
+      'ゆっくりじっくりすすむことが\nだいじな日だよ🐌\nあせらなくてだいじょうぶ！',
+    ],
+    lucky: ['💚 ラッキーカラー：みどり', '🎵 ラッキーアイテム：音楽', '🍀 ラッキーナンバー：5'],
+  },
+  {
+    rank: '小吉', cls: 'shokichi',
+    messages: [
+      'ちいさなことにきがついて\nよろこべるあなたはすてきだよ🌼\nそのかんしゃのきもちをたいせつに！',
+      'すこしずつ前にすすめば\nかならずゴールにたどりつけるよ🌈\nいっぽずつ、がんばれ！',
+      'きょうはていねいにすごすと\nいいことがあるよ✨\nすきなことをゆっくりたのしんでね！',
+    ],
+    lucky: ['💙 ラッキーカラー：水色', '🌸 ラッキーアイテム：花', '🍀 ラッキーナンバー：1'],
+  },
+  {
+    rank: '末吉', cls: 'suekichi',
+    messages: [
+      'いまはちからをためているじき🌱\nあとからかならず大きくさくよ！\nじぶんをしんじていてね💕',
+      'ゆっくりとはじまる\nしあわせのじかん🌙\nあわてなくてだいじょうぶ、きっとうまくいくよ！',
+      'ちょっぴりむずかしいかもだけど\nそれもたいせつなけいけん🌟\nあなたならのりこえられるよ！',
+    ],
+    lucky: ['💜 ラッキーカラー：むらさき', '⭐ ラッキーアイテム：ノート', '🍀 ラッキーナンバー：2'],
+  },
+];
+
+function drawOmikuji() {
+  // 演出: ボタンをシェイク→結果表示
+  const btn = document.querySelector('.omikuji-draw-btn');
+  btn.style.transform = 'scale(.9) rotate(-3deg)';
+  setTimeout(() => { btn.style.transform = ''; }, 100);
+
+  // ランダムで選ぶ
+  const entry = OMIKUJI_LIST[Math.floor(Math.random() * OMIKUJI_LIST.length)];
+  const msg = entry.messages[Math.floor(Math.random() * entry.messages.length)];
+  const lucky = entry.lucky[Math.floor(Math.random() * entry.lucky.length)];
+
+  // 結果セット
+  const rankEl = document.getElementById('omikuji-rank');
+  rankEl.textContent = entry.rank;
+  rankEl.className = 'omikuji-rank ' + entry.cls;
+  document.getElementById('omikuji-message').textContent = msg;
+  document.getElementById('omikuji-lucky').textContent = lucky;
+
+  // 表示切替（少しディレイ）
+  setTimeout(() => {
+    document.getElementById('omikuji-intro').style.display = 'none';
+    const res = document.getElementById('omikuji-result');
+    res.style.display = 'flex';
+    // 紙のアニメーションをリセット
+    const paper = document.getElementById('omikuji-paper');
+    paper.style.animation = 'none';
+    paper.offsetHeight; // reflow
+    paper.style.animation = '';
+
+    // エフェクト
+    playOmikujiSound(entry.cls);
+    launchOmikujiEffect(entry.cls);
+  }, 120);
+}
+
+function playOmikujiSound(cls) {
+  const c = getCtx();
+  if (cls === 'daikichi') {
+    // 大吉: キラキラ豪華
+    [{f:523,t:0},{f:659,t:.1},{f:784,t:.2},{f:1047,t:.3},{f:1319,t:.4},{f:1047,t:.55},{f:1319,t:.65}]
+      .forEach(({f,t}) => tone('triangle',f,.18,c.currentTime+t,.2));
+    [{f:2093,t:.3},{f:2637,t:.45}].forEach(({f,t}) => tone('sine',f,.07,c.currentTime+t,.25));
+  } else if (cls === 'kichi') {
+    [{f:523,t:0},{f:659,t:.1},{f:784,t:.22},{f:1047,t:.34}]
+      .forEach(({f,t}) => tone('triangle',f,.16,c.currentTime+t,.2));
+  } else {
+    [{f:440,t:0},{f:550,t:.12},{f:659,t:.24}]
+      .forEach(({f,t}) => tone('sine',f,.13,c.currentTime+t,.2));
+  }
+}
+
+function launchOmikujiEffect(cls) {
+  const count = cls === 'daikichi' ? 50 : cls === 'kichi' ? 30 : 16;
+  const extra = cls === 'daikichi' || cls === 'kichi' || cls === 'chukichi';
+  launchConfetti(count);
+  if (extra) {
+    // 桜の花びら風追加コンフェッティ
+    const sakura = ['🌸','✨','💖','⭐','🌟'];
+    for (let i = 0; i < (cls === 'daikichi' ? 10 : 5); i++) {
+      setTimeout(() => {
+        const el = document.createElement('div');
+        el.style.cssText = `
+          position:fixed;pointer-events:none;z-index:201;
+          font-size:${16+Math.random()*12}px;
+          left:${5+Math.random()*90}%;top:-10px;
+          animation:confettiFall ${1.5+Math.random()*1.2}s ease-in forwards;
+          animation-delay:${Math.random()*.4}s;
+        `;
+        el.textContent = sakura[Math.floor(Math.random()*sakura.length)];
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 2500);
+      }, i * 80);
+    }
+  }
+}
+
+function resetOmikuji() {
+  document.getElementById('omikuji-intro').style.display = 'flex';
+  document.getElementById('omikuji-result').style.display = 'none';
 }
 
 
