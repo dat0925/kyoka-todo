@@ -798,8 +798,12 @@ transition:all .2s;
 .all-reset-btn:active{transform:scale(.96);}
 /* ── 外部リンクボタン ── */
 .external-links{
-  display:flex;gap:6px;width:100%;margin-top:8px;
+  display:flex;gap:6px;
+  width:min(440px,92vw);
+  margin:14px auto 0;
+  padding:0 0 8px;
 }
+@media(min-width:768px){.external-links{width:100%;}}
 .ext-link-btn{
   flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
   padding:9px 8px;border-radius:12px;
@@ -1337,16 +1341,17 @@ transition:all .2s;
             <div class="count-row">まわした回数 <b id="m-roll-count">0</b> かい</div>
             <button class="reset-btn" onclick="resetMission()">🔄 リセット</button>
           </div>
-          <div class="external-links">
-            <a class="ext-link-btn parent-link" href="https://dat0925.github.io/kyoka-todo/parent.html" target="_blank">
-              <span class="el-icon">🔐</span>
-              保護者用ページ
-            </a>
-            <a class="ext-link-btn doc-link" href="https://dat0925.github.io/kyoka-todo/doc.html" target="_blank">
-              <span class="el-icon">📋</span>
-              開発ドキュメント
-            </a>
-          </div>
+        </div>
+        <!-- カード外リンクエリア（ミッション） -->
+        <div class="external-links">
+          <a class="ext-link-btn parent-link" href="https://dat0925.github.io/kyoka-todo/parent.html" target="_blank">
+            <span class="el-icon">🔐</span>
+            保護者用ページ
+          </a>
+          <a class="ext-link-btn doc-link" href="https://dat0925.github.io/kyoka-todo/doc.html" target="_blank">
+            <span class="el-icon">📋</span>
+            開発ドキュメント
+          </a>
         </div>
       </div>
 
@@ -1419,16 +1424,17 @@ transition:all .2s;
             <button class="reset-btn" onclick="resetHabit()">🔄 習慣リセット</button>
             <button class="all-reset-btn" onclick="resetAll()">🗑️ 全部リセット</button>
           </div>
-          <div class="external-links">
-            <a class="ext-link-btn parent-link" href="https://dat0925.github.io/kyoka-todo/parent.html" target="_blank">
-              <span class="el-icon">🔐</span>
-              保護者用ページ
-            </a>
-            <a class="ext-link-btn doc-link" href="https://dat0925.github.io/kyoka-todo/doc.html" target="_blank">
-              <span class="el-icon">📋</span>
-              開発ドキュメント
-            </a>
-          </div>
+        </div>
+        <!-- カード外リンクエリア（習慣） -->
+        <div class="external-links">
+          <a class="ext-link-btn parent-link" href="https://dat0925.github.io/kyoka-todo/parent.html" target="_blank">
+            <span class="el-icon">🔐</span>
+            保護者用ページ
+          </a>
+          <a class="ext-link-btn doc-link" href="https://dat0925.github.io/kyoka-todo/doc.html" target="_blank">
+            <span class="el-icon">📋</span>
+            開発ドキュメント
+          </a>
         </div>
       </div>
 
