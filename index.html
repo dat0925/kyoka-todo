@@ -995,49 +995,70 @@ transition:all .2s;
   font-size:.72rem;font-weight:900;color:var(--purple);
   letter-spacing:.1em;display:flex;align-items:center;gap:5px;
 }
-.timer-display{
+/* 時分秒セグメント表示 */
+.timer-segments{
+  display:flex;align-items:center;justify-content:center;
+  gap:4px;width:100%;
+}
+.timer-seg-group{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+}
+.timer-seg-num{
   font-family:'M PLUS Rounded 1c','Noto Sans JP',sans-serif;
-  font-size:2.6rem;font-weight:900;
-  color:var(--dark);letter-spacing:.06em;
-  line-height:1;
-  text-shadow:0 2px 8px rgba(201,126,247,.2);
-  transition:color .3s;
-  min-width:120px;text-align:center;
+  font-size:2.4rem;font-weight:900;
+  color:var(--dark);letter-spacing:.02em;line-height:1;
+  background:linear-gradient(135deg,#fff5fb,#f8f0ff);
+  border:2px solid var(--pink2);border-radius:10px;
+  padding:6px 10px;min-width:56px;text-align:center;
+  transition:color .3s, border-color .3s, background .3s;
 }
-.timer-display.running{
+.timer-seg-label{
+  font-size:.6rem;font-weight:900;color:#c097d0;letter-spacing:.1em;
+}
+.timer-seg-colon{
+  font-size:1.8rem;font-weight:900;color:var(--pink2);
+  padding-bottom:14px;line-height:1;
+  animation:colonBlink 1s step-end infinite;
+}
+.timer-seg-colon.paused{animation:none;opacity:.3;}
+@keyframes colonBlink{0%,100%{opacity:1;}50%{opacity:.2;}}
+/* running state */
+.timer-segments.running .timer-seg-num{
   color:var(--purple);
-  animation:timerPulse 1s ease-in-out infinite;
+  border-color:var(--purple);
+  background:linear-gradient(135deg,var(--purple2),#fff0ff);
 }
-.timer-display.ringing{
-  color:#e84393;
-  animation:timerRing .4s ease-in-out infinite;
+.timer-segments.running .timer-seg-colon{color:var(--purple);}
+/* ringing state */
+.timer-segments.ringing .timer-seg-num{
+  color:#e84393;border-color:#e84393;
+  background:linear-gradient(135deg,#fff0f8,#ffe0f0);
+  animation:ringSegPop .4s ease-in-out infinite;
 }
-@keyframes timerPulse{
-  0%,100%{text-shadow:0 2px 8px rgba(201,126,247,.2);}
-  50%{text-shadow:0 2px 20px rgba(201,126,247,.6);}
+@keyframes ringSegPop{
+  0%,100%{transform:scale(1);}
+  50%{transform:scale(1.05);}
 }
-@keyframes timerRing{
-  0%,100%{transform:scale(1) rotate(0deg);}
-  25%{transform:scale(1.05) rotate(-3deg);}
-  75%{transform:scale(1.05) rotate(3deg);}
-}
-/* プリセットボタン行 */
-.timer-presets{display:flex;gap:6px;width:100%;}
+/* プリセットボタン */
+.timer-presets{display:flex;gap:5px;width:100%;}
 .timer-preset-btn{
-  flex:1;padding:7px 4px;border-radius:10px;
+  flex:1;padding:7px 2px;border-radius:10px;
   border:2px solid var(--pink2);
   background:#fff;color:var(--purple);
   font-family:'Noto Sans JP',sans-serif;
-  font-size:.72rem;font-weight:900;letter-spacing:.04em;
+  font-size:.7rem;font-weight:900;letter-spacing:.02em;
   cursor:pointer;transition:all .18s;
   -webkit-tap-highlight-color:transparent;
+  line-height:1.3;
 }
+.timer-preset-btn .preset-icon{font-size:.75rem;display:block;margin-bottom:1px;}
 .timer-preset-btn:hover{background:var(--purple2);border-color:var(--purple);}
-.timer-preset-btn:active{transform:scale(.94);}
+.timer-preset-btn:active{transform:scale(.92);}
 .timer-preset-btn.selected{
   background:linear-gradient(135deg,var(--pink),var(--purple));
   color:#fff;border-color:transparent;
-  box-shadow:0 3px 10px rgba(201,126,247,.3);
+  box-shadow:0 3px 10px rgba(201,126,247,.35);
+  transform:scale(1.04);
 }
 /* コントロールボタン行 */
 .timer-controls{display:flex;gap:6px;width:100%;}
@@ -1203,11 +1224,37 @@ transition:all .2s;
           <!-- ★ タイマー ★ -->
           <div class="timer-wrap">
             <div class="timer-title">⏱ タイマー</div>
-            <div class="timer-display" id="timer-display">00:00</div>
+            <!-- 時分秒セグメント -->
+            <div class="timer-segments" id="timer-segments">
+              <div class="timer-seg-group" id="seg-h-wrap" style="display:none">
+                <div class="timer-seg-num" id="seg-h">00</div>
+                <div class="timer-seg-label">じかん</div>
+              </div>
+              <div class="timer-seg-colon" id="seg-colon-h" style="display:none">:</div>
+              <div class="timer-seg-group">
+                <div class="timer-seg-num" id="seg-m">00</div>
+                <div class="timer-seg-label">ふん</div>
+              </div>
+              <div class="timer-seg-colon" id="seg-colon-ms">:</div>
+              <div class="timer-seg-group">
+                <div class="timer-seg-num" id="seg-s">00</div>
+                <div class="timer-seg-label">びょう</div>
+              </div>
+            </div>
+            <!-- プリセット -->
             <div class="timer-presets">
-              <button class="timer-preset-btn" id="tp-1" onclick="timerPreset(1)">1分</button>
-              <button class="timer-preset-btn" id="tp-10" onclick="timerPreset(10)">10分</button>
-              <button class="timer-preset-btn" id="tp-15" onclick="timerPreset(15)">15分</button>
+              <button class="timer-preset-btn" id="tp-s10" onclick="timerPresetSec(10)">
+                <span class="preset-icon">+10</span>秒
+              </button>
+              <button class="timer-preset-btn" id="tp-1" onclick="timerPresetSec(60)">
+                <span class="preset-icon">+1</span>分
+              </button>
+              <button class="timer-preset-btn" id="tp-10" onclick="timerPresetSec(600)">
+                <span class="preset-icon">+10</span>分
+              </button>
+              <button class="timer-preset-btn" id="tp-15" onclick="timerPresetSec(900)">
+                <span class="preset-icon">+15</span>分
+              </button>
             </div>
             <div class="timer-controls">
               <button class="timer-btn start" id="timer-start-btn" onclick="timerStart()">
@@ -3200,21 +3247,23 @@ let timerTotal = 0;
 let timerInterval = null;
 let timerState = 'idle'; // idle | running | paused | ringing
 let timerRingInterval = null;
-let timerSelectedMin = 0;
 
-function timerPreset(min) {
-  // 押した分だけ加算（running/ringin中でも加算OK）
-  timerSeconds += min * 60;
-  timerTotal += min * 60;
-  timerSelectedMin = min;
+// 秒単位で加算するプリセット関数（HTML側から呼ばれる）
+function timerPresetSec(sec) {
+  timerSeconds += sec;
+  timerTotal += sec;
   // ボタンを一瞬光らせる
-  const btn = document.getElementById('tp-' + min);
+  const idMap = {10:'tp-s10', 60:'tp-1', 600:'tp-10', 900:'tp-15'};
+  const btn = document.getElementById(idMap[sec]);
   if (btn) {
     btn.classList.add('selected');
-    setTimeout(() => btn.classList.remove('selected'), 400);
+    setTimeout(() => btn.classList.remove('selected'), 350);
   }
   timerUpdateDisplay();
 }
+
+// 後方互換（旧コードから呼ばれる可能性がある場合用）
+function timerPreset(min) { timerPresetSec(min * 60); }
 
 function timerStart() {
   if (timerState === 'ringing') { timerStopRing(); return; }
@@ -3222,8 +3271,7 @@ function timerStart() {
   if (timerState === 'idle' || timerState === 'paused') {
     timerState = 'running';
     timerUpdateStartBtn(true);
-    const display = document.getElementById('timer-display');
-    if (display) { display.classList.remove('ringing'); display.classList.add('running'); }
+    timerSetSegClass('running');
     timerInterval = setInterval(() => {
       timerSeconds--;
       timerUpdateDisplay();
@@ -3244,8 +3292,7 @@ function timerPause() {
     timerInterval = null;
     timerState = 'paused';
     timerUpdateStartBtn(false);
-    const display = document.getElementById('timer-display');
-    if (display) display.classList.remove('running');
+    timerSetSegClass('paused');
   }
 }
 
@@ -3264,8 +3311,7 @@ function timerReset() {
   });
   timerUpdateDisplay();
   timerUpdateStartBtn(false);
-  const display = document.getElementById('timer-display');
-  if (display) { display.classList.remove('running','ringing'); }
+  timerSetSegClass('idle');
 }
 
 function timerUpdateStartBtn(running) {
@@ -3281,22 +3327,41 @@ function timerUpdateStartBtn(running) {
 }
 
 function timerUpdateDisplay() {
-  const el = document.getElementById('timer-display');
-  if (!el) return;
   const s = Math.max(0, timerSeconds);
   const h = Math.floor(s / 3600);
   const m = Math.floor((s % 3600) / 60);
   const sec = s % 60;
-  if (h > 0) {
-    el.textContent = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
-  } else {
-    el.textContent = String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
-  }
+  // セグメントに反映
+  const segH = document.getElementById('seg-h');
+  const segM = document.getElementById('seg-m');
+  const segS = document.getElementById('seg-s');
+  const segHWrap  = document.getElementById('seg-h-wrap');
+  const segColonH = document.getElementById('seg-colon-h');
+  if (segH) segH.textContent = String(h).padStart(2,'0');
+  if (segM) segM.textContent = String(m).padStart(2,'0');
+  if (segS) segS.textContent = String(sec).padStart(2,'0');
+  // 1時間未満は「じかん」セグメントを非表示
+  const showH = h > 0;
+  if (segHWrap)  segHWrap.style.display  = showH ? '' : 'none';
+  if (segColonH) segColonH.style.display = showH ? '' : 'none';
+}
+
+function timerSetSegClass(state) {
+  const segs = document.getElementById('timer-segments');
+  const colonMs = document.getElementById('seg-colon-ms');
+  const colonH  = document.getElementById('seg-colon-h');
+  if (!segs) return;
+  segs.className = 'timer-segments' + (state !== 'idle' && state !== 'paused' ? ' ' + state : '');
+  // コロンの点滅：runningのみ、pausedは止める
+  [colonMs, colonH].forEach(el => {
+    if (!el) return;
+    if (state === 'running') el.classList.remove('paused');
+    else el.classList.add('paused');
+  });
 }
 
 function timerStartRing() {
-  const display = document.getElementById('timer-display');
-  if (display) { display.classList.remove('running'); display.classList.add('ringing'); }
+  timerSetSegClass('ringing');
   launchConfetti(12);
   let ringCount = 0;
   const maxRings = 20; // 20秒分（1秒ごと）
@@ -3313,8 +3378,7 @@ function timerStopRing() {
   timerRingInterval = null;
   if (timerState === 'ringing') {
     timerState = 'idle';
-    const display = document.getElementById('timer-display');
-    if (display) display.classList.remove('ringing');
+    timerSetSegClass('idle');
     timerUpdateStartBtn(false);
   }
 }
