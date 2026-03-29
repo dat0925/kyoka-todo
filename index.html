@@ -1554,31 +1554,16 @@ async function sbUpsert(task_id, task_label, task_type, checked) {
     'Prefer': 'return=minimal',
   };
   try {
-    // まず既存レコードを確認
-    const checkRes = await fetch(
-      `${base}?date=eq.${TODAY}&task_id=eq.${encodeURIComponent(task_id)}&select=id`,
-      { headers }
+    // DELETE してから INSERT（最も確実なUPSERT代替）
+    await fetch(
+      `${base}?date=eq.${TODAY}&task_id=eq.${encodeURIComponent(task_id)}`,
+      { method: 'DELETE', headers }
     );
-    const existing = await checkRes.json();
-
-    if (existing && existing.length > 0) {
-      // 既存レコードあり → PATCH でcheckedを更新
-      await fetch(
-        `${base}?date=eq.${TODAY}&task_id=eq.${encodeURIComponent(task_id)}`,
-        {
-          method: 'PATCH',
-          headers,
-          body: JSON.stringify({ checked }),
-        }
-      );
-    } else {
-      // 新規 → POST でINSERT
-      await fetch(base, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ date: TODAY, task_id, task_label, task_type, checked }),
-      });
-    }
+    await fetch(base, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ date: TODAY, task_id, task_label, task_type, checked }),
+    });
   } catch(e) {
     console.warn('Supabase sync failed:', e);
   }
