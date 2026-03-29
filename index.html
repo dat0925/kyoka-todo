@@ -3203,15 +3203,16 @@ let timerRingInterval = null;
 let timerSelectedMin = 0;
 
 function timerPreset(min) {
-  timerReset();
+  // 押した分だけ加算（running/ringin中でも加算OK）
+  timerSeconds += min * 60;
+  timerTotal += min * 60;
   timerSelectedMin = min;
-  timerSeconds = min * 60;
-  timerTotal = timerSeconds;
-  // ボタン選択状態
-  [1,10,15].forEach(m => {
-    const btn = document.getElementById('tp-' + m);
-    if (btn) btn.classList.toggle('selected', m === min);
-  });
+  // ボタンを一瞬光らせる
+  const btn = document.getElementById('tp-' + min);
+  if (btn) {
+    btn.classList.add('selected');
+    setTimeout(() => btn.classList.remove('selected'), 400);
+  }
   timerUpdateDisplay();
 }
 
