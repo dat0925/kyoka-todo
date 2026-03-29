@@ -1,94 +1,89 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>✨ きょうのミッション ✨</title>
-  <link rel="manifest" href="manifest.json"/>
-  <meta name="mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="apple-mobile-web-app-title" content="ミッション"/>
-  <link rel="apple-touch-icon" href="icon-192.png"/>
-  <meta name="theme-color" content="#ff7eb3"/>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>✨ きょうのミッション ✨</title>
+<link rel="manifest" href="manifest.json"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="ミッション"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<meta name="theme-color" content="#ff7eb3"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --pink:#ff7eb3;--pink2:#ffb3d1;--purple:#c97ef7;
-  --yellow:#ffe066;--mint:#7ee8c8;--bg:#fff0f8;
-  --orange:#fdcb6e;--blue:#74b9ff;--navy:#1a6fa8;
+--pink:#ff7eb3;--pink2:#ffb3d1;--purple:#c97ef7;
+--yellow:#ffe066;--mint:#7ee8c8;--bg:#fff0f8;
+--orange:#fdcb6e;--blue:#74b9ff;--navy:#1a6fa8;
+--ninja:#2d2d4e;--ninja2:#4a4a7a;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-
 body{
-  font-family:'Noto Sans JP',sans-serif;
-  background:var(--bg);min-height:100vh;
-  overflow-x:hidden;
+font-family:'Noto Sans JP',sans-serif;
+background:var(--bg);min-height:100vh;
+overflow-x:hidden;
 }
 .stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
 .star{position:absolute;animation:floatStar linear infinite;opacity:.45;}
 @keyframes floatStar{
-  0%  {transform:translateY(110vh) rotate(0deg);opacity:0;}
-  10%,90%{opacity:.45;}
-  100%{transform:translateY(-10vh) rotate(360deg);opacity:0;}
+0% {transform:translateY(110vh) rotate(0deg);opacity:0;}
+10%,90%{opacity:.45;}
+100%{transform:translateY(-10vh) rotate(360deg);opacity:0;}
 }
-
 /* ═══ アプリシェル ═══ */
 #app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;}
-
 /* ── 固定ヘッダー（タブ＋進捗） ── */
 .sticky-header{
-  position:sticky;top:0;z-index:50;
-  background:#fff;
-  box-shadow:0 2px 14px rgba(255,126,179,.13);
-  flex-shrink:0;
+position:sticky;top:0;z-index:50;
+background:#fff;
+box-shadow:0 2px 14px rgba(255,126,179,.13);
+flex-shrink:0;
 }
-
 /* タブバー */
 .tab-bar{
-  display:flex;
-  border-bottom:2.5px solid var(--pink2);
+display:flex;
+border-bottom:2.5px solid var(--pink2);
 }
 .tab-btn{
-  flex:1;padding:11px 8px 9px;border:none;background:transparent;
-  font-family:'Noto Sans JP',sans-serif;font-size:.8rem;font-weight:700;
-  letter-spacing:.05em;color:#c097d0;cursor:pointer;
-  border-bottom:3px solid transparent;margin-bottom:-2.5px;
-  transition:color .2s,border-color .2s;
-  display:flex;flex-direction:column;align-items:center;gap:2px;
+flex:1;padding:11px 8px 9px;border:none;background:transparent;
+font-family:'Noto Sans JP',sans-serif;font-size:.8rem;font-weight:700;
+letter-spacing:.05em;color:#c097d0;cursor:pointer;
+border-bottom:3px solid transparent;margin-bottom:-2.5px;
+transition:color .2s,border-color .2s;
+display:flex;flex-direction:column;align-items:center;gap:2px;
 }
 .tab-btn .tab-icon{font-size:1.15rem;}
 .tab-btn.active{color:var(--pink);border-bottom-color:var(--pink);}
-
 /* ── ロックされたゲームタブ ── */
 .tab-btn.locked{
-  color:#ddd;cursor:not-allowed;opacity:.6;
-  position:relative;
+color:#ddd;cursor:not-allowed;opacity:.6;
+position:relative;
 }
 .tab-btn.locked .tab-icon::after{
-  content:'🔒';
-  position:absolute;
-  font-size:.55rem;
-  top:6px;right:calc(50% - 18px);
-  line-height:1;
+content:'🔒';
+position:absolute;
+font-size:.55rem;
+top:6px;right:calc(50% - 18px);
+line-height:1;
 }
 .tab-btn.locked:hover{color:#ddd;}
-
 /* ── ゲームロック画面（ペイン内） ── */
 .game-locked-screen{
-  display:flex;flex-direction:column;align-items:center;
-  justify-content:center;text-align:center;
-  padding:32px 20px;gap:14px;min-height:260px;
+display:flex;flex-direction:column;align-items:center;
+justify-content:center;text-align:center;
+padding:32px 20px;gap:14px;min-height:260px;
 }
 .lock-icon-big{
-  font-size:3.5rem;
-  animation:lockWiggle 3s ease-in-out infinite;
+font-size:3.5rem;
+animation:lockWiggle 3s ease-in-out infinite;
 }
 @keyframes lockWiggle{
-  0%,100%{transform:rotate(0deg);}
-  10%{transform:rotate(-8deg);}
-  20%{transform:rotate(8deg);}
-  30%{transform:rotate(0deg);}
+0%,100%{transform:rotate(0deg);}
+10%{transform:rotate(-8deg);}
+20%{transform:rotate(8deg);}
+30%{transform:rotate(0deg);}
 }
 .lock-title{font-size:1.05rem;font-weight:900;color:#c097d0;letter-spacing:.08em;}
 .lock-hint{font-size:.78rem;color:#d0b0e0;line-height:1.7;letter-spacing:.04em;}
@@ -96,57 +91,55 @@ body{
 .lock-prog-label{font-size:.72rem;color:#c097d0;margin-bottom:5px;display:flex;justify-content:space-between;}
 .lock-prog-bg{height:11px;border-radius:99px;background:#f0e0f8;overflow:hidden;}
 .lock-prog-fill{
-  height:100%;border-radius:99px;
-  background:linear-gradient(90deg,var(--pink),var(--purple));
-  transition:width .6s cubic-bezier(.4,0,.2,1);
+height:100%;border-radius:99px;
+background:linear-gradient(90deg,var(--pink),var(--purple));
+transition:width .6s cubic-bezier(.4,0,.2,1);
 }
-
 /* ── 解放バナー（全画面オーバーレイ） ── */
 #unlock-overlay{
-  position:fixed;inset:0;z-index:500;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  background:rgba(0,0,20,.9);
-  visibility:hidden;opacity:0;
-  transition:opacity .4s, visibility .4s;
+position:fixed;inset:0;z-index:500;
+display:flex;flex-direction:column;align-items:center;justify-content:center;
+background:rgba(0,0,20,.9);
+visibility:hidden;opacity:0;
+transition:opacity .4s, visibility .4s;
 }
 #unlock-overlay.show{opacity:1;visibility:visible;}
 .unlock-badge{
-  text-align:center;
-  animation:unlockPop .7s cubic-bezier(.34,1.4,.64,1);
-  max-width:min(360px,88vw);
+text-align:center;
+animation:unlockPop .7s cubic-bezier(.34,1.4,.64,1);
+max-width:min(360px,88vw);
 }
 @keyframes unlockPop{
-  0%{transform:scale(.3) rotate(-10deg);opacity:0;}
-  70%{transform:scale(1.08) rotate(2deg);}
-  100%{transform:scale(1) rotate(0);opacity:1;}
+0%{transform:scale(.3) rotate(-10deg);opacity:0;}
+70%{transform:scale(1.08) rotate(2deg);}
+100%{transform:scale(1) rotate(0);opacity:1;}
 }
 .unlock-emoji{font-size:4rem;display:block;margin-bottom:8px;
-  animation:unlockFloat 2s ease-in-out infinite;}
+animation:unlockFloat 2s ease-in-out infinite;}
 @keyframes unlockFloat{
-  0%,100%{transform:translateY(0);}
-  50%{transform:translateY(-10px);}
+0%,100%{transform:translateY(0);}
+50%{transform:translateY(-10px);}
 }
 .unlock-title{
-  font-size:1.5rem;font-weight:900;color:#fff;
-  letter-spacing:.1em;margin-bottom:6px;
-  text-shadow:0 0 30px rgba(255,180,100,.8);
+font-size:1.5rem;font-weight:900;color:#fff;
+letter-spacing:.1em;margin-bottom:6px;
+text-shadow:0 0 30px rgba(255,180,100,.8);
 }
 .unlock-sub{font-size:.85rem;color:#ffd6a0;line-height:1.7;margin-bottom:18px;}
 .unlock-go-btn{
-  padding:14px 36px;border-radius:50px;border:none;
-  background:linear-gradient(135deg,#ff9800,#ffcc00);
-  color:#7a3000;font-family:'Noto Sans JP',sans-serif;
-  font-size:1.05rem;font-weight:900;letter-spacing:.14em;
-  cursor:pointer;box-shadow:0 5px 24px rgba(255,180,0,.5);
-  transition:transform .15s,box-shadow .15s;
+padding:14px 36px;border-radius:50px;border:none;
+background:linear-gradient(135deg,#ff9800,#ffcc00);
+color:#7a3000;font-family:'Noto Sans JP',sans-serif;
+font-size:1.05rem;font-weight:900;letter-spacing:.14em;
+cursor:pointer;box-shadow:0 5px 24px rgba(255,180,0,.5);
+transition:transform .15s,box-shadow .15s;
 }
 .unlock-go-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(255,180,0,.65);}
 .unlock-go-btn:active{transform:scale(.97);}
-
 /* スタック進捗バー */
 .sticky-progress{
-  padding:7px 16px 8px;
-  background:#fff;
+padding:7px 16px 8px;
+background:#fff;
 }
 /* スマホ：1本 / PC：非表示 */
 .sp-single{display:block;}
@@ -154,69 +147,64 @@ body{
 .sp-dual{display:none;gap:16px;}
 .sp-dual-item{flex:1;}
 @media(min-width:768px){
-  .sp-single{display:none;}
-  .sp-dual{display:flex;}
-  .sticky-progress{padding:8px 24px 10px;}
+.sp-single{display:none;}
+.sp-dual{display:flex;}
+.sticky-progress{padding:8px 24px 10px;}
 }
 .sp-label{
-  display:flex;justify-content:space-between;
-  font-size:.68rem;font-weight:700;margin-bottom:4px;
+display:flex;justify-content:space-between;
+font-size:.68rem;font-weight:700;margin-bottom:4px;
 }
 .sp-label .sp-text{color:var(--purple);}
 .sp-label .sp-count{color:var(--pink);}
 .sp-bar-bg{height:9px;border-radius:99px;background:#f0e0f8;overflow:hidden;}
 .sp-bar-fill{
-  height:100%;border-radius:99px;
-  background:linear-gradient(90deg,var(--pink),var(--purple));
-  transition:width .5s cubic-bezier(.4,0,.2,1);
-  box-shadow:0 1px 6px rgba(255,126,179,.2);
+height:100%;border-radius:99px;
+background:linear-gradient(90deg,var(--pink),var(--purple));
+transition:width .5s cubic-bezier(.4,0,.2,1);
+box-shadow:0 1px 6px rgba(255,126,179,.2);
 }
 .sp-bar-fill.full{background:linear-gradient(90deg,var(--mint),#38d39f);box-shadow:0 1px 6px rgba(126,232,200,.3);}
-
 /* ── スワイプ領域 ── */
 .pane-viewport{
-  flex:1;overflow:hidden;position:relative;
-  touch-action:pan-y;
+flex:1;overflow:hidden;position:relative;
+touch-action:pan-y;
 }
 .pane-track{
-  display:flex;height:100%;will-change:transform;
+display:flex;height:100%;will-change:transform;
 }
 .pane{
-  flex-shrink:0;overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
-  padding:16px 0 60px;
-  display:flex;flex-direction:column;align-items:center;
+flex-shrink:0;overflow-y:auto;
+-webkit-overflow-scrolling:touch;
+padding:16px 0 60px;
+display:flex;flex-direction:column;align-items:center;
 }
-
 /* PC/iPad */
 @media(min-width:768px){
-  .tab-bar{display:none;}
-  .pane-viewport{overflow:visible;}
-  .pane-track{
-    display:grid!important;
-    grid-template-columns:1fr 1fr 1fr;
-    gap:16px;padding:20px 20px 40px;
-    width:100%!important;transform:none!important;height:auto!important;
-  }
-  .pane{width:100%!important;overflow-y:visible;padding:0;}
-  .sticky-header{padding:0;}
-  .card-progress{display:none!important;}
+.tab-bar{display:none;}
+.pane-viewport{overflow:visible;}
+.pane-track{
+display:grid!important;
+grid-template-columns:1fr 1fr 1fr;
+gap:16px;padding:20px 20px 40px;
+width:100%!important;transform:none!important;height:auto!important;
 }
-
+.pane{width:100%!important;overflow-y:visible;padding:0;}
+.sticky-header{padding:0;}
+.card-progress{display:none!important;}
+}
 /* ═══ カード ═══ */
 .card{
-  background:#fff;border-radius:28px;
-  padding:18px 16px;
-  width:min(440px,92vw);
-  box-shadow:0 5px 26px rgba(255,126,179,.13);
-  border:3px solid var(--pink2);
-  display:flex;flex-direction:column;align-items:center;gap:12px;
+background:#fff;border-radius:28px;
+padding:18px 16px;
+width:min(440px,92vw);
+box-shadow:0 5px 26px rgba(255,126,179,.13);
+border:3px solid var(--pink2);
+display:flex;flex-direction:column;align-items:center;gap:12px;
 }
 @media(min-width:768px){.card{width:100%;}}
-
 .card-title{font-size:1.02rem;font-weight:900;color:var(--purple);letter-spacing:.1em;}
 .card-title span{color:var(--pink);}
-
 /* PC用カード内進捗（スマホでは sticky-progress を使うので非表示） */
 .card-progress{display:none;width:100%;flex-direction:column;gap:4px;}
 .cp-label{display:flex;justify-content:space-between;font-size:.7rem;font-weight:700;}
@@ -224,7 +212,6 @@ body{
 .cp-bar-bg{height:9px;border-radius:99px;background:#f0e0f8;overflow:hidden;}
 .cp-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--pink),var(--purple));transition:width .5s cubic-bezier(.4,0,.2,1);}
 .cp-bar-fill.full{background:linear-gradient(90deg,var(--mint),#38d39f);}
-
 /* ═══ ドラム ═══ */
 .drum-wrap{width:100%;display:flex;flex-direction:column;align-items:center;}
 .pointer{width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:20px solid var(--purple);filter:drop-shadow(0 2px 4px rgba(201,126,247,.45));margin-bottom:-3px;z-index:3;position:relative;}
@@ -237,228 +224,304 @@ body{
 .drum-item{height:92px;width:100%;display:flex;align-items:center;justify-content:center;gap:10px;flex-shrink:0;padding:0 13px;}
 .drum-icon{font-size:1.75rem;line-height:1;flex-shrink:0;}
 .drum-label{font-size:clamp(.88rem,3.5vw,1.5rem);font-weight:900;color:#e060a0;letter-spacing:.07em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-
 /* ── ボタン行 ── */
 .btn-row{width:100%;display:flex;gap:8px;align-items:stretch;}
 #roll-btn{flex:1;padding:11px 9px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;font-family:'Noto Sans JP',sans-serif;font-size:.9rem;font-weight:900;letter-spacing:.12em;cursor:pointer;box-shadow:0 4px 14px rgba(255,126,179,.35);transition:transform .15s,box-shadow .15s;}
 #roll-btn:hover:not(:disabled){transform:translateY(-2px);}
 #roll-btn:active:not(:disabled){transform:scale(.97);}
 #roll-btn:disabled{opacity:.6;cursor:not-allowed;}
-
 /* チェックボタン */
 #m-check-btn{
-  flex:0 0 auto;border:none;border-radius:50px;
-  background:linear-gradient(135deg,#ff9de2,#ff6bb5);
-  color:#fff;font-family:'Noto Sans JP',sans-serif;
-  font-size:.78rem;font-weight:900;letter-spacing:.04em;
-  cursor:pointer;white-space:nowrap;
-  max-width:0;overflow:hidden;
-  padding-top:11px;padding-bottom:11px;
-  padding-left:0;padding-right:0;
-  opacity:0;pointer-events:none;
-  transition:max-width .3s cubic-bezier(.34,1.2,.64,1),
-             opacity .25s ease,
-             padding .3s cubic-bezier(.34,1.2,.64,1),
-             transform .15s,box-shadow .15s;
-  box-shadow:0 0 0 rgba(255,107,181,0);
+flex:0 0 auto;border:none;border-radius:50px;
+background:linear-gradient(135deg,#ff9de2,#ff6bb5);
+color:#fff;font-family:'Noto Sans JP',sans-serif;
+font-size:.78rem;font-weight:900;letter-spacing:.04em;
+cursor:pointer;white-space:nowrap;
+max-width:0;overflow:hidden;
+padding-top:11px;padding-bottom:11px;
+padding-left:0;padding-right:0;
+opacity:0;pointer-events:none;
+transition:max-width .3s cubic-bezier(.34,1.2,.64,1),
+opacity .25s ease,
+padding .3s cubic-bezier(.34,1.2,.64,1),
+transform .15s,box-shadow .15s;
+box-shadow:0 0 0 rgba(255,107,181,0);
 }
 #m-check-btn.visible{
-  max-width:160px;padding-left:14px;padding-right:14px;
-  opacity:1;pointer-events:auto;
-  box-shadow:0 5px 20px rgba(255,107,181,.45), 0 0 0 3px rgba(255,157,226,.3);
-  animation:checkBtnPop .4s cubic-bezier(.34,1.56,.64,1);
+max-width:160px;padding-left:14px;padding-right:14px;
+opacity:1;pointer-events:auto;
+box-shadow:0 5px 20px rgba(255,107,181,.45), 0 0 0 3px rgba(255,157,226,.3);
+animation:checkBtnPop .4s cubic-bezier(.34,1.56,.64,1);
 }
 @keyframes checkBtnPop{
-  0%{transform:scale(.6);}60%{transform:scale(1.1);}100%{transform:scale(1);}
+0%{transform:scale(.6);}60%{transform:scale(1.1);}100%{transform:scale(1);}
 }
 #m-check-btn:hover:not(:disabled){transform:translateY(-3px) scale(1.04);box-shadow:0 8px 24px rgba(255,107,181,.55);}
 #m-check-btn:active:not(:disabled){transform:scale(.96);}
 #m-check-btn.done{background:linear-gradient(135deg,#b2e8d8,#a0d8ee);box-shadow:none;cursor:default;opacity:.7;}
 #m-check-btn.secret-check{
-  background:linear-gradient(135deg,#9b00e0,#e040fb,#c97ef7);
-  box-shadow:0 5px 24px rgba(201,126,247,.6),0 0 0 3px rgba(201,126,247,.25);
-  animation:secretCheckPulse 1.5s ease-in-out infinite,checkBtnPop .4s cubic-bezier(.34,1.56,.64,1);
-  font-size:.72rem;
+background:linear-gradient(135deg,#9b00e0,#e040fb,#c97ef7);
+box-shadow:0 5px 24px rgba(201,126,247,.6),0 0 0 3px rgba(201,126,247,.25);
+animation:secretCheckPulse 1.5s ease-in-out infinite,checkBtnPop .4s cubic-bezier(.34,1.56,.64,1);
+font-size:.72rem;
 }
 @keyframes secretCheckPulse{
-  0%,100%{box-shadow:0 5px 24px rgba(201,126,247,.6),0 0 0 3px rgba(201,126,247,.25),0 0 20px rgba(201,126,247,.3);}
-  50%{box-shadow:0 5px 32px rgba(201,126,247,.8),0 0 0 6px rgba(201,126,247,.2),0 0 40px rgba(201,126,247,.4);}
+0%,100%{box-shadow:0 5px 24px rgba(201,126,247,.6),0 0 0 3px rgba(201,126,247,.25),0 0 20px rgba(201,126,247,.3);}
+50%{box-shadow:0 5px 32px rgba(201,126,247,.8),0 0 0 6px rgba(201,126,247,.2),0 0 40px rgba(201,126,247,.4);}
+}
+
+/* ═══ やりたいことエリア ═══ */
+.want-area{
+width:100%;
+border-radius:18px;
+background:linear-gradient(135deg,#f0f0ff,#e8e8f8);
+border:2.5px solid var(--ninja2);
+padding:12px 14px;
+display:flex;flex-direction:column;gap:10px;
+}
+.want-area-title{
+font-size:.75rem;font-weight:900;color:var(--ninja2);
+letter-spacing:.1em;
+display:flex;align-items:center;gap:5px;
+}
+.want-items{
+display:flex;gap:8px;width:100%;
+}
+.want-item{
+flex:1;
+display:flex;flex-direction:column;align-items:center;justify-content:center;
+gap:6px;
+padding:12px 8px;
+border-radius:14px;
+background:#fff;
+border:2.5px solid #d0d0f0;
+cursor:pointer;
+user-select:none;
+-webkit-tap-highlight-color:transparent;
+transition:all .2s cubic-bezier(.34,1.2,.64,1);
+position:relative;
+overflow:hidden;
+}
+.want-item:hover{
+border-color:var(--ninja2);
+transform:translateY(-2px);
+box-shadow:0 4px 14px rgba(74,74,122,.18);
+}
+.want-item:active{transform:scale(.96);}
+.want-item.checked{
+background:linear-gradient(135deg,#e8f4ff,#d4eaff);
+border-color:#6090d0;
+}
+.want-item.checked.ninja-checked{
+background:linear-gradient(135deg,#1a1a3a,#2d2d5a);
+border-color:#7070cc;
+}
+.want-item-icon{font-size:2rem;line-height:1;}
+.want-item-label{
+font-size:.75rem;font-weight:900;
+color:var(--ninja2);
+letter-spacing:.04em;
+text-align:center;
+}
+.want-item.checked .want-item-label{
+color:#3060b0;
+}
+.want-item.checked.ninja-checked .want-item-label{
+color:#a0a0ff;
+}
+/* チェックバッジ */
+.want-check-badge{
+position:absolute;top:5px;right:5px;
+width:18px;height:18px;
+border-radius:50%;
+background:linear-gradient(135deg,var(--mint),#38d39f);
+display:flex;align-items:center;justify-content:center;
+font-size:.65rem;color:#fff;
+opacity:0;transform:scale(0);
+transition:all .25s cubic-bezier(.34,1.56,.64,1);
+}
+.want-item.checked .want-check-badge{
+opacity:1;transform:scale(1);
+}
+.want-item.checked.ninja-checked .want-check-badge{
+background:linear-gradient(135deg,#8040ff,#c040ff);
+}
+/* 忍者専用スタイル */
+.want-item.ninja:not(.checked){
+background:linear-gradient(135deg,#f8f8ff,#f0f0ff);
+}
+.want-item.ninja:hover{
+border-color:#4a4a8a;
+box-shadow:0 4px 16px rgba(45,45,78,.25);
+}
+/* ゲーム専用スタイル */
+.want-item.game-want:not(.checked){
+background:linear-gradient(135deg,#fff8ff,#f8f0ff);
+}
+.want-item.game-want:hover{
+border-color:var(--purple);
+box-shadow:0 4px 16px rgba(201,126,247,.25);
+}
+.want-item.game-want.checked{
+background:linear-gradient(135deg,#fff0ff,#f0d8ff);
+border-color:var(--purple);
+}
+.want-item.game-want.checked .want-item-label{
+color:var(--purple);
+}
+.want-item.game-want.checked .want-check-badge{
+background:linear-gradient(135deg,var(--purple),#e040fb);
 }
 
 /* ═══ ゲームタブ ═══ */
 .game-card{padding:16px 14px!important;}
 .game-info-row{
-  display:flex;gap:8px;width:100%;justify-content:space-between;
+display:flex;gap:8px;width:100%;justify-content:space-between;
 }
 .game-stat{
-  flex:1;text-align:center;font-size:.72rem;color:#a080c0;
-  background:#fff5fb;border:1.5px solid var(--pink2);
-  border-radius:10px;padding:5px 4px;
+flex:1;text-align:center;font-size:.72rem;color:#a080c0;
+background:#fff5fb;border:1.5px solid var(--pink2);
+border-radius:10px;padding:5px 4px;
 }
 .game-stat b{display:block;font-size:.9rem;color:var(--purple);margin-top:1px;}
 .game-wrap{
-  width:100%;position:relative;
-  border-radius:16px;overflow:hidden;
-  border:3px solid var(--pink2);
-  background:#1a0030;
-  touch-action:none;
+width:100%;position:relative;
+border-radius:16px;overflow:hidden;
+border:3px solid var(--pink2);
+background:#1a0030;
+touch-action:none;
 }
 #game-canvas{display:block;width:100%;height:auto;}
 .game-overlay{
-  position:absolute;inset:0;
-  display:flex;align-items:center;justify-content:center;
-  background:rgba(20,0,40,.82);
-  -webkit-backdrop-filter:blur(4px);
-  backdrop-filter:blur(4px);
-  border-radius:13px;
-  transition:opacity .3s,visibility .3s;
+position:absolute;inset:0;
+display:flex;align-items:center;justify-content:center;
+background:rgba(20,0,40,.82);
+-webkit-backdrop-filter:blur(4px);
+backdrop-filter:blur(4px);
+border-radius:13px;
+transition:opacity .3s,visibility .3s;
 }
 .game-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none;}
 .game-overlay-content{text-align:center;}
 .overlay-title{
-  font-size:1.3rem;font-weight:900;color:#fff;
-  letter-spacing:.1em;margin-bottom:6px;
-  text-shadow:0 0 20px rgba(201,126,247,.8);
+font-size:1.3rem;font-weight:900;color:#fff;
+letter-spacing:.1em;margin-bottom:6px;
+text-shadow:0 0 20px rgba(201,126,247,.8);
 }
 .overlay-sub{font-size:.78rem;color:#c8a0e8;margin-bottom:16px;letter-spacing:.05em;}
 .overlay-btn{
-  padding:11px 30px;border-radius:50px;border:none;
-  background:linear-gradient(135deg,var(--purple),#e040fb);
-  color:#fff;font-family:'Noto Sans JP',sans-serif;
-  font-size:.95rem;font-weight:900;letter-spacing:.14em;
-  cursor:pointer;box-shadow:0 5px 18px rgba(201,126,247,.5);
-  transition:transform .15s,box-shadow .15s;
+padding:11px 30px;border-radius:50px;border:none;
+background:linear-gradient(135deg,var(--purple),#e040fb);
+color:#fff;font-family:'Noto Sans JP',sans-serif;
+font-size:.95rem;font-weight:900;letter-spacing:.14em;
+cursor:pointer;box-shadow:0 5px 18px rgba(201,126,247,.5);
+transition:transform .15s,box-shadow .15s;
 }
 .overlay-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(201,126,247,.65);}
 .overlay-btn:active{transform:scale(.97);}
 .game-ctrl-hint{
-  font-size:.66rem;color:#c097d0;letter-spacing:.05em;
-  text-align:center;margin-top:2px;
+font-size:.66rem;color:#c097d0;letter-spacing:.05em;
+text-align:center;margin-top:2px;
 }
-
 /* ── 隠しミッション ── */
-/* オーバーレイ */
 #secret-overlay{
-  position:fixed;inset:0;z-index:300;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  background:rgba(10,0,30,.88);
-  -webkit-backdrop-filter:blur(6px);
-  backdrop-filter:blur(6px);
-  opacity:0;
-  visibility:hidden;        /* pointer-eventsよりも確実に無効化 */
-  transition:opacity .4s ease, visibility .4s ease;
+position:fixed;inset:0;z-index:300;
+display:flex;flex-direction:column;align-items:center;justify-content:center;
+background:rgba(10,0,30,.88);
+-webkit-backdrop-filter:blur(6px);
+backdrop-filter:blur(6px);
+opacity:0;
+visibility:hidden;
+transition:opacity .4s ease, visibility .4s ease;
 }
-#secret-overlay.show{
-  opacity:1;
-  visibility:visible;       /* .showで完全に有効化 */
-}
-
+#secret-overlay.show{opacity:1;visibility:visible;}
 .secret-badge{
-  background:linear-gradient(135deg,#2d0060,#6a0080,#2d0060);
-  border:3px solid #c97ef7;
-  border-radius:28px;padding:28px 32px;
-  text-align:center;
-  box-shadow:0 0 60px rgba(201,126,247,.5), 0 0 120px rgba(201,126,247,.2);
-  animation:secretBadgePop .6s cubic-bezier(.34,1.4,.64,1);
-  max-width:min(360px,88vw);
+background:linear-gradient(135deg,#2d0060,#6a0080,#2d0060);
+border:3px solid #c97ef7;
+border-radius:28px;padding:28px 32px;
+text-align:center;
+box-shadow:0 0 60px rgba(201,126,247,.5), 0 0 120px rgba(201,126,247,.2);
+animation:secretBadgePop .6s cubic-bezier(.34,1.4,.64,1);
+max-width:min(360px,88vw);
 }
 @keyframes secretBadgePop{
-  0%{transform:scale(.4) rotate(-8deg);opacity:0;}
-  70%{transform:scale(1.08) rotate(2deg);}
-  100%{transform:scale(1) rotate(0deg);opacity:1;}
+0%{transform:scale(.4) rotate(-8deg);opacity:0;}
+70%{transform:scale(1.08) rotate(2deg);}
+100%{transform:scale(1) rotate(0deg);opacity:1;}
 }
 .secret-stars{font-size:2rem;letter-spacing:.2em;margin-bottom:8px;}
 .secret-title{
-  font-size:1.05rem;font-weight:900;letter-spacing:.18em;
-  color:#e0aaff;margin-bottom:6px;
-  text-shadow:0 0 20px rgba(201,126,247,.8);
+font-size:1.05rem;font-weight:900;letter-spacing:.18em;
+color:#e0aaff;margin-bottom:6px;
+text-shadow:0 0 20px rgba(201,126,247,.8);
 }
 .secret-label{
-  font-size:1.6rem;font-weight:900;color:#fff;letter-spacing:.06em;
-  margin:10px 0 6px;
-  text-shadow:0 0 30px rgba(255,200,255,.6);
+font-size:1.6rem;font-weight:900;color:#fff;letter-spacing:.06em;
+margin:10px 0 6px;
+text-shadow:0 0 30px rgba(255,200,255,.6);
 }
 .secret-desc{font-size:.78rem;color:#c8a0e8;margin-bottom:18px;letter-spacing:.05em;}
 .secret-start-btn{
-  padding:12px 32px;border-radius:50px;border:none;
-  background:linear-gradient(135deg,var(--purple),#e040fb);
-  color:#fff;font-family:'Noto Sans JP',sans-serif;
-  font-size:.95rem;font-weight:900;letter-spacing:.15em;
-  cursor:pointer;
-  box-shadow:0 5px 20px rgba(201,126,247,.5);
-  transition:transform .15s,box-shadow .15s;
+padding:12px 32px;border-radius:50px;border:none;
+background:linear-gradient(135deg,var(--purple),#e040fb);
+color:#fff;font-family:'Noto Sans JP',sans-serif;
+font-size:.95rem;font-weight:900;letter-spacing:.15em;
+cursor:pointer;
+box-shadow:0 5px 20px rgba(201,126,247,.5);
+transition:transform .15s,box-shadow .15s;
 }
 .secret-start-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(201,126,247,.65);}
 .secret-start-btn:active{transform:scale(.97);}
-
 .secret-skip-btn{
-  padding:12px 20px;border-radius:50px;
-  border:2px solid rgba(201,126,247,.4);
-  background:transparent;color:#c8a0e8;
-  font-family:'Noto Sans JP',sans-serif;
-  font-size:.85rem;font-weight:700;letter-spacing:.1em;
-  cursor:pointer;transition:all .2s;
+padding:12px 20px;border-radius:50px;
+border:2px solid rgba(201,126,247,.4);
+background:transparent;color:#c8a0e8;
+font-family:'Noto Sans JP',sans-serif;
+font-size:.85rem;font-weight:700;letter-spacing:.1em;
+cursor:pointer;transition:all .2s;
 }
 .secret-skip-btn:hover{background:rgba(201,126,247,.12);border-color:rgba(201,126,247,.7);}
 .secret-skip-btn:active{transform:scale(.97);}
-
-/* ドラム内 隠しミッション表示 */
-.drum-item.secret .drum-label{
-  color:#c97ef7;
-  text-shadow:0 0 12px rgba(201,126,247,.6);
-}
-.drum-item.secret .drum-icon{
-  filter:drop-shadow(0 0 6px rgba(201,126,247,.7));
-}
-
-/* 隠しミッション チェックボタン（超豪華版） */
+.drum-item.secret .drum-label{color:#c97ef7;text-shadow:0 0 12px rgba(201,126,247,.6);}
+.drum-item.secret .drum-icon{filter:drop-shadow(0 0 6px rgba(201,126,247,.7));}
 #m-check-btn.secret-check{
-  background:linear-gradient(135deg,#9b00e0,#e040fb,#c97ef7);
-  box-shadow:0 5px 24px rgba(201,126,247,.6),
-             0 0 0 3px rgba(201,126,247,.25),
-             0 0 20px rgba(201,126,247,.3);
-  animation:secretCheckPulse 1.5s ease-in-out infinite, checkBtnPop .4s cubic-bezier(.34,1.56,.64,1);
+background:linear-gradient(135deg,#9b00e0,#e040fb,#c97ef7);
+box-shadow:0 5px 24px rgba(201,126,247,.6),0 0 0 3px rgba(201,126,247,.25),0 0 20px rgba(201,126,247,.3);
+animation:secretCheckPulse 1.5s ease-in-out infinite, checkBtnPop .4s cubic-bezier(.34,1.56,.64,1);
 }
-@keyframes secretCheckPulse{
-  0%,100%{box-shadow:0 5px 24px rgba(201,126,247,.6),0 0 0 3px rgba(201,126,247,.25),0 0 20px rgba(201,126,247,.3);}
-  50%{box-shadow:0 5px 32px rgba(201,126,247,.8),0 0 0 6px rgba(201,126,247,.2),0 0 40px rgba(201,126,247,.4);}
-}
-
-/* 隠しミッション完了エフェクト */
 #secret-clear{
-  position:fixed;inset:0;z-index:400;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  visibility:hidden;opacity:0;
-  transition:opacity .3s, visibility .3s;
+position:fixed;inset:0;z-index:400;
+display:flex;flex-direction:column;align-items:center;justify-content:center;
+visibility:hidden;opacity:0;
+transition:opacity .3s, visibility .3s;
 }
 #secret-clear.show{opacity:1;visibility:visible;pointer-events:auto;}
 .secret-clear-inner{
-  text-align:center;
-  animation:secretClearPop .7s cubic-bezier(.34,1.4,.64,1);
+text-align:center;
+animation:secretClearPop .7s cubic-bezier(.34,1.4,.64,1);
 }
 @keyframes secretClearPop{0%{transform:scale(.3);opacity:0;}100%{transform:scale(1);opacity:1;}}
 .secret-clear-emoji{font-size:4rem;display:block;margin-bottom:8px;}
 .secret-clear-text{
-  font-size:1.4rem;font-weight:900;color:#fff;
-  text-shadow:0 0 30px rgba(201,126,247,1), 0 2px 0 rgba(0,0,0,.5);
-  letter-spacing:.08em;
+font-size:1.4rem;font-weight:900;color:#fff;
+text-shadow:0 0 30px rgba(201,126,247,1), 0 2px 0 rgba(0,0,0,.5);
+letter-spacing:.08em;
 }
 .secret-clear-sub{
-  font-size:.85rem;color:#e0aaff;margin-top:6px;letter-spacing:.06em;
-  text-shadow:0 0 10px rgba(201,126,247,.8);
+font-size:.85rem;color:#e0aaff;margin-top:6px;letter-spacing:.06em;
+text-shadow:0 0 10px rgba(201,126,247,.8);
 }
 .secret-clear-bg{
-  position:fixed;inset:0;z-index:-1;
-  background:radial-gradient(circle at center, rgba(100,0,160,.7) 0%, rgba(20,0,40,.85) 70%);
+position:fixed;inset:0;z-index:-1;
+background:radial-gradient(circle at center, rgba(100,0,160,.7) 0%, rgba(20,0,40,.85) 70%);
 }
 .secret-clear-close{
-  margin-top:20px;padding:10px 28px;border-radius:50px;border:2px solid #c97ef7;
-  background:transparent;color:#e0aaff;font-family:'Noto Sans JP',sans-serif;
-  font-size:.88rem;font-weight:700;cursor:pointer;letter-spacing:.1em;
-  transition:all .2s;pointer-events:auto;
+margin-top:20px;padding:10px 28px;border-radius:50px;border:2px solid #c97ef7;
+background:transparent;color:#e0aaff;font-family:'Noto Sans JP',sans-serif;
+font-size:.88rem;font-weight:700;cursor:pointer;letter-spacing:.1em;
+transition:all .2s;pointer-events:auto;
 }
 .secret-clear-close:hover{background:rgba(201,126,247,.2);}
-
 /* ── ミッションチップ ── */
 .mission-list-title{font-size:.66rem;font-weight:700;color:#c097d0;letter-spacing:.08em;margin-bottom:5px;text-align:center;}
 .mission-chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:5px;width:100%;}
@@ -467,87 +530,67 @@ body{
 .m-chip:active{transform:scale(.96);}
 .m-chip.checked{background:linear-gradient(135deg,#e8faf4,#d4f4ea);border-color:var(--mint);color:#2a9e7a;text-decoration:line-through;opacity:.72;}
 .m-chip-icon{font-size:.85rem;flex-shrink:0;}
-
 /* 全完了バナー */
 .all-done-banner{display:none;width:100%;border-radius:12px;padding:9px;background:linear-gradient(135deg,#fff8e1,#fff3e0);border:2.5px solid var(--yellow);text-align:center;font-size:.82rem;font-weight:900;color:#e0900a;}
 .all-done-banner.visible{display:block;}
-
 .bottom-row{display:flex;align-items:center;justify-content:space-between;width:100%;}
 .count-row{font-size:.64rem;color:#c097d0;letter-spacing:.04em;}
 .count-row b{color:var(--pink);}
 .reset-btn{font-size:.62rem;color:#c097d0;background:none;border:1px solid #e8d0f0;border-radius:8px;padding:3px 8px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all .2s;}
 .reset-btn:hover{background:#fff0fb;color:var(--purple);border-color:var(--purple);}
-
 /* ═══ 習慣 ═══ */
-
-/* ─── アコーディオンセクション ─── */
 .habit-section{width:100%;margin-bottom:5px;}
-
 .section-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:8px 12px;border-radius:13px;
-  font-size:.78rem;font-weight:900;letter-spacing:.06em;
-  cursor:pointer;user-select:none;
-  -webkit-tap-highlight-color:transparent;
-  transition:opacity .15s;
+display:flex;align-items:center;justify-content:space-between;
+padding:8px 12px;border-radius:13px;
+font-size:.78rem;font-weight:900;letter-spacing:.06em;
+cursor:pointer;user-select:none;
+-webkit-tap-highlight-color:transparent;
+transition:opacity .15s;
 }
 .section-header:active{opacity:.75;}
 .section-header.morning{background:linear-gradient(135deg,#fff3cd,#ffe8a0);color:#b8860b;}
 .section-header.school {background:linear-gradient(135deg,#d4eeff,#b3daff);color:var(--navy);}
-.section-header.after  {background:linear-gradient(135deg,#ffe0f0,#ffc8e8);color:#c04080;}
-
+.section-header.after {background:linear-gradient(135deg,#ffe0f0,#ffc8e8);color:#c04080;}
 .section-header-left{display:flex;align-items:center;gap:7px;}
 .section-icon{font-size:.95rem;}
-
 .section-header-right{display:flex;align-items:center;gap:7px;}
-
-/* 一括ボタン */
 .bulk-btn{
-  font-size:.65rem;font-weight:700;padding:3px 9px;border-radius:9px;
-  border:none;cursor:pointer;font-family:'Noto Sans JP',sans-serif;
-  transition:all .18s;-webkit-tap-highlight-color:transparent;
+font-size:.65rem;font-weight:700;padding:3px 9px;border-radius:9px;
+border:none;cursor:pointer;font-family:'Noto Sans JP',sans-serif;
+transition:all .18s;-webkit-tap-highlight-color:transparent;
 }
 .bulk-btn.check-all{background:rgba(255,255,255,.7);color:inherit;}
 .bulk-btn.check-all:hover{background:rgba(255,255,255,.9);}
 .bulk-btn.uncheck-all{background:rgba(0,0,0,.08);color:inherit;}
 .bulk-btn.uncheck-all:hover{background:rgba(0,0,0,.14);}
-
-/* 開閉矢印 */
 .chevron{
-  font-size:.75rem;transition:transform .28s cubic-bezier(.4,0,.2,1);
-  display:inline-block;opacity:.7;
+font-size:.75rem;transition:transform .28s cubic-bezier(.4,0,.2,1);
+display:inline-block;opacity:.7;
 }
 .section-header.open .chevron{transform:rotate(180deg);}
-
-/* アコーディオン本体 */
 .accordion-body{
-  overflow:hidden;
-  max-height:0;
-  transition:max-height .35s cubic-bezier(.4,0,.2,1), opacity .28s ease;
-  opacity:0;
+overflow:hidden;
+max-height:0;
+transition:max-height .35s cubic-bezier(.4,0,.2,1), opacity .28s ease;
+opacity:0;
 }
-.accordion-body.open{
-  max-height:2000px;/* 十分大きい値 */
-  opacity:1;
-}
-
-/* サブセクション */
+.accordion-body.open{max-height:2000px;opacity:1;}
 .sub-section{margin:6px 0 2px;}
 .sub-section-title{
-  font-size:.68rem;font-weight:900;color:#999;
-  letter-spacing:.08em;padding:0 2px 4px;
-  border-bottom:1px dashed #e8d0f0;
-  margin-bottom:5px;
+font-size:.68rem;font-weight:900;color:#999;
+letter-spacing:.08em;padding:0 2px 4px;
+border-bottom:1px dashed #e8d0f0;
+margin-bottom:5px;
 }
-
 .habit-list{display:flex;flex-direction:column;gap:4px;width:100%;padding-top:6px;}
 .habit-item{
-  display:flex;align-items:center;gap:8px;
-  padding:8px 11px;border-radius:11px;
-  background:#fff;border:2px solid #f0e0f8;
-  cursor:pointer;user-select:none;
-  -webkit-tap-highlight-color:transparent;
-  transition:background .16s,border-color .16s,transform .1s;
+display:flex;align-items:center;gap:8px;
+padding:8px 11px;border-radius:11px;
+background:#fff;border:2px solid #f0e0f8;
+cursor:pointer;user-select:none;
+-webkit-tap-highlight-color:transparent;
+transition:background .16s,border-color .16s,transform .1s;
 }
 .habit-item:hover{border-color:var(--pink2);background:#fff5fb;transform:translateX(2px);}
 .habit-item:active{transform:scale(.98);}
@@ -560,21 +603,17 @@ body{
 .habit-item.checked .habit-label{color:#2a9e7a;text-decoration:line-through;opacity:.8;}
 .habit-note{font-size:.62rem;color:#ccc;white-space:nowrap;flex-shrink:0;}
 .habit-item.checked .habit-note{color:var(--mint);}
-
 .habit-bottom{display:flex;align-items:center;justify-content:flex-end;width:100%;margin-top:3px;}
-
-/* ── 全リセットボタン ── */
 .all-reset-btn{
-  font-size:.62rem;color:#e07070;background:none;
-  border:1px solid #ffb3b3;border-radius:8px;
-  padding:3px 9px;cursor:pointer;
-  font-family:'Noto Sans JP',sans-serif;font-weight:700;
-  letter-spacing:.05em;
-  transition:all .2s;
+font-size:.62rem;color:#e07070;background:none;
+border:1px solid #ffb3b3;border-radius:8px;
+padding:3px 9px;cursor:pointer;
+font-family:'Noto Sans JP',sans-serif;font-weight:700;
+letter-spacing:.05em;
+transition:all .2s;
 }
 .all-reset-btn:hover{background:#fff0f0;color:#e05050;border-color:#e05050;}
 .all-reset-btn:active{transform:scale(.96);}
-
 /* ═══ confetti ═══ */
 .confetti-piece{position:fixed;border-radius:2px;pointer-events:none;z-index:200;animation:confettiFall 1.6s ease-in forwards;}
 @keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(110vh) rotate(720deg);opacity:0;}}
@@ -607,9 +646,9 @@ body{
     <button class="secret-clear-close" onclick="closeSecretClear()">とじる</button>
   </div>
 </div>
-<div id="app">
 
-  <!-- ── 固定ヘッダー（タブ＋進捗） ── -->
+<div id="app">
+  <!-- 固定ヘッダー -->
   <div class="sticky-header">
     <div class="tab-bar">
       <button class="tab-btn active" id="tab-mission" onclick="switchTab(0)">
@@ -622,22 +661,19 @@ body{
         <span class="tab-icon">🎮</span>ゲーム
       </button>
     </div>
-    <!-- スマホ：現在タブの進捗 / PC：両方の進捗を並べて表示 -->
     <div class="sticky-progress" id="sticky-progress">
-      <!-- スマホ用（1本） -->
       <div class="sp-single" id="sp-single">
         <div class="sp-label">
           <span class="sp-text" id="sp-text">📋 ミッション進捗</span>
-          <span class="sp-count" id="sp-count">0 / 11 完了</span>
+          <span class="sp-count" id="sp-count">0 / 9 完了</span>
         </div>
         <div class="sp-bar-bg"><div class="sp-bar-fill" id="sp-bar" style="width:0%"></div></div>
       </div>
-      <!-- PC用（2本並列） -->
       <div class="sp-dual" id="sp-dual">
         <div class="sp-dual-item">
           <div class="sp-label">
             <span class="sp-text">📋 ミッション</span>
-            <span class="sp-count" id="sp-m-count">0 / 11 完了</span>
+            <span class="sp-count" id="sp-m-count">0 / 9 完了</span>
           </div>
           <div class="sp-bar-bg"><div class="sp-bar-fill" id="sp-m-bar" style="width:0%"></div></div>
         </div>
@@ -652,7 +688,7 @@ body{
     </div>
   </div>
 
-  <!-- ── スワイプ領域 ── -->
+  <!-- スワイプ領域 -->
   <div class="pane-viewport" id="pane-viewport">
     <div class="pane-track" id="pane-track">
 
@@ -660,9 +696,8 @@ body{
       <div class="pane" id="pane-mission">
         <div class="card">
           <div class="card-title">✨ きょうの <span>ミッション</span> ✨</div>
-          <!-- PC用進捗 -->
           <div class="card-progress" id="m-card-progress">
-            <div class="cp-label"><span class="cp-text">📋 ミッション進捗</span><span class="cp-count" id="m-cp-count">0 / 11 完了</span></div>
+            <div class="cp-label"><span class="cp-text">📋 ミッション進捗</span><span class="cp-count" id="m-cp-count">0 / 9 完了</span></div>
             <div class="cp-bar-bg"><div class="cp-bar-fill" id="m-cp-bar" style="width:0%"></div></div>
           </div>
           <div class="drum-wrap">
@@ -681,6 +716,26 @@ body{
             <div class="mission-list-title">📋 タップしてもチェックできるよ！</div>
             <div class="mission-chips" id="mission-chips"></div>
           </div>
+
+          <!-- ★ やりたいことエリア ★ -->
+          <div class="want-area">
+            <div class="want-area-title">🌟 やりたいこと</div>
+            <div class="want-items">
+              <!-- 忍者修行 -->
+              <div class="want-item ninja" id="want-ninja" onclick="toggleWant('ninja')">
+                <div class="want-check-badge">✓</div>
+                <div class="want-item-icon">🥷</div>
+                <div class="want-item-label">忍者修行</div>
+              </div>
+              <!-- ゲーム -->
+              <div class="want-item game-want" id="want-game" onclick="toggleWant('game')">
+                <div class="want-check-badge">✓</div>
+                <div class="want-item-icon">🎮</div>
+                <div class="want-item-label">ゲーム</div>
+              </div>
+            </div>
+          </div>
+
           <div class="bottom-row">
             <div class="count-row">まわした回数 <b id="m-roll-count">0</b> かい</div>
             <button class="reset-btn" onclick="resetMission()">🔄 リセット</button>
@@ -692,13 +747,11 @@ body{
       <div class="pane" id="pane-habit">
         <div class="card">
           <div class="card-title">🌟 きょうの <span>習慣チェック</span></div>
-          <!-- PC用進捗 -->
           <div class="card-progress" id="h-card-progress">
             <div class="cp-label"><span class="cp-text">✅ 習慣進捗</span><span class="cp-count" id="h-cp-count">0 / 0 完了</span></div>
             <div class="cp-bar-bg"><div class="cp-bar-fill" id="h-cp-bar" style="width:0%"></div></div>
           </div>
           <div class="all-done-banner" id="h-all-done">🌈 けさのルーティン ぜんぶ できたよ！えらい！🌈</div>
-
           <!-- 朝 -->
           <div class="habit-section" id="sec-morning">
             <div class="section-header morning open" onclick="toggleSection('morning')">
@@ -712,7 +765,6 @@ body{
               <div class="habit-list" id="habit-list-morning"></div>
             </div>
           </div>
-
           <!-- 学校準備 -->
           <div class="habit-section" id="sec-school">
             <div class="section-header school open" onclick="toggleSection('school')">
@@ -726,7 +778,6 @@ body{
               <div class="habit-list" id="habit-list-school"></div>
             </div>
           </div>
-
           <!-- 下校後 -->
           <div class="habit-section" id="sec-after">
             <div class="section-header after open" onclick="toggleSection('after')">
@@ -740,7 +791,6 @@ body{
               <div id="habit-list-after-wrap"></div>
             </div>
           </div>
-
           <div class="habit-bottom">
             <button class="reset-btn" onclick="resetHabit()">🔄 習慣リセット</button>
             <button class="all-reset-btn" onclick="resetAll()">🗑️ 全部リセット</button>
@@ -750,7 +800,6 @@ body{
 
       <!-- ゲームペイン -->
       <div class="pane" id="pane-game">
-        <!-- ロック中カード -->
         <div class="card" id="game-locked-card">
           <div class="game-locked-screen">
             <span class="lock-icon-big">🔒</span>
@@ -763,13 +812,12 @@ body{
             <div class="lock-progress-wrap">
               <div class="lock-prog-label">
                 <span>ミッション進捗</span>
-                <span id="lock-prog-text">0 / 11</span>
+                <span id="lock-prog-text">0 / 9</span>
               </div>
               <div class="lock-prog-bg"><div class="lock-prog-fill" id="lock-prog-fill" style="width:0%"></div></div>
             </div>
           </div>
         </div>
-        <!-- 解放後カード -->
         <div class="card game-card" id="game-main-card" style="display:none">
           <div class="card-title">🎮 <span>アルカノイド</span></div>
           <div class="game-info-row">
@@ -789,8 +837,7 @@ body{
           </div>
           <div class="game-ctrl-hint">スマホ：左右タップ / PC：← → キー or マウス</div>
         </div>
-      </div><!-- /pane-game -->
-
+      </div>
     </div>
   </div>
 </div>
@@ -822,71 +869,76 @@ function playMCheck(){const c=getCtx();[880,1100,1320].forEach((f,i)=>tone('sine
 function playAllClear(){const c=getCtx();[{f:523,t:0},{f:659,t:.13},{f:784,t:.26},{f:1047,t:.4},{f:784,t:.54},{f:1047,t:.68}].forEach(({f,t})=>tone('triangle',f,.24,c.currentTime+t,.22));[{f:330,t:.4},{f:440,t:.54},{f:523,t:.68}].forEach(({f,t})=>tone('sine',f,.09,c.currentTime+t,.3));}
 function playHabitAllClear(){const c=getCtx();[523,659,784,880,1047].forEach((f,i)=>tone('triangle',f,.22,c.currentTime+i*.1,.22));}
 function playBulk(n){const c=getCtx();for(let i=0;i<Math.min(n,6);i++)tone('sine',660+i*80,.12,c.currentTime+i*.07,.11);}
+function playNinjaCheck(){const c=getCtx();[300,200,440,660].forEach((f,i)=>tone('square',f,.1,c.currentTime+i*.06,.12));}
 
 // ══════════════════════════════
 // データ
 // ══════════════════════════════
+// ※ 修行・ゲームはミッションドラムから除外
 const MISSION_ITEMS=[
   {label:'ピアノ',icon:'🎹'},{label:'日記',icon:'📔'},{label:'勉強',icon:'📚'},
-  {label:'修行',icon:'🥋'},{label:'新体操',icon:'🎀'},{label:'チャレンジタッチ',icon:'📱'},
+  {label:'新体操',icon:'🎀'},{label:'チャレンジタッチ',icon:'📱'},
   {label:'ストレッチ',icon:'🤸'},{label:'Y字バランス10秒',icon:'⭐'},
-  {label:'タッチタイピング',icon:'⌨️'},{label:'ゲーム',icon:'🎮'},{label:'読書',icon:'📖'},
+  {label:'タッチタイピング',icon:'⌨️'},{label:'読書',icon:'📖'},
 ];
+
+// やりたいことアイテム（下部エリア）
+const WANT_ITEMS={
+  ninja:{label:'忍者修行',icon:'🥷'},
+  game: {label:'ゲーム',icon:'🎮'},
+};
 
 // 隠しミッション（ドラムには含まれない）
 const SECRET_MISSION={label:'こっそりお手伝い',icon:'🤫',secret:true};
 
-// 習慣：サブセクション対応の構造
-// type:'sub' = サブセクション見出し
 const HABIT_SECTIONS=[
   {id:'morning',label:'朝のルーティン',cls:'morning',items:[
-    {id:'drug1', label:'薬：シダキュア',              note:'花粉症',icon:'💊'},
-    {id:'drug2', label:'薬：オロパタジン',            note:'花粉症',icon:'💊'},
-    {id:'drug3', label:'薬：フェキソフェナジン',      note:'花粉症',icon:'💊'},
-    {id:'toilet',label:'トイレ',                      note:'',      icon:'🚽'},
-    {id:'dress', label:'着替え',                      note:'スパッツはく',icon:'👗'},
-    {id:'wash',  label:'顔を洗う',                    note:'',      icon:'🚿'},
-    {id:'moist', label:'保湿液',                      note:'',      icon:'🧴'},
-    {id:'sunsc', label:'日焼け止め',                  note:'',      icon:'☀️'},
-    {id:'xylit', label:'キシリトール',                note:'',      icon:'🍬'},
-    {id:'teeth', label:'歯を磨く',                    note:'',      icon:'🪥'},
+    {id:'drug1', label:'薬：シダキュア', note:'花粉症',icon:'💊'},
+    {id:'drug2', label:'薬：オロパタジン', note:'花粉症',icon:'💊'},
+    {id:'drug3', label:'薬：フェキソフェナジン', note:'花粉症',icon:'💊'},
+    {id:'toilet',label:'トイレ', note:'', icon:'🚽'},
+    {id:'dress', label:'着替え', note:'スパッツはく',icon:'👗'},
+    {id:'wash', label:'顔を洗う', note:'', icon:'🚿'},
+    {id:'moist', label:'保湿液', note:'', icon:'🧴'},
+    {id:'sunsc', label:'日焼け止め', note:'', icon:'☀️'},
+    {id:'xylit', label:'キシリトール', note:'', icon:'🍬'},
+    {id:'teeth', label:'歯を磨く', note:'', icon:'🪥'},
   ]},
   {id:'school',label:'学校じゅんび',cls:'school',items:[
-    {id:'bottle',label:'水筒',              note:'',              icon:'🧃'},
-    {id:'gym',   label:'体操着',            note:'',              icon:'👕'},
-    {id:'spats', label:'スパッツ',          note:'体育は短いもの',icon:'🩲'},
-    {id:'shirt', label:'半袖シャツ',        note:'体育の日',      icon:'👚'},
-    {id:'pocket',label:'移動ポケット',      note:'',              icon:'🎽'},
-    {id:'nbook', label:'連絡帳',            note:'',              icon:'📒'},
-    {id:'cocof', label:'ここフレ',          note:'',              icon:'📦'},
-    {id:'sched', label:'時間割と持ち物確認',note:'学級通信で',    icon:'📅'},
-    {id:'lunch', label:'給食確認',          note:'',              icon:'🍱'},
-    {id:'cream', label:'ハンドクリーム',    note:'',              icon:'🤲'},
-    {id:'mask',  label:'マスク',            note:'',              icon:'😷'},
+    {id:'bottle',label:'水筒', note:'', icon:'🧃'},
+    {id:'gym', label:'体操着', note:'', icon:'👕'},
+    {id:'spats', label:'スパッツ', note:'体育は短いもの',icon:'🩲'},
+    {id:'shirt', label:'半袖シャツ', note:'体育の日', icon:'👚'},
+    {id:'pocket',label:'移動ポケット', note:'', icon:'🎽'},
+    {id:'nbook', label:'連絡帳', note:'', icon:'📒'},
+    {id:'cocof', label:'ここフレ', note:'', icon:'📦'},
+    {id:'sched', label:'時間割と持ち物確認',note:'学級通信で', icon:'📅'},
+    {id:'lunch', label:'給食確認', note:'', icon:'🍱'},
+    {id:'cream', label:'ハンドクリーム', note:'', icon:'🤲'},
+    {id:'mask', label:'マスク', note:'', icon:'😷'},
   ]},
   {id:'after',label:'下校後にやること',cls:'after',
-   subSections:[
-    {label:'🎒 忘れ物確認',items:[
-      {id:'hw',       label:'宿題',                   note:'',          icon:'📝'},
-      {id:'renbag',   label:'連絡袋を確認',            note:'',          icon:'👝'},
-      {id:'kyusyoku', label:'給食袋',                  note:'',          icon:'🍱'},
-      {id:'uwabaki',  label:'上靴',                   note:'金曜日',    icon:'👟'},
+    subSections:[
+      {label:'🎒 忘れ物確認',items:[
+        {id:'hw', label:'宿題', note:'', icon:'📝'},
+        {id:'renbag', label:'連絡袋を確認', note:'', icon:'👝'},
+        {id:'kyusyoku', label:'給食袋', note:'', icon:'🍱'},
+        {id:'uwabaki', label:'上靴', note:'金曜日', icon:'👟'},
+      ]},
+      {label:'💊 夕食後・寝る前',items:[
+        {id:'drug_eve1',label:'薬：フェキソフェナジン', note:'アレルギー',icon:'💊'},
+        {id:'drug_eve2',label:'薬：モンテルカストチュアブル',note:'喘息予防',icon:'💊'},
+        {id:'drug_eve3',label:'薬：オロパタジン', note:'花粉症', icon:'💊'},
+      ]},
+      {label:'🌙 夜のルーティン',items:[
+        {id:'hagaki2', label:'歯磨き', note:'', icon:'🪥'},
+        {id:'ofuro', label:'お風呂', note:'', icon:'🛁'},
+        {id:'moist2', label:'保湿液', note:'', icon:'🧴'},
+        {id:'cream2', label:'ハンドクリーム', note:'', icon:'🤲'},
+      ]},
     ]},
-    {label:'💊 夕食後・寝る前',items:[
-      {id:'drug_eve1',label:'薬：フェキソフェナジン',  note:'アレルギー',icon:'💊'},
-      {id:'drug_eve2',label:'薬：モンテルカストチュアブル',note:'喘息予防',icon:'💊'},
-      {id:'drug_eve3',label:'薬：オロパタジン',        note:'花粉症',    icon:'💊'},
-    ]},
-    {label:'🌙 夜のルーティン',items:[
-      {id:'hagaki2',  label:'歯磨き',                  note:'',          icon:'🪥'},
-      {id:'ofuro',    label:'お風呂',                  note:'',          icon:'🛁'},
-      {id:'moist2',   label:'保湿液',                  note:'',          icon:'🧴'},
-      {id:'cream2',   label:'ハンドクリーム',           note:'',          icon:'🤲'},
-    ]},
-  ]},
 ];
 
-// afterセクション全アイテムをフラット化
 function getAfterItems(){
   return HABIT_SECTIONS.find(s=>s.id==='after').subSections.flatMap(ss=>ss.items);
 }
@@ -910,7 +962,10 @@ function saveJSON(k,v){localStorage.setItem(k,JSON.stringify(v));}
 let mChecked=loadJSON(`m_checked_${TODAY}`,[]);
 let mRolls=parseInt(localStorage.getItem(`m_rolls_${TODAY}`)||'0',10);
 let hChecked=loadJSON(`h_checked_${TODAY}`,[]);
+// やりたいことのチェック状態
+let wantChecked=loadJSON(`want_checked_${TODAY}`,[]);
 let mCurrentLabel=null,mRolling=false;
+
 function mRemaining(){return MISSION_ITEMS.filter(it=>!mChecked.includes(it.label));}
 
 // ══════════════════════════════
@@ -922,7 +977,6 @@ let gameUnlocked=!!localStorage.getItem(GAME_UNLOCK_KEY);
 function isGameUnlockable(){
   return mChecked.length >= Math.ceil(MISSION_ITEMS.length/2);
 }
-
 function applyGameLockState(){
   const tab=document.getElementById('tab-game');
   const locked=document.getElementById('game-locked-card');
@@ -940,7 +994,6 @@ function applyGameLockState(){
     updateLockProgress();
   }
 }
-
 function updateLockProgress(){
   const n=mChecked.length,total=MISSION_ITEMS.length;
   const el=document.getElementById('lock-prog-text');
@@ -948,14 +1001,11 @@ function updateLockProgress(){
   if(el) el.textContent=`${n} / ${total}`;
   if(fill) fill.style.width=(total?n/total*100:0)+'%';
 }
-
 function tryGameTab(){
   if(gameUnlocked){switchTab(2);return;}
-  // ロックされていたら鍵がガチャガチャする軽い演出
   playLockRattle();
   shakeLockIcon();
 }
-
 function shakeLockIcon(){
   const icon=document.querySelector('.lock-icon-big');
   if(!icon)return;
@@ -970,26 +1020,19 @@ function shakeLockIcon(){
     },400);
   },50);
 }
-
 function playLockRattle(){
   const c=getCtx();
   [300,260,220].forEach((f,i)=>tone('square',f,.07,c.currentTime+i*.06,.08));
 }
-
-// ゲーム解放確認（ミッションチェック後に呼ぶ）
 function checkGameUnlock(fromSecret=false){
   if(gameUnlocked)return;
   if(fromSecret||isGameUnlockable()){
     gameUnlocked=true;
     localStorage.setItem(GAME_UNLOCK_KEY,'1');
     applyGameLockState();
-    // 演出
-    setTimeout(()=>{
-      showUnlockOverlay(fromSecret);
-    },fromSecret?800:400);
+    setTimeout(()=>{showUnlockOverlay(fromSecret);},fromSecret?800:400);
   }
 }
-
 function showUnlockOverlay(fromSecret){
   const overlay=document.getElementById('unlock-overlay');
   const emoji=document.getElementById('unlock-emoji');
@@ -998,1001 +1041,616 @@ function showUnlockOverlay(fromSecret){
   if(fromSecret){
     emoji.textContent='🤫✨🎮';
     title.textContent='ひみつのちからで かいほう！！';
-    sub.textContent='かくしミッションのごほうびだよ！\nゲームでたくさんあそんでね🎮💜';
+    sub.textContent='かくしミッション クリアしたから\nゲームがあそべるようになったよ🎉';
   } else {
-    emoji.textContent='🎮🎉🎊';
+    emoji.textContent='🎮';
     title.textContent='ゲーム かいほう！！';
-    sub.textContent='ミッションたくさんがんばったね！\nゲームであそんでいいよ✨';
+    sub.innerHTML='ミッションたくさんがんばったね！<br>ゲームであそんでいいよ🎉';
   }
   overlay.classList.add('show');
-  playUnlockSound(fromSecret);
-  launchConfetti(fromSecret?120:80);
-  if(fromSecret) launchSecretStars();
+  playFanfare();
+  launchConfetti(30);
 }
-
-function playUnlockSound(fromSecret){
-  const c=getCtx();
-  if(fromSecret){
-    // 神秘的な解放音
-    [{f:220,t:0},{f:330,t:.1},{f:440,t:.2},{f:660,t:.3},{f:880,t:.42},{f:1047,t:.56},{f:1319,t:.72}]
-      .forEach(({f,t})=>tone('triangle',f,.22,c.currentTime+t,.28));
-  } else {
-    // 明るくポップな解放音
-    [{f:523,t:0},{f:659,t:.1},{f:784,t:.2},{f:1047,t:.32},{f:1319,t:.46},{f:1047,t:.6},{f:1319,t:.74},{f:1568,t:.9}]
-      .forEach(({f,t})=>tone('triangle',f,.22,c.currentTime+t,.24));
-    [{f:131,t:.32},{f:196,t:.6},{f:262,t:.9}]
-      .forEach(({f,t})=>tone('sine',f,.12,c.currentTime+t,.35));
-  }
-}
-
 function closeUnlockOverlay(){
   document.getElementById('unlock-overlay').classList.remove('show');
   switchTab(2);
-  setTimeout(resizeCanvas,80);
 }
 
-// アコーディオン開閉状態（sessionStorage）
-function loadOpen(id){try{return sessionStorage.getItem('acc_'+id)!=='0';}catch{return true;}}
-function saveOpen(id,v){try{sessionStorage.setItem('acc_'+id,v?'1':'0');}catch{}}
-
 // ══════════════════════════════
-// スタック進捗バー更新
+// やりたいことチェック
 // ══════════════════════════════
-function updateStickyProgress(){
-  const mn=mChecked.length,mt=MISSION_ITEMS.length;
-  const hn=hChecked.length;
-
-  // スマホ用（現在のタブ）
-  const isMission=currentTab===0||window.innerWidth>=768;
-  const spText=document.getElementById('sp-text');
-  const spCount=document.getElementById('sp-count');
-  const spBar=document.getElementById('sp-bar');
-  if(currentTab===0){
-    spText.textContent='📋 ミッション進捗';
-    spCount.textContent=`${mn} / ${mt} 完了`;
-    spBar.style.width=(mt?mn/mt*100:0)+'%';
-    spBar.classList.toggle('full',mn>=mt);
+function toggleWant(key){
+  const el=document.getElementById(`want-${key}`);
+  if(!el)return;
+  const idx=wantChecked.indexOf(key);
+  if(idx>=0){
+    wantChecked.splice(idx,1);
+    el.classList.remove('checked');
+    if(key==='ninja') el.classList.remove('ninja-checked');
   } else {
-    spText.textContent='✅ 習慣進捗';
-    spCount.textContent=`${hn} / ${TOTAL_HABITS} 完了`;
-    spBar.style.width=(TOTAL_HABITS?hn/TOTAL_HABITS*100:0)+'%';
-    spBar.classList.toggle('full',hn>=TOTAL_HABITS);
-  }
-
-  // PC用（2本並列）
-  document.getElementById('sp-m-count').textContent=`${mn} / ${mt} 完了`;
-  const smb=document.getElementById('sp-m-bar');
-  smb.style.width=(mt?mn/mt*100:0)+'%';smb.classList.toggle('full',mn>=mt);
-  document.getElementById('sp-h-count').textContent=`${hn} / ${TOTAL_HABITS} 完了`;
-  const shb=document.getElementById('sp-h-bar');
-  shb.style.width=(TOTAL_HABITS?hn/TOTAL_HABITS*100:0)+'%';shb.classList.toggle('full',hn>=TOTAL_HABITS);
-
-  // PC用カード内進捗（念のため更新）
-  const mcp=document.getElementById('m-cp-count');if(mcp)mcp.textContent=`${mn} / ${mt} 完了`;
-  const mb=document.getElementById('m-cp-bar');if(mb){mb.style.width=(mt?mn/mt*100:0)+'%';mb.classList.toggle('full',mn>=mt);}
-  const hcp=document.getElementById('h-cp-count');if(hcp)hcp.textContent=`${hn} / ${TOTAL_HABITS} 完了`;
-  const hb=document.getElementById('h-cp-bar');if(hb){hb.style.width=(TOTAL_HABITS?hn/TOTAL_HABITS*100:0)+'%';hb.classList.toggle('full',hn>=TOTAL_HABITS);}
-}
-
-// ══════════════════════════════
-// タブ切替 & スワイプ
-// ══════════════════════════════
-let currentTab=0;
-const track=document.getElementById('pane-track');
-const viewport=document.getElementById('pane-viewport');
-
-const TAB_COUNT=3;
-
-function initTrack(){
-  if(window.innerWidth>=768)return;
-  const w=viewport.clientWidth;
-  track.style.width=(w*TAB_COUNT)+'px';
-  document.getElementById('pane-mission').style.width=w+'px';
-  document.getElementById('pane-habit').style.width=w+'px';
-  document.getElementById('pane-game').style.width=w+'px';
-  setTrackX(currentTab*w,false);
-}
-function setTrackX(x,animate){
-  track.style.transition=animate?'transform .35s cubic-bezier(.25,.46,.45,.94)':'none';
-  track.style.transform=`translateX(${-x}px)`;
-}
-function switchTab(idx,animate=true){
-  if(window.innerWidth>=768)return;
-  currentTab=idx;
-  setTrackX(idx*viewport.clientWidth,animate);
-  ['mission','habit','game'].forEach((id,i)=>{
-    document.getElementById(`tab-${id}`).classList.toggle('active',i===idx);
-  });
-  updateStickyProgress();
-  // ゲームタブに来たらキャンバスサイズ確定
-  if(idx===2) setTimeout(resizeCanvas,50);
-}
-
-let touchStartX=0,touchStartY=0,touchCurX=0,touchLastX=0,touchLastT=0;
-let touchVelX=0,isDragging=false,isDecided=false,isHorizontal=false,trackStartOff=0;
-
-viewport.addEventListener('touchstart',e=>{
-  if(window.innerWidth>=768)return;
-  const t=e.touches[0];
-  touchStartX=touchCurX=touchLastX=t.clientX;touchStartY=t.clientY;
-  touchLastT=Date.now();touchVelX=0;
-  isDragging=true;isDecided=false;isHorizontal=false;
-  trackStartOff=currentTab*viewport.clientWidth;
-  track.style.transition='none';
-},{passive:true});
-
-viewport.addEventListener('touchmove',e=>{
-  if(!isDragging||window.innerWidth>=768)return;
-  const t=e.touches[0];
-  const dx=t.clientX-touchStartX,dy=t.clientY-touchStartY;
-  if(!isDecided){
-    if(Math.abs(dx)<4&&Math.abs(dy)<4)return;
-    isDecided=true;isHorizontal=Math.abs(dx)>Math.abs(dy);
-  }
-  if(!isHorizontal)return;
-  e.preventDefault();
-  const now=Date.now(),dt=now-touchLastT;
-  if(dt>0)touchVelX=(t.clientX-touchLastX)/dt*1000;
-  touchLastX=t.clientX;touchLastT=now;touchCurX=t.clientX;
-  let off=trackStartOff-(t.clientX-touchStartX);
-  const max=(TAB_COUNT-1)*viewport.clientWidth;
-  if(off<0)off*=0.22;else if(off>max)off=max+(off-max)*0.22;
-  track.style.transform=`translateX(${-off}px)`;
-},{passive:false});
-
-viewport.addEventListener('touchend',e=>{
-  if(!isDragging||!isHorizontal||window.innerWidth>=768){isDragging=false;return;}
-  isDragging=false;
-  const dx=touchCurX-touchStartX,w=viewport.clientWidth;
-  let next=currentTab;
-  if(touchVelX<-280||dx<-w*0.33)next=Math.min(currentTab+1,TAB_COUNT-1);
-  else if(touchVelX>280||dx>w*0.33)next=Math.max(currentTab-1,0);
-  switchTab(next,true);
-},{passive:true});
-
-window.addEventListener('resize',()=>{
-  if(window.innerWidth>=768){
-    track.style.width='';track.style.transform='';track.style.transition='';
-    ['mission','habit','game'].forEach(id=>{document.getElementById('pane-'+id).style.width='';});
-  } else initTrack();
-  resizeCanvas();
-});
-initTrack();
-
-// ══════════════════════════════
-// アコーディオン
-// ══════════════════════════════
-function toggleSection(id,e){
-  if(e)e.stopPropagation();
-  const header=document.querySelector(`#sec-${id} .section-header`);
-  const body=document.getElementById(`body-${id}`);
-  const isOpen=body.classList.contains('open');
-  header.classList.toggle('open',!isOpen);
-  body.classList.toggle('open',!isOpen);
-  saveOpen(id,!isOpen);
-}
-// セクションヘッダーのクリック（一括ボタンのバブル防止）
-document.querySelectorAll('.section-header').forEach(h=>{
-  h.addEventListener('click',function(e){
-    if(e.target.closest('.bulk-btn'))e.stopPropagation();
-  });
-});
-
-function initAccordions(){
-  ['morning','school','after'].forEach(id=>{
-    const open=loadOpen(id);
-    const header=document.querySelector(`#sec-${id} .section-header`);
-    const body=document.getElementById(`body-${id}`);
-    header.classList.toggle('open',open);
-    body.classList.toggle('open',open);
-  });
-}
-
-// ══════════════════════════════
-// ミッション：ドラム
-// ══════════════════════════════
-const REPEATS=6,ITEM_H=92,LOOP_LEN=MISSION_ITEMS.length;
-const strip=document.getElementById('strip');
-for(let r=0;r<REPEATS;r++) MISSION_ITEMS.forEach(it=>{
-  const d=document.createElement('div');d.className='drum-item';
-  d.innerHTML=`<span class="drum-icon">${it.icon}</span><span class="drum-label">${it.label}</span>`;
-  strip.appendChild(d);
-});
-let stripIdx=0;
-function itemY(i){return -(i*ITEM_H);}
-strip.style.transform=`translateY(${itemY(LOOP_LEN*2+stripIdx)}px)`;
-
-const rollBtn=document.getElementById('roll-btn');
-const mCheckBtn=document.getElementById('m-check-btn');
-document.getElementById('m-roll-count').textContent=mRolls;
-
-function renderMChips(){
-  const chips=document.getElementById('mission-chips');chips.innerHTML='';
-  MISSION_ITEMS.forEach(it=>{
-    const c=document.createElement('div');const done=mChecked.includes(it.label);
-    c.className='m-chip'+(done?' checked':'');
-    c.innerHTML=`<span class="m-chip-icon">${it.icon}</span>${it.label}`;
-    c.addEventListener('click',()=>toggleMChip(it.label));chips.appendChild(c);
-  });
-  const allDone=mChecked.length>=MISSION_ITEMS.length;
-  document.getElementById('m-all-done').classList.toggle('visible',allDone);
-  rollBtn.disabled=allDone;
-  if(allDone)rollBtn.textContent='🎊 ぜんぶクリア！';
-  else if(!mRolling)rollBtn.textContent=mRolls>0?'🎲 もういちど！':'🎲 まわす！';
-  updateStickyProgress();
-  updateLockProgress();
-}
-renderMChips();
-
-function toggleMChip(label){
-  if(mRolling)return;
-  const i=mChecked.indexOf(label);
-  if(i===-1){mChecked.push(label);playMCheck();launchConfetti(14);
-    if(label===mCurrentLabel){mCheckBtn.classList.add('done');mCheckBtn.textContent='✔ チェック済み！';mCheckBtn.disabled=true;}
-  } else {
-    mChecked.splice(i,1);
-    if(label===mCurrentLabel){mCheckBtn.classList.remove('done');mCheckBtn.textContent='✅ おわった！';mCheckBtn.disabled=false;}
-  }
-  saveJSON(`m_checked_${TODAY}`,mChecked);renderMChips();
-  if(mChecked.length>=MISSION_ITEMS.length)setTimeout(()=>{playAllClear();launchConfetti(75);},200);
-  checkGameUnlock(false);
-}
-
-function startRoll(){
-  if(mRolling)return;const pool=mRemaining();if(!pool.length)return;
-  mRolling=true;rollBtn.disabled=true;rollBtn.textContent='🌀 まわってるよ…';
-  mCheckBtn.classList.remove('visible','done','secret-check');
-  mCheckBtn.disabled=false;mCheckBtn.textContent='✅ おわった！';
-  playStart();
-
-  // 8%の確率で隠しミッション発動（チェック済みでなければ）
-  const isSecret = (Math.random() < 0.08) && !mChecked.includes(SECRET_MISSION.label);
-
-  const chosen = isSecret ? SECRET_MISSION : pool[Math.floor(Math.random()*pool.length)];
-  const nextIdx = isSecret ? Math.floor(Math.random()*MISSION_ITEMS.length) : MISSION_ITEMS.indexOf(chosen);
-
-  const finalIdx=LOOP_LEN*3+nextIdx+LOOP_LEN*2;
-  const sy=itemY(LOOP_LEN*2+stripIdx),dist=itemY(finalIdx)-sy;
-  const DUR=3200,st=performance.now();let lastY=sy,landOk=true;
-  function eob(t){const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);}
-  function ease(t){return t<.35?(t/.35)*(t/.35)*.35:eob(t);}
-  function tick(now){
-    const t=Math.min((now-st)/DUR,1),y=sy+dist*ease(t);
-    strip.style.transform=`translateY(${y}px)`;
-    if(Math.abs(y-lastY)>=ITEM_H){playRollTick(Math.min(t*1.5,1));lastY=y;}
-    if(t>.88&&landOk){playLand();landOk=false;}
-    if(t<1){requestAnimationFrame(tick);return;}
-
-    stripIdx=nextIdx;strip.style.transition='none';
-    strip.style.transform=`translateY(${itemY(LOOP_LEN*2+nextIdx)}px)`;
-    mCurrentLabel=chosen.label;
-    mCurrentIsSecret=isSecret;
-
-    if(isSecret){
-      // ドラム表示を隠しミッションに書き換え
-      const centerItem=strip.querySelectorAll('.drum-item')[LOOP_LEN*2+nextIdx];
-      if(centerItem){
-        centerItem.querySelector('.drum-icon').textContent=SECRET_MISSION.icon;
-        centerItem.querySelector('.drum-label').textContent=SECRET_MISSION.label;
-        centerItem.classList.add('secret');
-      }
-      // 少し待ってから登場演出
-      setTimeout(()=>{
-        playSecretAppear();
-        document.getElementById('secret-overlay').classList.add('show');
-      },400);
+    wantChecked.push(key);
+    el.classList.add('checked');
+    if(key==='ninja'){
+      el.classList.add('ninja-checked');
+      playNinjaCheck();
+      launchConfetti(8);
     } else {
-      playFanfare();launchConfetti();
+      playHabitCheck();
+      launchConfetti(6);
     }
-
-    const alreadyDone=mChecked.includes(chosen.label);
-    mCheckBtn.classList.add('visible');
-    if(isSecret&&!alreadyDone){
-      mCheckBtn.classList.add('secret-check');
-      mCheckBtn.textContent='🤫 ひみつのミッション！';
-    } else if(alreadyDone){
-      mCheckBtn.classList.add('done');mCheckBtn.textContent='✔ チェック済み！';mCheckBtn.disabled=true;
-    }
-
-    mRolls++;document.getElementById('m-roll-count').textContent=mRolls;localStorage.setItem(`m_rolls_${TODAY}`,mRolls);
-    rollBtn.textContent='🎲 もういちど！';rollBtn.disabled=false;mRolling=false;
   }
-  requestAnimationFrame(tick);
+  saveJSON(`want_checked_${TODAY}`,wantChecked);
 }
-let mCurrentIsSecret=false;
 
-function checkMission(){
-  if(!mCurrentLabel||mChecked.includes(mCurrentLabel))return;
-  mChecked.push(mCurrentLabel);saveJSON(`m_checked_${TODAY}`,mChecked);
-  mCheckBtn.classList.remove('secret-check');
-  mCheckBtn.classList.add('done');mCheckBtn.textContent='✔ チェック済み！';mCheckBtn.disabled=true;
+function renderWantItems(){
+  Object.keys(WANT_ITEMS).forEach(key=>{
+    const el=document.getElementById(`want-${key}`);
+    if(!el)return;
+    if(wantChecked.includes(key)){
+      el.classList.add('checked');
+      if(key==='ninja') el.classList.add('ninja-checked');
+    } else {
+      el.classList.remove('checked','ninja-checked');
+    }
+  });
+}
 
-  if(mCurrentIsSecret){
-    playSecretClear();
-    setTimeout(()=>{
-      launchConfetti(120);
-      launchSecretStars();
-      document.getElementById('secret-clear').classList.add('show');
-    },100);
-    checkGameUnlock(true);
-  } else {
-    playMCheck();launchConfetti(18);
-    renderMChips();
-    if(mChecked.length>=MISSION_ITEMS.length)setTimeout(()=>{playAllClear();launchConfetti(75);},200);
-    checkGameUnlock(false);
+// ══════════════════════════════
+// 隠しミッション
+// ══════════════════════════════
+const SECRET_KEY=`secret_done_${TODAY}`;
+let secretDone=!!localStorage.getItem(SECRET_KEY);
+let secretSkipped=false;
+let secretTriggered=false;
+
+function maybeShowSecret(){
+  if(secretDone||secretSkipped||secretTriggered)return;
+  if(mChecked.length>=3&&Math.random()<0.25){
+    secretTriggered=true;
+    document.getElementById('secret-mission-label').textContent=SECRET_MISSION.label;
+    document.getElementById('secret-overlay').classList.add('show');
   }
 }
 
 function closeSecretOverlay(skip){
   document.getElementById('secret-overlay').classList.remove('show');
   if(skip){
-    // スキップ：チェックボタンを非表示に戻し、通常ロールに見せかける
-    mCurrentIsSecret=false;
-    mCurrentLabel=null;
-    mCheckBtn.classList.remove('visible','done','secret-check');
-    playFanfare();launchConfetti();
+    secretSkipped=true;
+    secretTriggered=false;
   } else {
-    playFanfare();launchConfetti();
+    showSecretInDrum();
   }
 }
 
-function closeSecretClear(){
-  document.getElementById('secret-clear').classList.remove('show');
-  renderMChips();
+function showSecretInDrum(){
+  mCurrentLabel=SECRET_MISSION.label;
+  const strip=document.getElementById('strip');
+  const item=document.createElement('div');
+  item.className='drum-item secret';
+  item.innerHTML=`<span class="drum-icon">${SECRET_MISSION.icon}</span><span class="drum-label">${SECRET_MISSION.label}</span>`;
+  strip.innerHTML='';
+  strip.appendChild(item);
+  strip.style.transform='translateY(0)';
+  const btn=document.getElementById('m-check-btn');
+  btn.classList.add('visible','secret-check');
+  btn.textContent='🤫 できた！';
+  document.getElementById('roll-btn').disabled=true;
 }
 
-// 隠しミッション登場音（神秘的）
-function playSecretAppear(){
-  const ctx=getCtx();
-  // 低音から高音へゆっくり上昇
-  [{f:220,t:0,d:.4},{f:330,t:.25,d:.4},{f:440,t:.5,d:.4},{f:660,t:.75,d:.5},{f:880,t:1.0,d:.6}]
-    .forEach(({f,t,d})=>tone('sine',f,.18,ctx.currentTime+t,d));
-  // きらきら高音
-  [{f:1320,t:1.3},{f:1760,t:1.5},{f:2093,t:1.7}]
-    .forEach(({f,t})=>tone('triangle',f,.12,ctx.currentTime+t,.3));
+// ══════════════════════════════
+// ドラム
+// ══════════════════════════════
+function buildStrip(items,targetIdx){
+  const strip=document.getElementById('strip');
+  strip.innerHTML='';
+  items.forEach(it=>{
+    const d=document.createElement('div');
+    d.className='drum-item'+(it.secret?' secret':'');
+    d.innerHTML=`<span class="drum-icon">${it.icon}</span><span class="drum-label">${it.label}</span>`;
+    strip.appendChild(d);
+  });
+  strip.style.transition='none';
+  strip.style.transform=`translateY(${-targetIdx*92}px)`;
 }
 
-// 隠しミッション完了音（超豪華）
-function playSecretClear(){
-  const ctx=getCtx();
-  // ファンファーレ
-  [{f:523,t:0},{f:659,t:.1},{f:784,t:.2},{f:1047,t:.3},
-   {f:1319,t:.45},{f:1047,t:.6},{f:1319,t:.75},{f:1568,t:.9}]
-    .forEach(({f,t})=>tone('triangle',f,.26,ctx.currentTime+t,.25));
-  // ベース
-  [{f:131,t:.3},{f:165,t:.6},{f:196,t:.9}]
-    .forEach(({f,t})=>tone('sine',f,.18,ctx.currentTime+t,.4));
-  // きらきら
-  for(let i=0;i<8;i++){
-    const f=800+Math.random()*1200;
-    tone('sine',f,.08,ctx.currentTime+.5+i*.15,.2);
+let rollTimer=null;
+function startRoll(){
+  if(mRolling)return;
+  const rem=mRemaining();
+  if(rem.length===0)return;
+  playStart();
+  mRolling=true;
+  document.getElementById('roll-btn').disabled=true;
+  const btn=document.getElementById('m-check-btn');
+  btn.classList.remove('visible','done','secret-check');
+  mCurrentLabel=null;
+
+  // 大量ループ + ターゲット
+  const targetItem=rem[Math.floor(Math.random()*rem.length)];
+  const LOOPS=6;
+  const items=[...MISSION_ITEMS,...MISSION_ITEMS,...MISSION_ITEMS,...MISSION_ITEMS,...MISSION_ITEMS,...MISSION_ITEMS,...MISSION_ITEMS];
+  // ターゲットを末尾近くに埋め込む
+  const targetPos=items.length-3+Math.floor(Math.random()*3);
+  items[targetPos]={...targetItem};
+  buildStrip(items,0);
+
+  let cur=0;
+  const total=targetPos;
+  const dur=2200;
+  const start=performance.now();
+
+  function tick(now){
+    const elapsed=now-start;
+    const progress=Math.min(elapsed/dur,1);
+    const ease=1-Math.pow(1-progress,4);
+    const idx=Math.round(ease*total);
+    if(idx!==cur){
+      cur=idx;
+      const strip=document.getElementById('strip');
+      strip.style.transition='none';
+      strip.style.transform=`translateY(${-cur*92}px)`;
+      playRollTick(progress);
+    }
+    if(progress<1){rollTimer=requestAnimationFrame(tick);}
+    else{
+      landRoll(targetItem,items,targetPos);
+    }
+  }
+  rollTimer=requestAnimationFrame(tick);
+  mRolls++;
+  localStorage.setItem(`m_rolls_${TODAY}`,mRolls);
+  document.getElementById('m-roll-count').textContent=mRolls;
+}
+
+function landRoll(item,items,targetPos){
+  mRolling=false;
+  playLand();
+  const strip=document.getElementById('strip');
+  strip.style.transition='transform .3s cubic-bezier(.34,1.2,.64,1)';
+  strip.style.transform=`translateY(${-targetPos*92}px)`;
+  mCurrentLabel=item.label;
+  setTimeout(()=>{
+    document.getElementById('roll-btn').disabled=false;
+    const btn=document.getElementById('m-check-btn');
+    btn.classList.remove('done','secret-check');
+    btn.textContent='✅ おわった！';
+    if(!mChecked.includes(item.label)){
+      btn.classList.add('visible');
+    }
+    maybeShowSecret();
+  },320);
+}
+
+function checkMission(){
+  if(!mCurrentLabel)return;
+  const isSecret=mCurrentLabel===SECRET_MISSION.label;
+  if(isSecret){
+    if(secretDone)return;
+    secretDone=true;
+    localStorage.setItem(SECRET_KEY,'1');
+    document.getElementById('m-check-btn').classList.add('done');
+    document.getElementById('m-check-btn').textContent='🤫 クリア！';
+    showSecretClear();
+    checkGameUnlock(true);
+    return;
+  }
+  if(mChecked.includes(mCurrentLabel))return;
+  mChecked.push(mCurrentLabel);
+  saveJSON(`m_checked_${TODAY}`,mChecked);
+  playMCheck();
+  launchConfetti(12);
+  const btn=document.getElementById('m-check-btn');
+  btn.classList.remove('visible');
+  btn.classList.add('done');
+  renderMissionChips();
+  updateProgress();
+  checkAllMissionDone();
+  checkGameUnlock();
+  updateLockProgress();
+}
+
+function checkAllMissionDone(){
+  const banner=document.getElementById('m-all-done');
+  if(mChecked.length>=MISSION_ITEMS.length){
+    banner.classList.add('visible');
+    playAllClear();
+    launchConfetti(40);
+  } else {
+    banner.classList.remove('visible');
   }
 }
-function resetMission(){
-  if(!confirm('ミッションのチェックをリセットするよ？'))return;
-  mChecked=[];saveJSON(`m_checked_${TODAY}`,[]);mCurrentLabel=null;
-  mCheckBtn.classList.remove('visible','done');rollBtn.disabled=false;rollBtn.textContent='🎲 まわす！';
-  renderMChips();
+
+// ══════════════════════════════
+// ミッションチップ
+// ══════════════════════════════
+function renderMissionChips(){
+  const wrap=document.getElementById('mission-chips');
+  wrap.innerHTML='';
+  MISSION_ITEMS.forEach(it=>{
+    const chip=document.createElement('div');
+    chip.className='m-chip'+(mChecked.includes(it.label)?' checked':'');
+    chip.innerHTML=`<span class="m-chip-icon">${it.icon}</span>${it.label}`;
+    chip.onclick=()=>chipToggle(it.label,chip);
+    wrap.appendChild(chip);
+  });
+}
+function chipToggle(label,chip){
+  if(chip.classList.contains('checked')){
+    mChecked=mChecked.filter(l=>l!==label);
+    chip.classList.remove('checked');
+  } else {
+    mChecked.push(label);
+    chip.classList.add('checked');
+    playMCheck();
+    launchConfetti(8);
+  }
+  saveJSON(`m_checked_${TODAY}`,mChecked);
+  updateProgress();
+  checkAllMissionDone();
+  checkGameUnlock();
+  updateLockProgress();
 }
 
 // ══════════════════════════════
-// 習慣：描画
+// 習慣チェック
 // ══════════════════════════════
-function secCheckedCount(secId){
-  const sec=HABIT_SECTIONS.find(s=>s.id===secId);
-  let ids=[];
-  if(sec.items)ids=sec.items.map(it=>it.id);
-  if(sec.subSections)sec.subSections.forEach(ss=>ss.items.forEach(it=>ids.push(it.id)));
-  return ids.filter(id=>hChecked.includes(id)).length+'/'+ids.length;
-}
-
 function renderHabits(){
-  // 朝 / 学校
-  ['morning','school'].forEach(secId=>{
-    const sec=HABIT_SECTIONS.find(s=>s.id===secId);
-    const list=document.getElementById(`habit-list-${secId}`);list.innerHTML='';
-    const allDone=sec.items.every(it=>hChecked.includes(it.id));
-    const bulk=document.getElementById(`bulk-${secId}`);
-    bulk.textContent=allDone?'チェックを外す':'まとめてチェック';
-    bulk.className='bulk-btn '+(allDone?'uncheck-all':'check-all');
-    bulk.onclick=(e)=>{e.stopPropagation();allDone?bulkUncheck(secId):bulkCheck(secId);};
-    sec.items.forEach(item=>list.appendChild(makeHabitItem(item)));
-    const cnt=document.getElementById(`sec-cnt-${secId}`);
-    if(cnt)cnt.textContent='('+secCheckedCount(secId)+')';
-  });
-
-  // 下校後（サブセクション）
-  const afterSec=HABIT_SECTIONS.find(s=>s.id==='after');
-  const wrap=document.getElementById('habit-list-after-wrap');wrap.innerHTML='';
-  const allAfterIds=getAfterItems().map(it=>it.id);
-  const allAfterDone=allAfterIds.every(id=>hChecked.includes(id));
-  const bulkAfter=document.getElementById('bulk-after');
-  bulkAfter.textContent=allAfterDone?'チェックを外す':'まとめてチェック';
-  bulkAfter.className='bulk-btn '+(allAfterDone?'uncheck-all':'check-all');
-  bulkAfter.onclick=(e)=>{e.stopPropagation();allAfterDone?bulkUncheck('after'):bulkCheck('after');};
-  afterSec.subSections.forEach(ss=>{
-    const subDiv=document.createElement('div');subDiv.className='sub-section';
-    const title=document.createElement('div');title.className='sub-section-title';title.textContent=ss.label;
-    subDiv.appendChild(title);
-    const list=document.createElement('div');list.className='habit-list';
-    ss.items.forEach(item=>list.appendChild(makeHabitItem(item)));
-    subDiv.appendChild(list);wrap.appendChild(subDiv);
-  });
-  const cnt=document.getElementById('sec-cnt-after');
-  if(cnt)cnt.textContent='('+secCheckedCount('after')+')';
-
-  // 全完了
-  const allDone=hChecked.length>=TOTAL_HABITS;
-  document.getElementById('h-all-done').classList.toggle('visible',allDone);
-  updateStickyProgress();
-}
-
-function makeHabitItem(item){
-  const done=hChecked.includes(item.id);
-  const el=document.createElement('div');
-  el.className='habit-item'+(done?' checked':'');
-  el.innerHTML=`
-    <div class="habit-check-box"><span class="habit-check-mark">✓</span></div>
-    <span style="font-size:.95rem;flex-shrink:0">${item.icon}</span>
-    <span class="habit-label">${item.label}</span>
-    ${item.note?`<span class="habit-note">${item.note}</span>`:''}
-  `;
-  el.addEventListener('click',()=>toggleHabit(item.id));
-  return el;
-}
-
-renderHabits();
-initAccordions();
-
-function toggleHabit(id){
-  const wasAll=hChecked.length>=TOTAL_HABITS;
-  const i=hChecked.indexOf(id);
-  if(i===-1){hChecked.push(id);playHabitCheck();launchConfetti(7,'#7ee8c8');}
-  else{hChecked.splice(i,1);playHabitUncheck();}
-  saveJSON(`h_checked_${TODAY}`,hChecked);renderHabits();
-  if(!wasAll&&hChecked.length>=TOTAL_HABITS)setTimeout(()=>{playHabitAllClear();launchConfetti(60);},200);
-}
-
-function bulkCheck(secId){
-  const sec=HABIT_SECTIONS.find(s=>s.id===secId);
-  const wasAll=hChecked.length>=TOTAL_HABITS;
-  let allIds=[];
-  if(sec.items)allIds=sec.items.map(it=>it.id);
-  if(sec.subSections)sec.subSections.forEach(ss=>ss.items.forEach(it=>allIds.push(it.id)));
-  const newIds=allIds.filter(id=>!hChecked.includes(id));
-  newIds.forEach(id=>hChecked.push(id));
-  saveJSON(`h_checked_${TODAY}`,hChecked);
-  if(newIds.length){playBulk(newIds.length);launchConfetti(18,'#7ee8c8');}
-  renderHabits();
-  if(!wasAll&&hChecked.length>=TOTAL_HABITS)setTimeout(()=>{playHabitAllClear();launchConfetti(60);},200);
-}
-function bulkUncheck(secId){
-  const sec=HABIT_SECTIONS.find(s=>s.id===secId);
-  let allIds=[];
-  if(sec.items)allIds=sec.items.map(it=>it.id);
-  if(sec.subSections)sec.subSections.forEach(ss=>ss.items.forEach(it=>allIds.push(it.id)));
-  hChecked=hChecked.filter(id=>!allIds.includes(id));
-  saveJSON(`h_checked_${TODAY}`,hChecked);renderHabits();
-}
-function resetHabit(){
-  if(!confirm('習慣チェックをリセットするよ？'))return;
-  hChecked=[];saveJSON(`h_checked_${TODAY}`,[]);renderHabits();
-}
-function resetAll(){
-  if(!confirm('ミッションも習慣も、ぜんぶリセットするよ？\nよくかんがえてね！'))return;
-  // ミッションリセット
-  mChecked=[];saveJSON(`m_checked_${TODAY}`,[]);mCurrentLabel=null;
-  mCheckBtn.classList.remove('visible','done');rollBtn.disabled=false;rollBtn.textContent='🎲 まわす！';
-  renderMChips();
-  // 習慣リセット
-  hChecked=[];saveJSON(`h_checked_${TODAY}`,[]);renderHabits();
-}
-
-// 隠しミッション用 紫の星エフェクト
-function launchSecretStars(){
-  const emojis=['🌟','✨','💫','⭐','🎊','💜','🔮'];
-  for(let i=0;i<30;i++){
-    const el=document.createElement('div');
-    el.style.cssText=`
-      position:fixed;font-size:${1.5+Math.random()*1.5}rem;
-      left:${Math.random()*100}vw;top:${-5+Math.random()*20}vh;
-      pointer-events:none;z-index:401;
-      animation:confettiFall ${1.5+Math.random()}s ease-in forwards;
-      animation-delay:${Math.random()*.5}s;
-    `;
-    el.textContent=emojis[Math.floor(Math.random()*emojis.length)];
-    document.body.appendChild(el);
-    el.addEventListener('animationend',()=>el.remove());
-  }
-}
-
-// confetti
-const COLORS=['#ff7eb3','#ffb3d1','#c97ef7','#ffe066','#7ee8c8','#ff9de2','#74b9ff'];
-function launchConfetti(n=50,extra){
-  const colors=extra?[extra,...COLORS]:COLORS;
-  for(let i=0;i<n;i++){
-    const el=document.createElement('div');el.className='confetti-piece';
-    el.style.cssText=`left:${Math.random()*100}vw;top:${Math.random()*20}vh;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'2px'};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;animation-duration:${1.2+Math.random()*.9}s;animation-delay:${Math.random()*.3}s;`;
-    document.body.appendChild(el);el.addEventListener('animationend',()=>el.remove());
-  }
-}
-
-// 浮かぶ星
-['⭐','✨','💫','🌸','💕','🎀'].forEach(e=>{
-  for(let j=0;j<3;j++){
-    const s=document.createElement('div');s.className='star';s.textContent=e;
-    s.style.cssText=`left:${Math.random()*100}vw;animation-duration:${8+Math.random()*10}s;animation-delay:${Math.random()*12}s;font-size:${.88+Math.random()*.85}rem;`;
-    document.getElementById('stars').appendChild(s);
-  }
-});
-
-updateStickyProgress();
-applyGameLockState();
-document.addEventListener('keydown',e=>{if(e.code==='Space'&&currentTab===0){e.preventDefault();startRoll();}});
-
-
-// ══════════════════════════════════════════════════
-// アルカノイド（強化版）
-// ══════════════════════════════════════════════════
-const canvas=document.getElementById('game-canvas');
-const ctx2=canvas.getContext('2d');
-
-// ── 定数 ──
-const COLS=10, ROWS=7;
-const LIVES_MAX=3;
-const BRICK_COLORS=['#ff7eb3','#ff6b9d','#c97ef7','#a855f7','#74b9ff','#38bdf8','#7ee8c8','#34d399'];
-// アイテム種別
-const ITEM_TYPES={
-  MULTI: {icon:'🔵', color:'#74b9ff', label:'マルチボール'},
-  WIDE:  {icon:'🟢', color:'#7ee8c8', label:'パドル拡大'},
-  FAST:  {icon:'🔴', color:'#ff7eb3', label:'スピードUP'},
-  SCORE2:{icon:'⭐', color:'#ffe066', label:'2倍スコア'},
-  SLOW:  {icon:'🟡', color:'#ffd600', label:'スピードDOWN'},
-};
-
-let gW,gH,bW,bH,padW,padH,ballR;
-let gScore=0,gHi=parseInt(localStorage.getItem('arkanoid_hi2')||'0');
-let gLives=LIVES_MAX,gLevel=1,gScoreMult=1;
-let balls=[]; // マルチボール対応
-let pad={x:0};
-let bricks=[];
-let items=[]; // 落下アイテム
-let gState='idle';
-let gRaf=null;
-let padTarget=0;
-let wideTimer=0, slowTimer=0;
-let levelUpFlash=0;
-
-// ── タッチ操作 ──
-let gameTouchX=null;
-const gamePane=document.getElementById('pane-game');
-gamePane.addEventListener('touchstart',e=>{
-  if(gState!=='playing')return;
-  gameTouchX=e.touches[0].clientX;
-},{passive:true});
-gamePane.addEventListener('touchmove',e=>{
-  if(gState!=='playing'||gameTouchX===null)return;
-  e.stopPropagation();
-  const dx=e.touches[0].clientX-gameTouchX;
-  padTarget=Math.max(padW/2,Math.min(gW-padW/2,pad.x+dx*1.6));
-  gameTouchX=e.touches[0].clientX;
-},{passive:true});
-gamePane.addEventListener('click',e=>{
-  if(gState!=='playing')return;
-  const rect=canvas.getBoundingClientRect();
-  padTarget=Math.max(padW/2,Math.min(gW-padW/2,(e.clientX-rect.left)/rect.width*gW));
-});
-
-// ── キーボード ──
-const keys2={};
-document.addEventListener('keydown',e=>{
-  keys2[e.key]=true;
-  if(['ArrowLeft','ArrowRight'].includes(e.key))e.preventDefault();
-});
-document.addEventListener('keyup',e=>{keys2[e.key]=false;});
-
-// ── キャンバスリサイズ ──
-function resizeCanvas(){
-  const wrap=document.querySelector('.game-wrap');
-  if(!wrap)return;
-  gW=wrap.clientWidth-6;
-  gH=Math.round(gW*1.25);
-  canvas.width=gW;canvas.height=gH;
-  canvas.style.width=gW+'px';canvas.style.height=gH+'px';
-  bW=Math.floor((gW-(COLS+1)*3)/COLS);
-  bH=Math.floor(gH*0.038);
-  padW=Math.floor(gW*0.2);
-  padH=Math.floor(gH*0.022);
-  ballR=Math.max(6,Math.floor(gW*0.022));
-  if(gState==='playing') resetBallPad();
-  else drawIdle();
-}
-
-// ── ボール初期化 ──
-function makeBall(x,y,angle){
-  const spd=baseSpeed();
-  return {
-    x:x||gW/2,y:y||(gH-padH*3-ballR),
-    vx:spd*Math.cos(angle||((Math.random()*60+60)*Math.PI/180))*(Math.random()<.5?1:-1),
-    vy:-spd*Math.sin(angle||((Math.random()*60+60)*Math.PI/180)),
-    trail:[]
-  };
-}
-function baseSpeed(){
-  // レベルが上がるごとに速くなる
-  return gW*(0.0075+gLevel*0.0012);
-}
-
-function resetBallPad(){
-  pad.x=gW/2;padTarget=gW/2;
-  balls=[makeBall()];
-}
-
-// ── ブロック生成 ──
-function initBricks(lv){
-  bricks=[];
-  const gapX=3,gapY=4;
-  const totalW=COLS*(bW+gapX)-gapX;
-  const startX=(gW-totalW)/2;
-  const rows=Math.min(ROWS+Math.floor(lv/2),ROWS+4); // レベルで行数増加
-  for(let r=0;r<rows;r++){
-    for(let c=0;c<COLS;c++){
-      // レベル3以降：2hitブロックをランダムに混ぜる
-      const hp=(lv>=3&&Math.random()<0.25)?2:1;
-      bricks.push({
-        x:startX+c*(bW+gapX),
-        y:gH*0.06+r*(bH+gapY),
-        w:bW,h:bH,
-        hp,maxHp:hp,
-        alive:true,
-        color:BRICK_COLORS[(r+c)%BRICK_COLORS.length],
-        flash:0
+  HABIT_SECTIONS.forEach(sec=>{
+    if(sec.items){
+      const list=document.getElementById(`habit-list-${sec.id}`);
+      if(!list)return;
+      list.innerHTML='';
+      sec.items.forEach(it=>list.appendChild(makeHabitItem(it)));
+    }
+    if(sec.subSections){
+      const wrap=document.getElementById('habit-list-after-wrap');
+      if(!wrap)return;
+      wrap.innerHTML='';
+      sec.subSections.forEach(ss=>{
+        const sub=document.createElement('div');
+        sub.className='sub-section';
+        const title=document.createElement('div');
+        title.className='sub-section-title';
+        title.textContent=ss.label;
+        sub.appendChild(title);
+        const list=document.createElement('div');
+        list.className='habit-list';
+        ss.items.forEach(it=>list.appendChild(makeHabitItem(it)));
+        sub.appendChild(list);
+        wrap.appendChild(sub);
       });
     }
-  }
-}
-
-// ── アイテムドロップ ──
-function dropItem(bx,by){
-  if(Math.random()>0.18)return; // 18%でドロップ
-  const types=Object.keys(ITEM_TYPES);
-  const type=types[Math.floor(Math.random()*types.length)];
-  items.push({x:bx,y:by,type,vy:gH*0.003,r:ballR*1.3,anim:0});
-}
-
-// ── ゲーム開始 ──
-function gameStart(){
-  document.getElementById('game-overlay').classList.add('hidden');
-  resizeCanvas();
-  gScore=0;gLives=LIVES_MAX;gLevel=1;gScoreMult=1;
-  wideTimer=0;slowTimer=0;items=[];
-  updateGameUI();
-  initBricks(gLevel);
-  resetBallPad();
-  gState='playing';
-  if(gRaf)cancelAnimationFrame(gRaf);
-  gRaf=requestAnimationFrame(gameLoop);
-}
-
-function nextLevel(){
-  gLevel++;
-  items=[];
-  initBricks(gLevel);
-  resetBallPad();
-  padW=Math.floor(gW*0.2); // パドル幅リセット
-  wideTimer=0;slowTimer=0;
-  levelUpFlash=60;
-  gSfx('levelup');
-  updateGameUI();
-}
-
-// ── メインループ ──
-function gameLoop(){
-  if(gState!=='playing')return;
-  update2();draw2();
-  gRaf=requestAnimationFrame(gameLoop);
-}
-
-function update2(){
-  const spd=gW*0.02*(1+(wideTimer>0?0:-0)+(slowTimer>0?-0.4:0));
-
-  // タイマー
-  if(wideTimer>0) wideTimer--;
-  if(slowTimer>0) slowTimer--;
-  if(wideTimer===0&&padW!==Math.floor(gW*0.2)) padW=Math.floor(gW*0.2);
-  if(levelUpFlash>0) levelUpFlash--;
-
-  // パドル移動
-  if(keys2['ArrowLeft'])  padTarget=Math.max(padW/2,pad.x-spd);
-  if(keys2['ArrowRight']) padTarget=Math.min(gW-padW/2,pad.x+spd);
-  pad.x+=(padTarget-pad.x)*0.28;
-
-  // ── ボール更新 ──
-  const speedMod=slowTimer>0?0.5:1.0;
-  let allDead=true;
-  balls.forEach(b=>{
-    if(b.dead)return;
-    allDead=false;
-    // トレイル
-    b.trail.push({x:b.x,y:b.y});
-    if(b.trail.length>8)b.trail.shift();
-
-    b.x+=b.vx*speedMod;
-    b.y+=b.vy*speedMod;
-
-    // 壁反射
-    if(b.x-ballR<0){b.x=ballR;b.vx=Math.abs(b.vx);gSfx('wall');}
-    if(b.x+ballR>gW){b.x=gW-ballR;b.vx=-Math.abs(b.vx);gSfx('wall');}
-    if(b.y-ballR<0){b.y=ballR;b.vy=Math.abs(b.vy);gSfx('wall');}
-
-    // パドル衝突
-    const py=gH-padH-8;
-    if(b.vy>0&&b.y+ballR>=py&&b.y+ballR<=py+padH+Math.abs(b.vy)&&
-       b.x>=pad.x-padW/2-ballR&&b.x<=pad.x+padW/2+ballR){
-      b.vy=-Math.abs(b.vy);
-      const off=(b.x-pad.x)/(padW/2);
-      b.vx=off*baseSpeed()*1.2;
-      // 速度上限
-      const spMax=baseSpeed()*2.2;
-      const spCur=Math.hypot(b.vx,b.vy);
-      if(spCur>spMax){b.vx=b.vx/spCur*spMax;b.vy=b.vy/spCur*spMax;}
-      gSfx('pad');
-    }
-
-    // ブロック衝突
-    for(const br of bricks){
-      if(!br.alive)continue;
-      if(b.x+ballR>br.x&&b.x-ballR<br.x+br.w&&b.y+ballR>br.y&&b.y-ballR<br.y+br.h){
-        br.hp--;br.flash=8;
-        if(br.hp<=0){
-          br.alive=false;
-          gScore+=BLOCK_SCORE*gScoreMult;
-          dropItem(br.x+br.w/2,br.y+br.h/2);
-          gSfx('brick');
-        } else {
-          gSfx('wall'); // 2ヒットブロックの半壊音
-        }
-        // 反射方向
-        const overlapL=b.x+ballR-br.x,overlapR=br.x+br.w-(b.x-ballR);
-        const overlapT=b.y+ballR-br.y,overlapB=br.y+br.h-(b.y-ballR);
-        const minH=Math.min(overlapL,overlapR),minV=Math.min(overlapT,overlapB);
-        if(minH<minV)b.vx*=-1;else b.vy*=-1;
-        updateGameUI();
-        break;
-      }
-    }
-
-    // 落下
-    if(b.y-ballR>gH) b.dead=true;
   });
-
-  // 全ボール消滅
-  if(allDead||balls.every(b=>b.dead)){
-    gLives--;gSfx('miss');
-    balls=balls.filter(b=>!b.dead);
-    if(gLives<=0){
-      gState='dead';
-      if(gScore>gHi){gHi=gScore;localStorage.setItem('arkanoid_hi2',gHi);}
-      showOverlay('😢 ゲームオーバー','スコア: '+gScore,'もういちど');
-    } else {
-      resetBallPad();
+  updateHabitSectionCounts();
+}
+function makeHabitItem(it){
+  const div=document.createElement('div');
+  div.className='habit-item'+(hChecked.includes(it.id)?' checked':'');
+  div.id=`hi-${it.id}`;
+  div.innerHTML=`
+    <div class="habit-check-box"><span class="habit-check-mark">✓</span></div>
+    <span class="habit-label">${it.icon} ${it.label}</span>
+    ${it.note?`<span class="habit-note">${it.note}</span>`:''}
+  `;
+  div.onclick=()=>toggleHabit(it.id,div);
+  return div;
+}
+function toggleHabit(id,el){
+  if(hChecked.includes(id)){
+    hChecked=hChecked.filter(x=>x!==id);
+    el.classList.remove('checked');
+    playHabitUncheck();
+  } else {
+    hChecked.push(id);
+    el.classList.add('checked');
+    playHabitCheck();
+  }
+  saveJSON(`h_checked_${TODAY}`,hChecked);
+  updateProgress();
+  updateHabitSectionCounts();
+  checkHabitAllDone();
+}
+function updateHabitSectionCounts(){
+  HABIT_SECTIONS.forEach(sec=>{
+    let ids=[];
+    if(sec.items) ids=sec.items.map(it=>it.id);
+    if(sec.subSections) ids=sec.subSections.flatMap(ss=>ss.items.map(it=>it.id));
+    const done=ids.filter(id=>hChecked.includes(id)).length;
+    const el=document.getElementById(`sec-cnt-${sec.id}`);
+    if(el) el.textContent=`${done}/${ids.length}`;
+    const bulk=document.getElementById(`bulk-${sec.id}`);
+    if(bulk){
+      const allDone=done===ids.length;
+      bulk.className=`bulk-btn ${allDone?'uncheck-all':'check-all'}`;
+      bulk.textContent=allDone?'まとめてリセット':'まとめてチェック';
+      bulk.onclick=(e)=>bulkCheck(sec.id,e);
     }
-    updateGameUI();
+  });
+}
+function bulkCheck(secId,e){
+  if(e){e.stopPropagation();}
+  const sec=HABIT_SECTIONS.find(s=>s.id===secId);
+  if(!sec)return;
+  let ids=[];
+  if(sec.items) ids=sec.items.map(it=>it.id);
+  if(sec.subSections) ids=sec.subSections.flatMap(ss=>ss.items.map(it=>it.id));
+  const allDone=ids.every(id=>hChecked.includes(id));
+  if(allDone){
+    hChecked=hChecked.filter(id=>!ids.includes(id));
+  } else {
+    const newIds=ids.filter(id=>!hChecked.includes(id));
+    hChecked=[...hChecked,...newIds];
+    playBulk(newIds.length);
+    launchConfetti(10);
+  }
+  ids.forEach(id=>{
+    const el=document.getElementById(`hi-${id}`);
+    if(el) el.classList.toggle('checked',hChecked.includes(id));
+  });
+  saveJSON(`h_checked_${TODAY}`,hChecked);
+  updateProgress();
+  updateHabitSectionCounts();
+  checkHabitAllDone();
+}
+function checkHabitAllDone(){
+  const total=getAllHabitIds().length;
+  const banner=document.getElementById('h-all-done');
+  if(hChecked.length>=total){
+    banner.classList.add('visible');
+    playHabitAllClear();
+  } else {
+    banner.classList.remove('visible');
+  }
+}
+function toggleSection(id){
+  const header=document.querySelector(`#sec-${id} .section-header`);
+  const body=document.getElementById(`body-${id}`);
+  header.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
+// ══════════════════════════════
+// 進捗
+// ══════════════════════════════
+function updateProgress(){
+  const mDone=mChecked.length,mTotal=MISSION_ITEMS.length;
+  const hDone=hChecked.length,hTotal=TOTAL_HABITS;
+  const mPct=mTotal?mDone/mTotal*100:0;
+  const hPct=hTotal?hDone/hTotal*100:0;
+
+  // スマホ（現在タブに応じて切り替え）
+  const spText=document.getElementById('sp-text');
+  const spCount=document.getElementById('sp-count');
+  const spBar=document.getElementById('sp-bar');
+  const tab=currentTab;
+  if(tab===0||tab===2){
+    spText.textContent='📋 ミッション進捗';
+    spCount.textContent=`${mDone} / ${mTotal} 完了`;
+    spBar.style.width=mPct+'%';
+    spBar.classList.toggle('full',mDone>=mTotal&&mTotal>0);
+  } else {
+    spText.textContent='✅ 習慣チェック進捗';
+    spCount.textContent=`${hDone} / ${hTotal} 完了`;
+    spBar.style.width=hPct+'%';
+    spBar.classList.toggle('full',hDone>=hTotal&&hTotal>0);
   }
 
-  // 全クリア
-  if(bricks.length&&bricks.every(b=>!b.alive)){
-    gState='levelclear';
-    if(gScore>gHi){gHi=gScore;localStorage.setItem('arkanoid_hi2',gHi);}
-    // 次のレベルへ自動進行
-    launchConfetti(50);gSfx('clear');
+  // PC（2本）
+  ['sp-m-count','m-cp-count'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=`${mDone} / ${mTotal} 完了`;});
+  ['sp-h-count','h-cp-count'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=`${hDone} / ${hTotal} 完了`;});
+  const smb=document.getElementById('sp-m-bar');if(smb){smb.style.width=mPct+'%';smb.classList.toggle('full',mDone>=mTotal&&mTotal>0);}
+  const shb=document.getElementById('sp-h-bar');if(shb){shb.style.width=hPct+'%';shb.classList.toggle('full',hDone>=hTotal&&hTotal>0);}
+  const mcb=document.getElementById('m-cp-bar');if(mcb){mcb.style.width=mPct+'%';mcb.classList.toggle('full',mDone>=mTotal&&mTotal>0);}
+  const hcb=document.getElementById('h-cp-bar');if(hcb){hcb.style.width=hPct+'%';hcb.classList.toggle('full',hDone>=hTotal&&hTotal>0);}
+}
+
+// ══════════════════════════════
+// リセット
+// ══════════════════════════════
+function resetMission(){
+  if(!confirm('ミッションをリセットしてもいい？'))return;
+  mChecked=[];mRolls=0;
+  saveJSON(`m_checked_${TODAY}`,[]);
+  localStorage.setItem(`m_rolls_${TODAY}`,'0');
+  // やりたいこともリセット
+  wantChecked=[];
+  saveJSON(`want_checked_${TODAY}`,[]);
+  renderWantItems();
+  document.getElementById('m-roll-count').textContent='0';
+  document.getElementById('strip').innerHTML='';
+  const btn=document.getElementById('m-check-btn');
+  btn.classList.remove('visible','done','secret-check');
+  mCurrentLabel=null;mRolling=false;
+  document.getElementById('roll-btn').disabled=false;
+  document.getElementById('m-all-done').classList.remove('visible');
+  renderMissionChips();
+  updateProgress();
+  updateLockProgress();
+}
+function resetHabit(){
+  if(!confirm('習慣チェックをリセットしてもいい？'))return;
+  hChecked=[];
+  saveJSON(`h_checked_${TODAY}`,[]);
+  document.querySelectorAll('.habit-item.checked').forEach(el=>el.classList.remove('checked'));
+  document.getElementById('h-all-done').classList.remove('visible');
+  updateProgress();
+  updateHabitSectionCounts();
+}
+function resetAll(){
+  if(!confirm('全部リセットしてもいい？'))return;
+  resetMission();
+  hChecked=[];
+  saveJSON(`h_checked_${TODAY}`,[]);
+  document.querySelectorAll('.habit-item.checked').forEach(el=>el.classList.remove('checked'));
+  document.getElementById('h-all-done').classList.remove('visible');
+  updateProgress();
+  updateHabitSectionCounts();
+}
+
+// ══════════════════════════════
+// 隠しミッション完了
+// ══════════════════════════════
+function showSecretClear(){
+  const el=document.getElementById('secret-clear');
+  el.classList.add('show');
+  launchConfetti(50);
+  const c=getCtx();
+  [523,659,784,1047,784,1047,1319].forEach((f,i)=>tone('triangle',f,.22,c.currentTime+i*.12,.25));
+}
+function closeSecretClear(){
+  document.getElementById('secret-clear').classList.remove('show');
+}
+
+// ══════════════════════════════
+// タブ切り替え
+// ══════════════════════════════
+let currentTab=0;
+const PANE_COUNT=3;
+
+function switchTab(idx){
+  if(!gameUnlocked&&idx===2)return;
+  currentTab=idx;
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  const vp=document.getElementById('pane-viewport');
+  const pw=vp.offsetWidth;
+  document.getElementById('pane-track').style.transform=`translateX(${-idx*pw}px)`;
+  document.querySelectorAll('.pane').forEach((p,i)=>p.style.width=pw+'px');
+  updateProgress();
+  if(idx===2&&gameUnlocked) initGameCanvas();
+}
+window.addEventListener('resize',()=>{
+  const vp=document.getElementById('pane-viewport');
+  const pw=vp.offsetWidth;
+  document.getElementById('pane-track').style.transform=`translateX(${-currentTab*pw}px)`;
+  document.querySelectorAll('.pane').forEach(p=>p.style.width=pw+'px');
+});
+
+// スワイプ
+let tsX=null,tsY=null;
+document.getElementById('pane-viewport').addEventListener('touchstart',e=>{
+  tsX=e.touches[0].clientX;tsY=e.touches[0].clientY;
+},{passive:true});
+document.getElementById('pane-viewport').addEventListener('touchend',e=>{
+  if(tsX===null)return;
+  const dx=e.changedTouches[0].clientX-tsX;
+  const dy=e.changedTouches[0].clientY-tsY;
+  if(Math.abs(dx)>Math.abs(dy)*1.5&&Math.abs(dx)>44){
+    let next=currentTab+(dx<0?1:-1);
+    next=Math.max(0,Math.min(PANE_COUNT-1,next));
+    if(next===2&&!gameUnlocked)return;
+    switchTab(next);
+  }
+  tsX=tsY=null;
+},{passive:true});
+
+// ══════════════════════════════
+// confetti
+// ══════════════════════════════
+function launchConfetti(n){
+  const colors=['#ff7eb3','#ffb3d1','#c97ef7','#ffe066','#7ee8c8','#74b9ff','#fdcb6e'];
+  for(let i=0;i<n;i++){
     setTimeout(()=>{
-      if(gState==='levelclear'){gState='playing';nextLevel();}
-    },1800);
-    updateGameUI();
-  }
-
-  // ── アイテム更新 ──
-  items.forEach(it=>{
-    it.y+=it.vy;
-    it.anim=(it.anim+0.1)%(Math.PI*2);
-    // パドルに当たったか
-    const py=gH-padH-8;
-    if(it.y+it.r>=py&&it.y-it.r<=py+padH&&it.x>=pad.x-padW/2&&it.x<=pad.x+padW/2){
-      applyItem(it.type);
-      it.collected=true;
-    }
-    if(it.y-it.r>gH) it.collected=true;
-  });
-  items=items.filter(it=>!it.collected);
-}
-
-// ── アイテム効果 ──
-function applyItem(type){
-  gSfx('item');
-  launchConfetti(18);
-  const info=ITEM_TYPES[type];
-  showItemLabel(info.label,info.color);
-  if(type==='MULTI'){
-    // ボール追加（最大5個）
-    if(balls.filter(b=>!b.dead).length<5){
-      const b=balls.find(x=>!x.dead);
-      if(b) balls.push(makeBall(b.x,b.y,(Math.random()*Math.PI*2)));
-    }
-  } else if(type==='WIDE'){
-    padW=Math.min(Math.floor(gW*0.36),padW*1.5);
-    wideTimer=600; // 約10秒
-  } else if(type==='FAST'){
-    // ボール全部加速
-    balls.forEach(b=>{if(!b.dead){const m=1.25;b.vx*=m;b.vy*=m;}});
-  } else if(type==='SCORE2'){
-    gScoreMult=2;
-    setTimeout(()=>{gScoreMult=1;},8000);
-  } else if(type==='SLOW'){
-    slowTimer=360;// 約6秒スローモーション
+      const el=document.createElement('div');
+      el.className='confetti-piece';
+      const size=6+Math.random()*8;
+      el.style.cssText=`
+        width:${size}px;height:${size}px;
+        background:${colors[Math.floor(Math.random()*colors.length)]};
+        left:${10+Math.random()*80}%;
+        top:${-10+Math.random()*20}px;
+        animation-duration:${1.2+Math.random()*.8}s;
+        animation-delay:${Math.random()*.3}s;
+        border-radius:${Math.random()>0.5?'50%':'2px'};
+      `;
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(),2200);
+    },i*30);
   }
 }
 
-// アイテム取得ラベル表示
-let itemLabelTimer=0,itemLabelText='',itemLabelColor='#fff';
-function showItemLabel(text,color){
-  itemLabelText=text+'GET!';itemLabelColor=color;itemLabelTimer=90;
-}
-
-// ── 描画 ──
-function draw2(){
-  ctx2.fillStyle='#0e0020';ctx2.fillRect(0,0,gW,gH);
-
-  // グリッド
-  ctx2.strokeStyle='rgba(120,0,200,.08)';ctx2.lineWidth=1;
-  for(let x=0;x<gW;x+=24){ctx2.beginPath();ctx2.moveTo(x,0);ctx2.lineTo(x,gH);ctx2.stroke();}
-  for(let y=0;y<gH;y+=24){ctx2.beginPath();ctx2.moveTo(0,y);ctx2.lineTo(gW,y);ctx2.stroke();}
-
-  // レベルアップフラッシュ
-  if(levelUpFlash>0){
-    ctx2.fillStyle=`rgba(255,224,100,${levelUpFlash/60*0.18})`;
-    ctx2.fillRect(0,0,gW,gH);
-  }
-
-  // ブロック
-  for(const b of bricks){
-    if(!b.alive)continue;
-    const flash=b.flash>0;
-    if(flash)b.flash--;
-    const col=flash?'#fff':b.color;
-    ctx2.fillStyle=col;
-    ctx2.beginPath();roundRect(ctx2,b.x,b.y,b.w,b.h,3);ctx2.fill();
-    // 光沢
-    ctx2.fillStyle=`rgba(255,255,255,${flash?0.6:0.22})`;
-    ctx2.beginPath();roundRect(ctx2,b.x+2,b.y+2,b.w-4,b.h*0.38,2);ctx2.fill();
-    // 2ヒットブロックはヒビ
-    if(b.maxHp===2&&b.hp===1){
-      ctx2.strokeStyle='rgba(0,0,0,.5)';ctx2.lineWidth=1.5;
-      ctx2.beginPath();ctx2.moveTo(b.x+b.w*0.3,b.y);ctx2.lineTo(b.x+b.w*0.5,b.y+b.h);ctx2.stroke();
-      ctx2.beginPath();ctx2.moveTo(b.x+b.w*0.6,b.y);ctx2.lineTo(b.x+b.w*0.4,b.y+b.h);ctx2.stroke();
-    }
-  }
-
-  // アイテム
-  items.forEach(it=>{
-    const info=ITEM_TYPES[it.type];
-    const bob=Math.sin(it.anim)*3;
-    // 光るリング
-    ctx2.strokeStyle=info.color;ctx2.lineWidth=2;
-    ctx2.globalAlpha=0.7+Math.sin(it.anim)*0.3;
-    ctx2.beginPath();ctx2.arc(it.x,it.y+bob,it.r+2,0,Math.PI*2);ctx2.stroke();
-    ctx2.globalAlpha=1;
-    // 絵文字
-    ctx2.font=`${it.r*1.6}px serif`;ctx2.textAlign='center';ctx2.textBaseline='middle';
-    ctx2.fillText(info.icon,it.x,it.y+bob);
-  });
-
-  // パドル
-  const py=gH-padH-8;
-  const effPadW=wideTimer>0?padW:padW;
-  const pg=ctx2.createLinearGradient(pad.x-effPadW/2,py,pad.x+effPadW/2,py);
-  if(wideTimer>0){pg.addColorStop(0,'#38d39f');pg.addColorStop(1,'#7ee8c8');}
-  else{pg.addColorStop(0,'#c97ef7');pg.addColorStop(1,'#ff7eb3');}
-  ctx2.fillStyle=pg;
-  ctx2.shadowColor=wideTimer>0?'rgba(56,211,159,.6)':'rgba(201,126,247,.5)';
-  ctx2.shadowBlur=10;
-  ctx2.beginPath();roundRect(ctx2,pad.x-effPadW/2,py,effPadW,padH,padH/2);ctx2.fill();
-  ctx2.shadowBlur=0;
-  // 光沢
-  ctx2.fillStyle='rgba(255,255,255,.3)';
-  ctx2.beginPath();roundRect(ctx2,pad.x-effPadW/2+3,py+2,effPadW-6,padH*0.38,padH*0.2);ctx2.fill();
-
-  // ボール（複数）
-  balls.forEach((b,bi)=>{
-    if(b.dead)return;
-    // トレイル
-    b.trail.forEach((t,i)=>{
-      const a=(i+1)/b.trail.length*0.35;
-      ctx2.globalAlpha=a;
-      ctx2.fillStyle=bi===0?'#ffb3d1':'#b3d1ff';
-      ctx2.beginPath();ctx2.arc(t.x,t.y,ballR*(i+1)/b.trail.length*0.8,0,Math.PI*2);ctx2.fill();
-    });
-    ctx2.globalAlpha=1;
-    // ボール本体
-    const bg2=ctx2.createRadialGradient(b.x-ballR*.3,b.y-ballR*.3,1,b.x,b.y,ballR);
-    if(bi===0){bg2.addColorStop(0,'#fff');bg2.addColorStop(.5,'#ffb3d1');bg2.addColorStop(1,'#c97ef7');}
-    else{bg2.addColorStop(0,'#fff');bg2.addColorStop(.5,'#b3d1ff');bg2.addColorStop(1,'#74b9ff');}
-    ctx2.fillStyle=bg2;
-    ctx2.shadowColor=bi===0?'rgba(201,126,247,.8)':'rgba(116,185,255,.8)';
-    ctx2.shadowBlur=8;
-    ctx2.beginPath();ctx2.arc(b.x,b.y,ballR,0,Math.PI*2);ctx2.fill();
-    ctx2.shadowBlur=0;
-  });
-  ctx2.globalAlpha=1;
-
-  // アイテムラベル
-  if(itemLabelTimer>0){
-    itemLabelTimer--;
-    const a=itemLabelTimer>20?1:itemLabelTimer/20;
-    const y=gH/2-30-((90-itemLabelTimer)*0.5);
-    ctx2.globalAlpha=a;
-    ctx2.font=`bold ${Math.floor(gW*0.055)}px 'Noto Sans JP',sans-serif`;
-    ctx2.textAlign='center';ctx2.textBaseline='middle';
-    ctx2.strokeStyle='rgba(0,0,0,.5)';ctx2.lineWidth=4;ctx2.strokeText(itemLabelText,gW/2,y);
-    ctx2.fillStyle=itemLabelColor;ctx2.fillText(itemLabelText,gW/2,y);
-    ctx2.globalAlpha=1;
-  }
-
-  // レベル表示
-  ctx2.font=`${Math.floor(gW*0.038)}px 'Noto Sans JP',sans-serif`;
-  ctx2.textAlign='right';ctx2.textBaseline='top';
-  ctx2.fillStyle='rgba(200,150,255,.5)';
-  ctx2.fillText(`Lv.${gLevel}`,gW-6,4);
-
-  // 2倍スコア表示
-  if(gScoreMult===2){
-    ctx2.font=`bold ${Math.floor(gW*0.04)}px 'Noto Sans JP',sans-serif`;
-    ctx2.textAlign='left';ctx2.fillStyle='#ffe066';
-    ctx2.fillText('×2',6,4);
-  }
-
-  // レベルクリアテキスト
-  if(gState==='levelclear'){
-    ctx2.fillStyle='rgba(0,0,20,.5)';ctx2.fillRect(0,0,gW,gH);
-    ctx2.font=`bold ${Math.floor(gW*0.1)}px 'Noto Sans JP',sans-serif`;
-    ctx2.textAlign='center';ctx2.textBaseline='middle';
-    ctx2.strokeStyle='rgba(255,200,0,.8)';ctx2.lineWidth=5;
-    ctx2.strokeText(`Lv.${gLevel} クリア！`,gW/2,gH/2);
-    ctx2.fillStyle='#ffe066';ctx2.fillText(`Lv.${gLevel} クリア！`,gW/2,gH/2);
-    ctx2.font=`${Math.floor(gW*0.055)}px 'Noto Sans JP',sans-serif`;
-    ctx2.fillStyle='#fff';ctx2.fillText(`次のレベルへ…`,gW/2,gH/2+gH*0.12);
+// ══════════════════════════════
+// 星パーティクル
+// ══════════════════════════════
+function createStars(){
+  const wrap=document.getElementById('stars');
+  const emojis=['⭐','✨','🌟','💫','★'];
+  for(let i=0;i<18;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    const size=12+Math.random()*14;
+    s.style.cssText=`
+      font-size:${size}px;
+      left:${Math.random()*100}%;
+      animation-duration:${8+Math.random()*14}s;
+      animation-delay:${-Math.random()*14}s;
+    `;
+    s.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    wrap.appendChild(s);
   }
 }
 
-function drawIdle(){
-  if(!gW||!gH){resizeCanvas();return;}
-  ctx2.fillStyle='#0e0020';ctx2.fillRect(0,0,gW,gH);
-  const bW2=Math.floor((gW-(COLS+1)*3)/COLS);
-  const bH2=Math.floor(gH*0.038);
-  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
-    const gapX=3,gapY=4;
-    const totalW=COLS*(bW2+gapX)-gapX;
-    const startX=(gW-totalW)/2;
-    const x=startX+c*(bW2+gapX),y=gH*0.06+r*(bH2+gapY);
-    ctx2.fillStyle=BRICK_COLORS[(r+c)%BRICK_COLORS.length]+'99';
-    ctx2.beginPath();roundRect(ctx2,x,y,bW2,bH2,3);ctx2.fill();
-  }
+// ══════════════════════════════
+// ゲーム（アルカノイド）
+// ══════════════════════════════
+let gameInited=false;
+let gAnimId=null;
+let gState='idle'; // idle|playing|gameover|clear
+const GW=340,GH=480;
+let gPx,gBx,gBy,gBvx,gBvy,gLives,gScore,gHi,gBricks,gRunning;
+const BRICK_ROWS=5,BRICK_COLS=8,BRICK_W=36,BRICK_H=14,BRICK_PAD=4;
+const BRICK_OX=(GW-(BRICK_COLS*(BRICK_W+BRICK_PAD)-BRICK_PAD))/2;
+const BRICK_OY=48;
+const PAD_W=60,PAD_H=10,PAD_Y=GH-30;
+const BALL_R=7,BALL_SPEED=4.5;
+
+function initGameCanvas(){
+  if(gameInited)return;
+  gameInited=true;
+  const canvas=document.getElementById('game-canvas');
+  canvas.width=GW;canvas.height=GH;
+  gHi=parseInt(localStorage.getItem('arkanoid_hi')||'0');
+  document.getElementById('g-hi').textContent=gHi;
+  gState='idle';
 }
 
-function roundRect(c,x,y,w,h,r){
-  c.beginPath();
-  c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.arcTo(x+w,y,x+w,y+r,r);
-  c.lineTo(x+w,y+h-r);c.arcTo(x+w,y+h,x+w-r,y+h,r);
-  c.lineTo(x+r,y+h);c.arcTo(x,y+h,x,y+h-r,r);
-  c.lineTo(x,y+r);c.arcTo(x,y,x+r,y,r);c.closePath();
-}
-
-function showOverlay(title,sub,btn){
-  document.getElementById('overlay-title').textContent=title;
-  document.getElementById('overlay-sub').textContent=sub;
-  document.getElementById('overlay-btn').textContent='▶ '+btn;
-  document.getElementById('game-overlay').classList.remove('hidden');
+function gameStart(){
+  const overlay=document.getElementById('game-overlay');
+  overlay.classList.add('hidden');
+  gPx=GW/2;gBx=GW/2;gBy=GH-60;
+  gBvx=(Math.random()>0.5?1:-1)*BALL_SPEED*.7;
+  gBvy=-BALL_SPEED;
+  gLives=3;gScore=0;
+  gBricks=[];
+  for(let r=0;r<BRICK_ROWS;r++)for(let c=0;c<BRICK_COLS;c++)gBricks.push({r,c,hp:1});
   updateGameUI();
+  gState='playing';
+  if(gAnimId) cancelAnimationFrame(gAnimId);
+  gameLoop();
+
+  // コントロール
+  const canvas=document.getElementById('game-canvas');
+  canvas.onmousemove=e=>{
+    const rect=canvas.getBoundingClientRect();
+    gPx=(e.clientX-rect.left)*(GW/rect.width);
+  };
+  canvas.ontouchmove=e=>{
+    e.preventDefault();
+    const rect=canvas.getBoundingClientRect();
+    gPx=(e.touches[0].clientX-rect.left)*(GW/rect.width);
+  };
+  // タップ左右
+  canvas.onclick=e=>{
+    if(gState!=='playing')return;
+    const rect=canvas.getBoundingClientRect();
+    const x=e.clientX-rect.left;
+    gPx+=x<rect.width/2?-30:30;
+    gPx=Math.max(PAD_W/2,Math.min(GW-PAD_W/2,gPx));
+  };
+  document.onkeydown=e=>{
+    if(gState!=='playing')return;
+    if(e.key==='ArrowLeft') gPx=Math.max(PAD_W/2,gPx-20);
+    if(e.key==='ArrowRight') gPx=Math.min(GW-PAD_W/2,gPx+20);
+  };
 }
 
 function updateGameUI(){
@@ -2001,39 +1659,142 @@ function updateGameUI(){
   document.getElementById('g-lives').textContent='❤️'.repeat(Math.max(0,gLives));
 }
 
-// ── 効果音 ──
-function gSfx(type){
-  const c=getCtx();
-  if(type==='wall'){
-    tone('square',500,.04,c.currentTime,.035);
-  } else if(type==='pad'){
-    tone('sine',700,.09,c.currentTime,.05);
-    tone('sine',900,.06,c.currentTime+.03,.05);
-  } else if(type==='brick'){
-    tone('square',900,.08,c.currentTime,.04);
-    tone('sine',600,.04,c.currentTime+.02,.06);
-  } else if(type==='miss'){
-    [280,240,200,160].forEach((f,i)=>tone('sine',f,.15,c.currentTime+i*.1,.12));
-  } else if(type==='clear'){
-    [{f:523,t:0},{f:659,t:.1},{f:784,t:.2},{f:1047,t:.32},{f:1319,t:.46}]
-      .forEach(({f,t})=>tone('triangle',f,.22,c.currentTime+t,.22));
-  } else if(type==='item'){
-    [880,1100,1320,1760].forEach((f,i)=>tone('sine',f,.15,c.currentTime+i*.06,.12));
-  } else if(type==='levelup'){
-    [{f:523,t:0},{f:659,t:.08},{f:784,t:.16},{f:1047,t:.26},{f:1319,t:.38},{f:1568,t:.52}]
-      .forEach(({f,t})=>tone('triangle',f,.2,c.currentTime+t,.2));
+const BRICK_COLORS=[
+  ['#ff6b9d','#ff85b3'],['#c97ef7','#d89af8'],['#74b9ff','#90c8ff'],
+  ['#fdcb6e','#fdd98a'],['#7ee8c8','#a0f0d8'],
+];
+
+function gameLoop(){
+  if(gState!=='playing'){return;}
+  const canvas=document.getElementById('game-canvas');
+  const ctx=canvas.getContext('2d');
+
+  // 背景
+  ctx.fillStyle='#1a0030';ctx.fillRect(0,0,GW,GH);
+
+  // ブリック
+  gBricks.forEach(b=>{
+    if(b.hp<=0)return;
+    const x=BRICK_OX+b.c*(BRICK_W+BRICK_PAD);
+    const y=BRICK_OY+b.r*(BRICK_H+BRICK_PAD);
+    const [c1,c2]=BRICK_COLORS[b.r%BRICK_COLORS.length];
+    const g2=ctx.createLinearGradient(x,y,x,y+BRICK_H);
+    g2.addColorStop(0,c1);g2.addColorStop(1,c2);
+    ctx.fillStyle=g2;
+    ctx.beginPath();ctx.roundRect(x,y,BRICK_W,BRICK_H,4);ctx.fill();
+  });
+
+  // パドル
+  const pg=ctx.createLinearGradient(gPx-PAD_W/2,PAD_Y,gPx+PAD_W/2,PAD_Y);
+  pg.addColorStop(0,'#ff7eb3');pg.addColorStop(1,'#c97ef7');
+  ctx.fillStyle=pg;
+  ctx.beginPath();ctx.roundRect(gPx-PAD_W/2,PAD_Y,PAD_W,PAD_H,6);ctx.fill();
+
+  // ボール
+  ctx.beginPath();ctx.arc(gBx,gBy,BALL_R,0,Math.PI*2);
+  const bg=ctx.createRadialGradient(gBx-2,gBy-2,1,gBx,gBy,BALL_R);
+  bg.addColorStop(0,'#fff');bg.addColorStop(1,'#ffb3d1');
+  ctx.fillStyle=bg;ctx.fill();
+
+  // 移動
+  gBx+=gBvx;gBy+=gBvy;
+
+  // 壁反射
+  if(gBx-BALL_R<0){gBx=BALL_R;gBvx=Math.abs(gBvx);}
+  if(gBx+BALL_R>GW){gBx=GW-BALL_R;gBvx=-Math.abs(gBvx);}
+  if(gBy-BALL_R<0){gBy=BALL_R;gBvy=Math.abs(gBvy);}
+
+  // パドル当たり
+  if(gBy+BALL_R>=PAD_Y&&gBy+BALL_R<=PAD_Y+PAD_H+Math.abs(gBvy)&&
+     gBx>=gPx-PAD_W/2&&gBx<=gPx+PAD_W/2){
+    gBy=PAD_Y-BALL_R;
+    const rel=(gBx-(gPx-PAD_W/2))/PAD_W-0.5;
+    gBvx=rel*BALL_SPEED*2;
+    gBvy=-Math.abs(gBvy);
+    tone('sine',440,.2,getCtx().currentTime,.06);
   }
+
+  // ブリック当たり
+  for(let b of gBricks){
+    if(b.hp<=0)continue;
+    const bx=BRICK_OX+b.c*(BRICK_W+BRICK_PAD);
+    const by=BRICK_OY+b.r*(BRICK_H+BRICK_PAD);
+    if(gBx+BALL_R>bx&&gBx-BALL_R<bx+BRICK_W&&
+       gBy+BALL_R>by&&gBy-BALL_R<by+BRICK_H){
+      b.hp--;
+      gScore+=10;
+      if(gScore>gHi){gHi=gScore;localStorage.setItem('arkanoid_hi',gHi);}
+      updateGameUI();
+      tone('square',660,.12,getCtx().currentTime,.05);
+      // 反射
+      const overlapX=Math.min(gBx+BALL_R-bx,bx+BRICK_W-gBx+BALL_R);
+      const overlapY=Math.min(gBy+BALL_R-by,by+BRICK_H-gBy+BALL_R);
+      if(overlapX<overlapY) gBvx=-gBvx; else gBvy=-gBvy;
+      break;
+    }
+  }
+
+  // 落下
+  if(gBy-BALL_R>GH){
+    gLives--;
+    updateGameUI();
+    tone('sawtooth',180,.3,getCtx().currentTime,.4);
+    if(gLives<=0){
+      gState='gameover';
+      showGameOver();
+      return;
+    }
+    gBx=gPx;gBy=PAD_Y-BALL_R-5;
+    gBvx=(Math.random()>0.5?1:-1)*BALL_SPEED*.7;
+    gBvy=-BALL_SPEED;
+  }
+
+  // クリア
+  if(gBricks.every(b=>b.hp<=0)){
+    gState='clear';
+    showGameClear();
+    return;
+  }
+
+  gAnimId=requestAnimationFrame(gameLoop);
 }
 
-// ── マウス操作 ──
-canvas.addEventListener('mousemove',e=>{
-  if(gState!=='playing')return;
-  const rect=canvas.getBoundingClientRect();
-  padTarget=Math.max(padW/2,Math.min(gW-padW/2,(e.clientX-rect.left)/rect.width*gW));
-});
+function showGameOver(){
+  const overlay=document.getElementById('game-overlay');
+  overlay.classList.remove('hidden');
+  document.getElementById('overlay-title').textContent='💔 ゲームオーバー';
+  document.getElementById('overlay-sub').textContent=`スコア: ${gScore}`;
+  document.getElementById('overlay-btn').textContent='▶ もう一度';
+}
+function showGameClear(){
+  playAllClear();launchConfetti(30);
+  const overlay=document.getElementById('game-overlay');
+  overlay.classList.remove('hidden');
+  document.getElementById('overlay-title').textContent='🎊 クリア！！';
+  document.getElementById('overlay-sub').textContent=`スコア: ${gScore}`;
+  document.getElementById('overlay-btn').textContent='▶ もう一度';
+}
 
-// ── 初期化 ──
-const BLOCK_SCORE=10;
-setTimeout(()=>{resizeCanvas();updateGameUI();},100);
+// ══════════════════════════════
+// 初期化
+// ══════════════════════════════
+function init(){
+  createStars();
+  renderMissionChips();
+  renderHabits();
+  renderWantItems();
+  updateProgress();
+  applyGameLockState();
+  checkHabitAllDone();
+  checkAllMissionDone();
 
+  // ペイン幅設定
+  const vp=document.getElementById('pane-viewport');
+  const pw=vp.offsetWidth;
+  document.getElementById('pane-track').style.transform='translateX(0)';
+  document.querySelectorAll('.pane').forEach(p=>p.style.width=pw+'px');
+}
+init();
 </script>
+</body>
+</html>
