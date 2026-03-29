@@ -446,6 +446,47 @@ background:linear-gradient(135deg,#e0a020,#ffcc40);
 }
 .pause-btn:hover{background:var(--purple);color:#fff;}
 .pause-btn.paused{background:var(--purple);color:#fff;}
+/* ── 遊び方ボタン＆パネル ── */
+.help-btn{
+  padding:6px 14px;border-radius:50px;
+  border:2px solid var(--purple);background:transparent;
+  color:var(--purple);font-family:"Noto Sans JP",sans-serif;
+  font-size:.72rem;font-weight:900;letter-spacing:.06em;
+  cursor:pointer;transition:all .18s;
+}
+.help-btn:hover{background:var(--purple);color:#fff;}
+.help-panel{
+  width:100%;border-radius:14px;
+  background:linear-gradient(135deg,#f8f0ff,#fff5fb);
+  border:2px solid var(--purple);
+  padding:14px 14px 12px;
+  position:relative;
+  display:none;
+  animation:helpSlideIn .22s cubic-bezier(.34,1.2,.64,1);
+}
+.help-panel.open{display:block;}
+@keyframes helpSlideIn{
+  0%{opacity:0;transform:translateY(-8px);}
+  100%{opacity:1;transform:translateY(0);}
+}
+.help-close{
+  position:absolute;top:8px;right:10px;
+  font-size:.8rem;color:#c097d0;cursor:pointer;font-weight:700;
+  width:22px;height:22px;display:flex;align-items:center;justify-content:center;
+  border-radius:50%;background:#f0e0f8;transition:all .15s;
+}
+.help-close:hover{background:var(--purple);color:#fff;}
+.help-title{
+  font-size:.82rem;font-weight:900;color:var(--purple);
+  margin-bottom:10px;letter-spacing:.06em;
+}
+.help-body{display:flex;flex-direction:column;gap:7px;}
+.help-item{
+  font-size:.74rem;color:#555;line-height:1.5;
+  padding:6px 10px;border-radius:9px;background:#fff;
+  border:1.5px solid #f0e0f8;
+}
+.help-item b{color:var(--purple);}
 /* ── マージゲーム ── */
 .merge-board-wrap{width:100%;display:flex;justify-content:center;}
 .merge-board{
@@ -480,19 +521,22 @@ background:linear-gradient(135deg,#e0a020,#ffcc40);
 .slide-tile.empty{background:#3d3d6e;cursor:default;}
 .game-info-row{
 display:flex;gap:8px;width:100%;justify-content:space-between;
+margin:6px 0 2px;
 }
 .game-stat{
 flex:1;text-align:center;font-size:.72rem;color:#a080c0;
 background:#fff5fb;border:1.5px solid var(--pink2);
-border-radius:10px;padding:5px 4px;
+border-radius:12px;padding:8px 4px 6px;
 }
-.game-stat b{display:block;font-size:.9rem;color:var(--purple);margin-top:1px;}
+.game-stat b{display:block;font-size:1rem;color:var(--purple);margin-top:2px;font-weight:900;}
+.difficulty-row{margin:6px 0 4px;}
 .game-wrap{
 width:100%;position:relative;
 border-radius:16px;overflow:hidden;
 border:3px solid var(--pink2);
 background:#1a0030;
 touch-action:none;
+max-height:320px;
 }
 #game-canvas{display:block;width:100%;height:auto;}
 .game-overlay{
@@ -992,8 +1036,20 @@ transition:all .2s;
               <div class="merge-board" id="merge-board"></div>
             </div>
             <div class="game-ctrl-row">
-              <span class="game-ctrl-hint">スワイプ or ← ↑ → ↓ キー</span>
+              <button class="help-btn" onclick="toggleMergeHelp()">？ 遊び方</button>
               <button class="overlay-btn" style="padding:8px 18px;font-size:.8rem" onclick="mergeNewGame()">🔄 リセット</button>
+            </div>
+            <!-- 遊び方パネル -->
+            <div class="help-panel" id="merge-help-panel">
+              <div class="help-close" onclick="toggleMergeHelp()">✕</div>
+              <div class="help-title">🔢 マージ2048 の遊び方</div>
+              <div class="help-body">
+                <div class="help-item">👆 <b>スワイプ</b>（上下左右）でタイルを動かす</div>
+                <div class="help-item">🔢 同じ数字のタイルが<b>ぶつかると合体</b>して2倍になる</div>
+                <div class="help-item">🏆 <b>2048</b>のタイルを作ったらゴール！</div>
+                <div class="help-item">💡 タイルが動かせなくなったら<b>ゲームオーバー</b></div>
+                <div class="help-item">⌨️ PCは<b>矢印キー</b>でも操作できるよ</div>
+              </div>
             </div>
           </div>
 
@@ -1818,7 +1874,7 @@ let gState = 'idle';
 let gPaused = false;
 
 // キャンバスサイズ
-const GW = 360, GH = 640;  // 縦30%増 560→640（本来+168だが上限を640に）
+const GW = 360, GH = 320;  // 縦幅を半分に
 
 let gPx, gLives, gScore, gHi, gBricks;
 
@@ -1839,7 +1895,7 @@ let gLaserCooldown = 0;
 const BRICK_W = 25, BRICK_H = 10, BRICK_PAD = 3;
 const BRICK_COLS = 11, BRICK_ROWS = 9;
 const BRICK_OX = (GW - (BRICK_COLS * (BRICK_W + BRICK_PAD) - BRICK_PAD)) / 2;
-const BRICK_OY = 50;
+const BRICK_OY = 30;
 
 const PAD_H = 10, PAD_Y = GH - 28;
 const BALL_R = 6;
@@ -1890,7 +1946,7 @@ function gameStart() {
   document.getElementById('pause-btn').classList.remove('paused');
 
   gPx = GW / 2;
-  gBalls = [{ x: GW/2, y: GH-80, vx: (Math.random()>.5?1:-1)*diff.speed*.7, vy: -diff.speed }];
+  gBalls = [{ x: GW/2, y: GH-60, vx: (Math.random()>.5?1:-1)*diff.speed*.7, vy: -diff.speed }];
   gItems = [];
   gLasers = [];
   gPowerUps = { multiball: 0, laser: 0, wide: 0 };
@@ -2306,6 +2362,11 @@ const MERGE_TEXT_COLORS = {
   16:'#f9f6f2', 32:'#f9f6f2', 64:'#f9f6f2', 128:'#f9f6f2',
   256:'#f9f6f2', 512:'#f9f6f2', 1024:'#f9f6f2', 2048:'#f9f6f2',
 };
+
+function toggleMergeHelp() {
+  const p = document.getElementById('merge-help-panel');
+  p.classList.toggle('open');
+}
 
 function mergeInit() {
   mgHi = parseInt(localStorage.getItem('merge_hi') || '0');
