@@ -732,7 +732,8 @@ transition:opacity .15s;
 .section-header:active{opacity:.75;}
 .section-header.morning{background:linear-gradient(135deg,#fff3cd,#ffe8a0);color:#b8860b;}
 .section-header.school {background:linear-gradient(135deg,#d4eeff,#b3daff);color:var(--navy);}
-.section-header.after {background:linear-gradient(135deg,#ffe0f0,#ffc8e8);color:#c04080;}
+.section-header.after   {background:linear-gradient(135deg,#ffe0f0,#ffc8e8);color:#c04080;}
+.section-header.evening {background:linear-gradient(135deg,#e8e0ff,#d0c8f8);color:#5040a0;}
 .section-header-left{display:flex;align-items:center;gap:7px;}
 .section-icon{font-size:.95rem;}
 .section-header-right{display:flex;align-items:center;gap:7px;}
@@ -979,6 +980,98 @@ transition:all .2s;
   50%{transform:translateY(-6px);opacity:1;}
 }
 
+
+/* ═══ タイマー ═══ */
+.timer-wrap{
+  width:100%;
+  background:linear-gradient(135deg,#fff0f8,#f0e8ff);
+  border:2.5px solid var(--pink2);
+  border-radius:20px;
+  padding:14px 14px 12px;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  margin-top:2px;
+}
+.timer-title{
+  font-size:.72rem;font-weight:900;color:var(--purple);
+  letter-spacing:.1em;display:flex;align-items:center;gap:5px;
+}
+.timer-display{
+  font-family:'M PLUS Rounded 1c','Noto Sans JP',sans-serif;
+  font-size:2.6rem;font-weight:900;
+  color:var(--dark);letter-spacing:.06em;
+  line-height:1;
+  text-shadow:0 2px 8px rgba(201,126,247,.2);
+  transition:color .3s;
+  min-width:120px;text-align:center;
+}
+.timer-display.running{
+  color:var(--purple);
+  animation:timerPulse 1s ease-in-out infinite;
+}
+.timer-display.ringing{
+  color:#e84393;
+  animation:timerRing .4s ease-in-out infinite;
+}
+@keyframes timerPulse{
+  0%,100%{text-shadow:0 2px 8px rgba(201,126,247,.2);}
+  50%{text-shadow:0 2px 20px rgba(201,126,247,.6);}
+}
+@keyframes timerRing{
+  0%,100%{transform:scale(1) rotate(0deg);}
+  25%{transform:scale(1.05) rotate(-3deg);}
+  75%{transform:scale(1.05) rotate(3deg);}
+}
+/* プリセットボタン行 */
+.timer-presets{display:flex;gap:6px;width:100%;}
+.timer-preset-btn{
+  flex:1;padding:7px 4px;border-radius:10px;
+  border:2px solid var(--pink2);
+  background:#fff;color:var(--purple);
+  font-family:'Noto Sans JP',sans-serif;
+  font-size:.72rem;font-weight:900;letter-spacing:.04em;
+  cursor:pointer;transition:all .18s;
+  -webkit-tap-highlight-color:transparent;
+}
+.timer-preset-btn:hover{background:var(--purple2);border-color:var(--purple);}
+.timer-preset-btn:active{transform:scale(.94);}
+.timer-preset-btn.selected{
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;border-color:transparent;
+  box-shadow:0 3px 10px rgba(201,126,247,.3);
+}
+/* コントロールボタン行 */
+.timer-controls{display:flex;gap:6px;width:100%;}
+.timer-btn{
+  flex:1;padding:9px 6px;border-radius:12px;border:none;
+  font-family:'Noto Sans JP',sans-serif;
+  font-size:.75rem;font-weight:900;letter-spacing:.06em;
+  cursor:pointer;transition:all .18s;
+  -webkit-tap-highlight-color:transparent;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+}
+.timer-btn-icon{font-size:1.1rem;line-height:1;}
+.timer-btn.start{
+  background:linear-gradient(135deg,var(--pink),#e84393);
+  color:#fff;box-shadow:0 3px 12px rgba(232,67,147,.3);
+}
+.timer-btn.start:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(232,67,147,.4);}
+.timer-btn.start:active{transform:scale(.95);}
+.timer-btn.start.paused{
+  background:linear-gradient(135deg,#55efc4,#00b894);
+  box-shadow:0 3px 12px rgba(0,184,148,.3);
+}
+.timer-btn.pause-timer{
+  background:linear-gradient(135deg,#fdcb6e,#e17055);
+  color:#fff;box-shadow:0 3px 12px rgba(225,112,85,.2);
+}
+.timer-btn.pause-timer:hover{transform:translateY(-2px);}
+.timer-btn.pause-timer:active{transform:scale(.95);}
+.timer-btn.reset-timer{
+  background:#f5f0ff;color:var(--purple);
+  border:2px solid var(--purple2);
+}
+.timer-btn.reset-timer:hover{background:var(--purple2);}
+.timer-btn.reset-timer:active{transform:scale(.95);}
 /* ═══ confetti ═══ */
 .confetti-piece{position:fixed;border-radius:2px;pointer-events:none;z-index:200;animation:confettiFall 1.6s ease-in forwards;}
 @keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(110vh) rotate(720deg);opacity:0;}}
@@ -1107,6 +1200,28 @@ transition:all .2s;
             </div>
           </div>
 
+          <!-- ★ タイマー ★ -->
+          <div class="timer-wrap">
+            <div class="timer-title">⏱ タイマー</div>
+            <div class="timer-display" id="timer-display">00:00</div>
+            <div class="timer-presets">
+              <button class="timer-preset-btn" id="tp-1" onclick="timerPreset(1)">1分</button>
+              <button class="timer-preset-btn" id="tp-10" onclick="timerPreset(10)">10分</button>
+              <button class="timer-preset-btn" id="tp-15" onclick="timerPreset(15)">15分</button>
+            </div>
+            <div class="timer-controls">
+              <button class="timer-btn start" id="timer-start-btn" onclick="timerStart()">
+                <span class="timer-btn-icon">▶</span>スタート
+              </button>
+              <button class="timer-btn pause-timer" id="timer-pause-btn" onclick="timerPause()">
+                <span class="timer-btn-icon">⏸</span>一時停止
+              </button>
+              <button class="timer-btn reset-timer" onclick="timerReset()">
+                <span class="timer-btn-icon">🔄</span>リセット
+              </button>
+            </div>
+          </div>
+
           <div class="bottom-row">
             <div class="count-row">まわした回数 <b id="m-roll-count">0</b> かい</div>
             <button class="reset-btn" onclick="resetMission()">🔄 リセット</button>
@@ -1159,7 +1274,20 @@ transition:all .2s;
               </div>
             </div>
             <div class="accordion-body open" id="body-after">
-              <div id="habit-list-after-wrap"></div>
+              <div class="habit-list" id="habit-list-after"></div>
+            </div>
+          </div>
+          <!-- 夕食後・寝る前 -->
+          <div class="habit-section" id="sec-evening">
+            <div class="section-header evening open" onclick="toggleSection('evening')">
+              <div class="section-header-left"><span class="section-icon">🌙</span>夕食後・寝る前<span id="sec-cnt-evening" style="font-size:.7rem;margin-left:4px;opacity:.8"></span></div>
+              <div class="section-header-right">
+                <button class="bulk-btn check-all" id="bulk-evening" onclick.stop="bulkCheck('evening',event)">まとめてチェック</button>
+                <span class="chevron">▼</span>
+              </div>
+            </div>
+            <div class="accordion-body open" id="body-evening">
+              <div class="habit-list" id="habit-list-evening"></div>
             </div>
           </div>
           <div class="habit-bottom">
@@ -1446,26 +1574,23 @@ const HABIT_SECTIONS=[
     {id:'cream', label:'ハンドクリーム', note:'', icon:'🤲'},
     {id:'mask', label:'マスク', note:'', icon:'😷'},
   ]},
-  {id:'after',label:'下校後にやること',cls:'after',
-    subSections:[
-      {label:'🎒 忘れ物確認',items:[
-        {id:'hw', label:'宿題', note:'', icon:'📝'},
-        {id:'renbag', label:'連絡袋を確認', note:'', icon:'👝'},
-        {id:'kyusyoku', label:'給食袋', note:'', icon:'🍱'},
-        {id:'uwabaki', label:'上靴', note:'金曜日', icon:'👟'},
-      ]},
-      {label:'💊 夕食後・寝る前',items:[
-        {id:'drug_eve1',label:'薬：フェキソフェナジン', note:'アレルギー',icon:'💊'},
-        {id:'hagaki2', label:'歯磨き', note:'', icon:'🪥'},
-        {id:'kataduke', label:'おかたづけ', note:'', icon:'🧹'},
-        {id:'ofuro', label:'お風呂', note:'', icon:'🛁'},
-        {id:'stretch_eve', label:'ストレッチ', note:'', icon:'🤸'},
-        {id:'drug_eve2',label:'薬：モンテルカストチュアブル',note:'喘息予防',icon:'💊'},
-        {id:'drug_eve3',label:'薬：オロパタジン', note:'花粉症', icon:'💊'},
-        {id:'moist2', label:'保湿液', note:'', icon:'🧴'},
-        {id:'cream2', label:'ハンドクリーム', note:'', icon:'🤲'},
-      ]},
-    ]},
+  {id:'after',label:'下校後にやること',cls:'after',items:[
+    {id:'hw', label:'宿題', note:'', icon:'📝'},
+    {id:'renbag', label:'連絡袋を確認', note:'', icon:'👝'},
+    {id:'kyusyoku', label:'給食袋', note:'', icon:'🍱'},
+    {id:'uwabaki', label:'上靴', note:'金曜日', icon:'👟'},
+  ]},
+  {id:'evening',label:'夕食後・寝る前',cls:'evening',items:[
+    {id:'drug_eve1',label:'薬：フェキソフェナジン', note:'アレルギー',icon:'💊'},
+    {id:'hagaki2', label:'歯磨き', note:'', icon:'🪥'},
+    {id:'kataduke', label:'おかたづけ', note:'', icon:'🧹'},
+    {id:'ofuro', label:'お風呂', note:'', icon:'🛁'},
+    {id:'stretch_eve', label:'ストレッチ', note:'', icon:'🤸'},
+    {id:'drug_eve2',label:'薬：モンテルカストチュアブル',note:'喘息予防',icon:'💊'},
+    {id:'drug_eve3',label:'薬：オロパタジン', note:'花粉症', icon:'💊'},
+    {id:'moist2', label:'保湿液', note:'', icon:'🧴'},
+    {id:'cream2', label:'ハンドクリーム', note:'', icon:'🤲'},
+  ]},
 ];
 
 function getAfterItems(){
@@ -1475,7 +1600,6 @@ function getAllHabitIds(){
   const flat=[];
   HABIT_SECTIONS.forEach(sec=>{
     if(sec.items) sec.items.forEach(it=>flat.push(it.id));
-    if(sec.subSections) sec.subSections.forEach(ss=>ss.items.forEach(it=>flat.push(it.id)));
   });
   return flat;
 }
@@ -1830,30 +1954,11 @@ function chipToggle(label,chip){
 // ══════════════════════════════
 function renderHabits(){
   HABIT_SECTIONS.forEach(sec=>{
-    if(sec.items){
-      const list=document.getElementById(`habit-list-${sec.id}`);
-      if(!list)return;
-      list.innerHTML='';
-      sec.items.forEach(it=>list.appendChild(makeHabitItem(it)));
-    }
-    if(sec.subSections){
-      const wrap=document.getElementById('habit-list-after-wrap');
-      if(!wrap)return;
-      wrap.innerHTML='';
-      sec.subSections.forEach(ss=>{
-        const sub=document.createElement('div');
-        sub.className='sub-section';
-        const title=document.createElement('div');
-        title.className='sub-section-title';
-        title.textContent=ss.label;
-        sub.appendChild(title);
-        const list=document.createElement('div');
-        list.className='habit-list';
-        ss.items.forEach(it=>list.appendChild(makeHabitItem(it)));
-        sub.appendChild(list);
-        wrap.appendChild(sub);
-      });
-    }
+    if(!sec.items)return;
+    const list=document.getElementById(`habit-list-${sec.id}`);
+    if(!list)return;
+    list.innerHTML='';
+    sec.items.forEach(it=>list.appendChild(makeHabitItem(it)));
   });
   updateHabitSectionCounts();
 }
@@ -1888,7 +1993,6 @@ function updateHabitSectionCounts(){
   HABIT_SECTIONS.forEach(sec=>{
     let ids=[];
     if(sec.items) ids=sec.items.map(it=>it.id);
-    if(sec.subSections) ids=sec.subSections.flatMap(ss=>ss.items.map(it=>it.id));
     const done=ids.filter(id=>hChecked.includes(id)).length;
     const el=document.getElementById(`sec-cnt-${sec.id}`);
     if(el) el.textContent=`${done}/${ids.length}`;
@@ -1907,7 +2011,6 @@ function bulkCheck(secId,e){
   if(!sec)return;
   let ids=[];
   if(sec.items) ids=sec.items.map(it=>it.id);
-  if(sec.subSections) ids=sec.subSections.flatMap(ss=>ss.items.map(it=>it.id));
   const allDone=ids.every(id=>hChecked.includes(id));
   if(allDone){
     hChecked=hChecked.filter(id=>!ids.includes(id));
@@ -3087,6 +3190,128 @@ slideRender = function() {
   _origSlideRender();
   slideSetupSwipe();
 };
+
+
+// ══════════════════════════════
+// タイマー
+// ══════════════════════════════
+let timerSeconds = 0;
+let timerTotal = 0;
+let timerInterval = null;
+let timerState = 'idle'; // idle | running | paused | ringing
+let timerRingInterval = null;
+let timerSelectedMin = 0;
+
+function timerPreset(min) {
+  timerReset();
+  timerSelectedMin = min;
+  timerSeconds = min * 60;
+  timerTotal = timerSeconds;
+  // ボタン選択状態
+  [1,10,15].forEach(m => {
+    const btn = document.getElementById('tp-' + m);
+    if (btn) btn.classList.toggle('selected', m === min);
+  });
+  timerUpdateDisplay();
+}
+
+function timerStart() {
+  if (timerState === 'ringing') { timerStopRing(); return; }
+  if (timerSeconds <= 0 && timerTotal <= 0) return;
+  if (timerState === 'idle' || timerState === 'paused') {
+    timerState = 'running';
+    timerUpdateStartBtn(true);
+    const display = document.getElementById('timer-display');
+    if (display) { display.classList.remove('ringing'); display.classList.add('running'); }
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      timerUpdateDisplay();
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        timerState = 'ringing';
+        timerStartRing();
+      }
+    }, 1000);
+  }
+}
+
+function timerPause() {
+  timerStopRing();
+  if (timerState === 'running') {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    timerState = 'paused';
+    timerUpdateStartBtn(false);
+    const display = document.getElementById('timer-display');
+    if (display) display.classList.remove('running');
+  }
+}
+
+function timerReset() {
+  timerStopRing();
+  clearInterval(timerInterval);
+  timerInterval = null;
+  timerState = 'idle';
+  timerSeconds = timerTotal;
+  timerUpdateDisplay();
+  timerUpdateStartBtn(false);
+  const display = document.getElementById('timer-display');
+  if (display) { display.classList.remove('running','ringing'); }
+}
+
+function timerUpdateStartBtn(running) {
+  const btn = document.getElementById('timer-start-btn');
+  if (!btn) return;
+  if (running) {
+    btn.innerHTML = '<span class="timer-btn-icon">▶</span>ランチュウ';
+    btn.classList.remove('paused');
+  } else {
+    btn.innerHTML = '<span class="timer-btn-icon">▶</span>スタート';
+    btn.classList.add('paused');
+  }
+}
+
+function timerUpdateDisplay() {
+  const el = document.getElementById('timer-display');
+  if (!el) return;
+  const s = Math.max(0, timerSeconds);
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  el.textContent = String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+}
+
+function timerStartRing() {
+  const display = document.getElementById('timer-display');
+  if (display) { display.classList.remove('running'); display.classList.add('ringing'); }
+  launchConfetti(12);
+  let ringCount = 0;
+  const maxRings = 20; // 20秒分（1秒ごと）
+  timerRingInterval = setInterval(() => {
+    playTimerRing();
+    ringCount++;
+    if (ringCount >= maxRings) timerStopRing();
+  }, 1000);
+  playTimerRing(); // 即時1発
+}
+
+function timerStopRing() {
+  clearInterval(timerRingInterval);
+  timerRingInterval = null;
+  if (timerState === 'ringing') {
+    timerState = 'idle';
+    const display = document.getElementById('timer-display');
+    if (display) display.classList.remove('ringing');
+  }
+}
+
+function playTimerRing() {
+  const c = getCtx();
+  // かわいいベル音: 高音のサイン波を2音
+  [{f:1047,t:0},{f:1319,t:.08},{f:1047,t:.18},{f:880,t:.26}]
+    .forEach(({f,t}) => tone('sine', f, .18, c.currentTime+t, .14));
+  tone('triangle', 2093, .06, c.currentTime+.05, .2);
+}
 
 
 // ══════════════════════════════
