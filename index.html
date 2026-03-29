@@ -1774,44 +1774,62 @@ function switchGame(name) {
 // ══════════════════════════════
 let gameInited = false;
 let gAnimId = null;
-let gState = 'idle'; // idle|playing|paused|gameover|clear
+let gState = 'idle';
 let gPaused = false;
 
-// キャンバスサイズ: iPadでも縦を大きく
-const GW = 360, GH = 560;
+// キャンバスサイズ
+const GW = 360, GH = 640;  // 縦30%増 560→640（本来+168だが上限を640に）
 
-let gPx, gBx, gBy, gBvx, gBvy, gLives, gScore, gHi, gBricks;
+let gPx, gLives, gScore, gHi, gBricks;
 
-// ブロック: 30%小さく（元36x14→25x10）、列数増加
+// マルチボール配列 { x, y, vx, vy }
+let gBalls = [];
+
+// 落下アイテム配列 { x, y, type, vy }
+let gItems = [];
+
+// レーザー配列 { x, y, vy }
+let gLasers = [];
+
+// アクティブパワーアップ
+let gPowerUps = { multiball: 0, laser: 0, wide: 0 };  // 残りフレーム数
+let gLaserCooldown = 0;
+
+// ブロック: 30%小さく、行数も30%増 7→9行
 const BRICK_W = 25, BRICK_H = 10, BRICK_PAD = 3;
-const BRICK_COLS = 11, BRICK_ROWS = 7;
+const BRICK_COLS = 11, BRICK_ROWS = 9;
 const BRICK_OX = (GW - (BRICK_COLS * (BRICK_W + BRICK_PAD) - BRICK_PAD)) / 2;
 const BRICK_OY = 50;
 
 const PAD_H = 10, PAD_Y = GH - 28;
 const BALL_R = 6;
 
-// 難易度設定
+// 難易度
 const DIFF_SETTINGS = {
-  easy:   { padW: 72, speed: 3.5, label: 'やさしい' },
-  normal: { padW: 55, speed: 5.0, label: 'ふつう' },
-  hard:   { padW: 38, speed: 6.5, label: 'むずかしい' },
+  easy:   { padW: 72, speed: 3.5 },
+  normal: { padW: 55, speed: 5.0 },
+  hard:   { padW: 38, speed: 6.5 },
 };
 let gDiff = 'easy';
 
+// アイテム種類
+const ITEM_TYPES = [
+  { type: 'multiball', color: '#ff9de2', icon: '⚽×2', label: 'マルチボール' },
+  { type: 'laser',     color: '#ff4757', icon: '⚡',   label: 'レーザー' },
+  { type: 'wide',      color: '#2ed573', icon: '↔',    label: 'パドル拡大' },
+  { type: 'life',      color: '#ffa502', icon: '❤',    label: '+1ライフ' },
+  { type: 'bomb',      color: '#eccc68', icon: '💣',   label: '爆弾' },
+];
+
 function setDifficulty(d) {
   gDiff = d;
-  ['easy','normal','hard'].forEach(k => {
-    document.getElementById('diff-' + k).classList.toggle('active', k === d);
-  });
-  // プレイ中でなければ何もしない（次ゲームから適用）
+  ['easy','normal','hard'].forEach(k =>
+    document.getElementById('diff-' + k).classList.toggle('active', k === d));
 }
-
 function getDiff() { return DIFF_SETTINGS[gDiff]; }
 
 function initGameCanvas() {
   if (gameInited) {
-    // 解像度のみ再適用
     const canvas = document.getElementById('game-canvas');
     canvas.width = GW; canvas.height = GH;
     return;
@@ -1826,24 +1844,27 @@ function initGameCanvas() {
 
 function gameStart() {
   const diff = getDiff();
-  const overlay = document.getElementById('game-overlay');
-  overlay.classList.add('hidden');
+  document.getElementById('game-overlay').classList.add('hidden');
   gPaused = false;
   document.getElementById('pause-btn').textContent = '⏸ 一時停止';
   document.getElementById('pause-btn').classList.remove('paused');
 
   gPx = GW / 2;
-  gBx = GW / 2; gBy = GH - 80;
-  gBvx = (Math.random() > 0.5 ? 1 : -1) * diff.speed * 0.7;
-  gBvy = -diff.speed;
+  gBalls = [{ x: GW/2, y: GH-80, vx: (Math.random()>.5?1:-1)*diff.speed*.7, vy: -diff.speed }];
+  gItems = [];
+  gLasers = [];
+  gPowerUps = { multiball: 0, laser: 0, wide: 0 };
+  gLaserCooldown = 0;
   gLives = 3; gScore = 0;
 
-  // ブロック生成（難易度hardはHP2のブロック追加）
   gBricks = [];
   for (let r = 0; r < BRICK_ROWS; r++) {
     for (let c = 0; c < BRICK_COLS; c++) {
-      const hp = (gDiff === 'hard' && r < 2) ? 2 : 1;
-      gBricks.push({ r, c, hp, maxHp: hp });
+      const hp = (gDiff === 'hard' && r < 3) ? 2 : 1;
+      // アイテム入りブロック（約20%）
+      const hasItem = Math.random() < 0.20;
+      const itemType = hasItem ? ITEM_TYPES[Math.floor(Math.random() * ITEM_TYPES.length)].type : null;
+      gBricks.push({ r, c, hp, maxHp: hp, itemType });
     }
   }
   updateGameUI();
@@ -1857,42 +1878,48 @@ function togglePause() {
   if (gState !== 'playing' && gState !== 'paused') return;
   if (gState === 'playing') {
     gState = 'paused';
-    gPaused = true;
-    cancelAnimationFrame(gAnimId);
-    gAnimId = null;
+    cancelAnimationFrame(gAnimId); gAnimId = null;
     document.getElementById('pause-btn').textContent = '▶ つづける';
     document.getElementById('pause-btn').classList.add('paused');
-    // 一時停止画面を描画
-    const canvas = document.getElementById('game-canvas');
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = 'rgba(0,0,30,0.6)';
-    ctx.fillRect(0, 0, GW, GH);
+    const ctx = document.getElementById('game-canvas').getContext('2d');
+    ctx.fillStyle = 'rgba(0,0,30,.65)';
+    ctx.fillRect(0,0,GW,GH);
     ctx.fillStyle = '#fff';
-    ctx.font = 'bold 28px "Noto Sans JP"';
+    ctx.font = 'bold 26px "Noto Sans JP"';
     ctx.textAlign = 'center';
-    ctx.fillText('⏸ 一時停止', GW / 2, GH / 2);
+    ctx.fillText('⏸ 一時停止', GW/2, GH/2);
+    ctx.font = '14px "Noto Sans JP"';
+    ctx.fillStyle = '#c8a0e8';
+    ctx.fillText('もう一度タップでつづける', GW/2, GH/2+30);
   } else {
     gState = 'playing';
-    gPaused = false;
     document.getElementById('pause-btn').textContent = '⏸ 一時停止';
     document.getElementById('pause-btn').classList.remove('paused');
     gameLoop();
   }
 }
 
+function fireLaser() {
+  if (gLaserCooldown > 0 || gPowerUps.laser <= 0) return;
+  const padW = getDiff().padW * (gPowerUps.wide > 0 ? 1.5 : 1);
+  gLasers.push({ x: gPx - padW/2 + 6, y: PAD_Y - 4, vy: -12 });
+  gLasers.push({ x: gPx + padW/2 - 6, y: PAD_Y - 4, vy: -12 });
+  gLaserCooldown = 18;
+  tone('triangle', 880, .15, getCtx().currentTime, .1);
+}
+
 function setupControls() {
   const canvas = document.getElementById('game-canvas');
-  // マウス
   canvas.onmousemove = e => {
     if (gState !== 'playing') return;
     const rect = canvas.getBoundingClientRect();
     gPx = (e.clientX - rect.left) * (GW / rect.width);
+    clampPaddle();
   };
-  // タッチスライド（自然なパドル追従）
-  let touchStartX = null;
-  let touchStartPx = null;
+  let touchStartX = null, touchStartPx = null;
   canvas.ontouchstart = e => {
     e.preventDefault();
+    if (gState === 'paused') { togglePause(); return; }
     touchStartX = e.touches[0].clientX;
     touchStartPx = gPx;
   };
@@ -1900,18 +1927,34 @@ function setupControls() {
     e.preventDefault();
     if (gState !== 'playing' || touchStartX === null) return;
     const rect = canvas.getBoundingClientRect();
-    const scale = GW / rect.width;
-    const dx = (e.touches[0].clientX - touchStartX) * scale;
-    const diff = getDiff();
-    gPx = Math.max(diff.padW / 2, Math.min(GW - diff.padW / 2, touchStartPx + dx));
+    const dx = (e.touches[0].clientX - touchStartX) * (GW / rect.width);
+    gPx = touchStartPx + dx;
+    clampPaddle();
   };
-  canvas.ontouchend = () => { touchStartX = null; };
-  // キーボード
+  canvas.ontouchend = e => {
+    touchStartX = null;
+    // ダブルタップでレーザー発射
+    if (gPowerUps.laser > 0) fireLaser();
+  };
+  canvas.onclick = e => {
+    if (gState === 'paused') { togglePause(); return; }
+    if (gPowerUps.laser > 0) fireLaser();
+  };
   document.onkeydown = e => {
-    if (e.key === 'ArrowLeft')  { gPx = Math.max(getDiff().padW / 2, gPx - 18); }
-    if (e.key === 'ArrowRight') { gPx = Math.min(GW - getDiff().padW / 2, gPx + 18); }
-    if (e.key === ' ' || e.key === 'Escape') togglePause();
+    if (e.key === 'ArrowLeft')  { gPx -= 18; clampPaddle(); }
+    if (e.key === 'ArrowRight') { gPx += 18; clampPaddle(); }
+    if (e.key === ' ')   { if (gPowerUps.laser > 0) fireLaser(); else togglePause(); }
+    if (e.key === 'Escape') togglePause();
   };
+}
+
+function clampPaddle() {
+  const padW = getPadW();
+  gPx = Math.max(padW/2, Math.min(GW - padW/2, gPx));
+}
+
+function getPadW() {
+  return getDiff().padW * (gPowerUps.wide > 0 ? 1.5 : 1);
 }
 
 function updateGameUI() {
@@ -1923,7 +1966,7 @@ function updateGameUI() {
 const BRICK_COLORS = [
   ['#ff6b9d','#ff85b3'], ['#c97ef7','#d89af8'], ['#74b9ff','#90c8ff'],
   ['#fdcb6e','#fdd98a'], ['#7ee8c8','#a0f0d8'], ['#fd79a8','#e84393'],
-  ['#a29bfe','#6c5ce7'],
+  ['#a29bfe','#6c5ce7'], ['#55efc4','#00b894'], ['#ffeaa7','#fdcb6e'],
 ];
 
 function gameLoop() {
@@ -1931,140 +1974,281 @@ function gameLoop() {
   const canvas = document.getElementById('game-canvas');
   const ctx = canvas.getContext('2d');
   const diff = getDiff();
-  const padW = diff.padW;
+  const padW = getPadW();
 
-  // 背景
+  // デクリメント
+  if (gPowerUps.multiball > 0) gPowerUps.multiball--;
+  if (gPowerUps.laser > 0) gPowerUps.laser--;
+  if (gPowerUps.wide > 0) gPowerUps.wide--;
+  if (gLaserCooldown > 0) gLaserCooldown--;
+
+  // ── 背景 ──
   ctx.fillStyle = '#1a0030';
   ctx.fillRect(0, 0, GW, GH);
-
-  // グリッド風装飾
   ctx.strokeStyle = 'rgba(255,255,255,.03)';
   ctx.lineWidth = 1;
-  for (let x = 0; x < GW; x += 20) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,GH); ctx.stroke(); }
-  for (let y = 0; y < GH; y += 20) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(GW,y); ctx.stroke(); }
+  for (let x=0;x<GW;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,GH);ctx.stroke();}
+  for (let y=0;y<GH;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(GW,y);ctx.stroke();}
 
-  // ブリック
+  // ── パワーアップ状態表示 ──
+  let puX = 4;
+  const puItems = [];
+  if (gPowerUps.multiball > 0) puItems.push({ icon:'⚽', frames: gPowerUps.multiball, color:'#ff9de2' });
+  if (gPowerUps.laser > 0)     puItems.push({ icon:'⚡', frames: gPowerUps.laser,     color:'#ff4757' });
+  if (gPowerUps.wide > 0)      puItems.push({ icon:'↔',  frames: gPowerUps.wide,      color:'#2ed573' });
+  puItems.forEach(pu => {
+    ctx.fillStyle = pu.color;
+    ctx.globalAlpha = 0.85;
+    ctx.font = 'bold 11px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(pu.icon + ' ' + Math.ceil(pu.frames/60) + 's', puX, GH - 6);
+    puX += 60;
+  });
+  ctx.globalAlpha = 1;
+
+  // ── ブリック ──
   gBricks.forEach(b => {
     if (b.hp <= 0) return;
     const x = BRICK_OX + b.c * (BRICK_W + BRICK_PAD);
     const y = BRICK_OY + b.r * (BRICK_H + BRICK_PAD);
     const [c1, c2] = BRICK_COLORS[b.r % BRICK_COLORS.length];
-    const alpha = b.maxHp > 1 ? (0.5 + 0.5 * b.hp / b.maxHp) : 1;
-    ctx.globalAlpha = alpha;
-    const g2 = ctx.createLinearGradient(x, y, x, y + BRICK_H);
+    ctx.globalAlpha = b.maxHp > 1 ? (0.5 + 0.5 * b.hp / b.maxHp) : 1;
+    const g2 = ctx.createLinearGradient(x, y, x, y+BRICK_H);
     g2.addColorStop(0, c1); g2.addColorStop(1, c2);
     ctx.fillStyle = g2;
     ctx.beginPath(); ctx.roundRect(x, y, BRICK_W, BRICK_H, 3); ctx.fill();
-    // HP2ブロックはクラック表示
+    // クラック
     if (b.maxHp > 1 && b.hp === 1) {
-      ctx.globalAlpha = 0.5;
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(x + BRICK_W * 0.3, y + 2);
-      ctx.lineTo(x + BRICK_W * 0.6, y + BRICK_H - 2);
-      ctx.stroke();
+      ctx.globalAlpha = 0.5; ctx.strokeStyle='#fff'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(x+BRICK_W*.3,y+2); ctx.lineTo(x+BRICK_W*.6,y+BRICK_H-2); ctx.stroke();
+    }
+    // アイテム入り光る枠
+    if (b.itemType) {
+      ctx.globalAlpha = 0.6 + 0.4*Math.sin(Date.now()/200);
+      ctx.strokeStyle = '#ffe066'; ctx.lineWidth = 1.5;
+      ctx.strokeRect(x+0.5, y+0.5, BRICK_W-1, BRICK_H-1);
     }
     ctx.globalAlpha = 1;
   });
 
-  // パドル
-  const pg = ctx.createLinearGradient(gPx - padW / 2, PAD_Y, gPx + padW / 2, PAD_Y);
-  pg.addColorStop(0, '#ff7eb3'); pg.addColorStop(1, '#c97ef7');
+  // ── 落下アイテム ──
+  gItems = gItems.filter(it => it.y < GH + 20);
+  gItems.forEach(it => {
+    it.y += it.vy;
+    const itData = ITEM_TYPES.find(t => t.type === it.type);
+    ctx.fillStyle = itData.color;
+    ctx.globalAlpha = 0.92;
+    ctx.beginPath(); ctx.roundRect(it.x - 14, it.y - 9, 28, 18, 5); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 10px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(itData.icon, it.x, it.y);
+    ctx.globalAlpha = 1;
+    // パドルとの当たり
+    if (it.y + 9 >= PAD_Y && it.y - 9 <= PAD_Y + PAD_H &&
+        it.x >= gPx - padW/2 - 14 && it.x <= gPx + padW/2 + 14) {
+      applyItem(it.type);
+      it.y = GH + 99; // 消去
+    }
+  });
+
+  // ── レーザー ──
+  gLasers = gLasers.filter(l => l.y > -10);
+  gLasers.forEach(l => {
+    l.y += l.vy;
+    ctx.strokeStyle = '#ff4757';
+    ctx.lineWidth = 3;
+    ctx.globalAlpha = 0.9;
+    ctx.shadowColor = '#ff4757'; ctx.shadowBlur = 8;
+    ctx.beginPath(); ctx.moveTo(l.x, l.y); ctx.lineTo(l.x, l.y + 18); ctx.stroke();
+    ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+    // レーザーとブリックの当たり
+    for (let b of gBricks) {
+      if (b.hp <= 0) continue;
+      const bx = BRICK_OX + b.c*(BRICK_W+BRICK_PAD);
+      const by = BRICK_OY + b.r*(BRICK_H+BRICK_PAD);
+      if (l.x >= bx && l.x <= bx+BRICK_W && l.y >= by && l.y <= by+BRICK_H) {
+        // レーザーはその列を全部まとめて貫通
+        const col = b.c;
+        gBricks.forEach(bb => {
+          if (bb.c === col && bb.hp > 0) {
+            const pts = bb.maxHp > 1 ? 20 : 10;
+            gScore += pts;
+            if (bb.itemType) spawnItem(bb);
+            bb.hp = 0;
+          }
+        });
+        if (gScore > gHi) { gHi = gScore; localStorage.setItem('arkanoid_hi', gHi); }
+        updateGameUI();
+        tone('triangle', 880, .18, getCtx().currentTime, .08);
+        l.y = -99; // レーザー消去
+        break;
+      }
+    }
+  });
+
+  // ── パドル ──
+  const padColor1 = gPowerUps.wide > 0 ? '#2ed573' : '#ff7eb3';
+  const padColor2 = gPowerUps.wide > 0 ? '#00b894' : '#c97ef7';
+  const pg = ctx.createLinearGradient(gPx-padW/2, PAD_Y, gPx+padW/2, PAD_Y);
+  pg.addColorStop(0, padColor1); pg.addColorStop(1, padColor2);
   ctx.fillStyle = pg;
-  ctx.beginPath(); ctx.roundRect(gPx - padW / 2, PAD_Y, padW, PAD_H, 6); ctx.fill();
-  // パドル光沢
+  ctx.beginPath(); ctx.roundRect(gPx-padW/2, PAD_Y, padW, PAD_H, 6); ctx.fill();
   ctx.fillStyle = 'rgba(255,255,255,.3)';
-  ctx.beginPath(); ctx.roundRect(gPx - padW / 2 + 4, PAD_Y + 1, padW - 8, 3, 2); ctx.fill();
-
-  // ボール
-  ctx.beginPath(); ctx.arc(gBx, gBy, BALL_R, 0, Math.PI * 2);
-  const bg = ctx.createRadialGradient(gBx - 2, gBy - 2, 1, gBx, gBy, BALL_R);
-  bg.addColorStop(0, '#fff'); bg.addColorStop(1, '#ffb3d1');
-  ctx.fillStyle = bg; ctx.fill();
-  // ボール残像
-  ctx.globalAlpha = 0.15;
-  ctx.beginPath(); ctx.arc(gBx - gBvx * 2, gBy - gBvy * 2, BALL_R, 0, Math.PI * 2);
-  ctx.fillStyle = '#ffb3d1'; ctx.fill();
-  ctx.globalAlpha = 1;
-
-  // 移動
-  gBx += gBvx; gBy += gBvy;
-
-  // 壁反射
-  if (gBx - BALL_R < 0) { gBx = BALL_R; gBvx = Math.abs(gBvx); }
-  if (gBx + BALL_R > GW) { gBx = GW - BALL_R; gBvx = -Math.abs(gBvx); }
-  if (gBy - BALL_R < 0) { gBy = BALL_R; gBvy = Math.abs(gBvy); }
-
-  // パドル当たり
-  if (gBy + BALL_R >= PAD_Y && gBy + BALL_R <= PAD_Y + PAD_H + Math.abs(gBvy) &&
-      gBx >= gPx - padW / 2 && gBx <= gPx + padW / 2) {
-    gBy = PAD_Y - BALL_R;
-    const rel = (gBx - (gPx - padW / 2)) / padW - 0.5;
-    const spd = diff.speed;
-    gBvx = rel * spd * 2.2;
-    gBvy = -Math.sqrt(spd * spd - gBvx * gBvx) || -spd;
-    if (Math.abs(gBvy) < spd * 0.4) gBvy = -spd * 0.4;
-    tone('sine', 440, .2, getCtx().currentTime, .06);
+  ctx.beginPath(); ctx.roundRect(gPx-padW/2+4, PAD_Y+1, padW-8, 3, 2); ctx.fill();
+  // レーザー砲台
+  if (gPowerUps.laser > 0) {
+    ctx.fillStyle = '#ff4757';
+    ctx.globalAlpha = 0.8 + 0.2*Math.sin(Date.now()/100);
+    ctx.beginPath(); ctx.rect(gPx-padW/2, PAD_Y-4, 5, 6); ctx.fill();
+    ctx.beginPath(); ctx.rect(gPx+padW/2-5, PAD_Y-4, 5, 6); ctx.fill();
+    ctx.globalAlpha = 1;
   }
 
-  // ブリック当たり
-  for (let b of gBricks) {
-    if (b.hp <= 0) continue;
-    const bx = BRICK_OX + b.c * (BRICK_W + BRICK_PAD);
-    const by = BRICK_OY + b.r * (BRICK_H + BRICK_PAD);
-    if (gBx + BALL_R > bx && gBx - BALL_R < bx + BRICK_W &&
-        gBy + BALL_R > by && gBy - BALL_R < by + BRICK_H) {
-      b.hp--;
-      const pts = b.maxHp > 1 ? 20 : 10;
-      gScore += pts;
-      if (gScore > gHi) { gHi = gScore; localStorage.setItem('arkanoid_hi', gHi); }
+  // ── ボール ──
+  gBalls.forEach(b => {
+    // 残像
+    ctx.globalAlpha = 0.15;
+    ctx.beginPath(); ctx.arc(b.x-b.vx*2, b.y-b.vy*2, BALL_R, 0, Math.PI*2);
+    ctx.fillStyle = '#ffb3d1'; ctx.fill();
+    ctx.globalAlpha = 1;
+    // 本体
+    ctx.beginPath(); ctx.arc(b.x, b.y, BALL_R, 0, Math.PI*2);
+    const bg = ctx.createRadialGradient(b.x-2, b.y-2, 1, b.x, b.y, BALL_R);
+    bg.addColorStop(0, '#fff'); bg.addColorStop(1, '#ffb3d1');
+    ctx.fillStyle = bg; ctx.fill();
+  });
+
+  // ── ボール物理更新 ──
+  const ballsToRemove = [];
+  gBalls.forEach((b, bi) => {
+    b.x += b.vx; b.y += b.vy;
+    // 壁
+    if (b.x-BALL_R<0){b.x=BALL_R;b.vx=Math.abs(b.vx);}
+    if (b.x+BALL_R>GW){b.x=GW-BALL_R;b.vx=-Math.abs(b.vx);}
+    if (b.y-BALL_R<0){b.y=BALL_R;b.vy=Math.abs(b.vy);}
+    // パドル
+    if (b.y+BALL_R>=PAD_Y && b.y+BALL_R<=PAD_Y+PAD_H+Math.abs(b.vy) &&
+        b.x>=gPx-padW/2 && b.x<=gPx+padW/2) {
+      b.y = PAD_Y-BALL_R;
+      const rel = (b.x-(gPx-padW/2))/padW - 0.5;
+      const spd = diff.speed;
+      b.vx = rel*spd*2.2;
+      b.vy = -Math.sqrt(Math.max(spd*spd - b.vx*b.vx, spd*spd*0.16));
+      tone('sine', 440, .2, getCtx().currentTime, .06);
+    }
+    // ブリック
+    for (let br of gBricks) {
+      if (br.hp<=0) continue;
+      const bx=BRICK_OX+br.c*(BRICK_W+BRICK_PAD);
+      const by=BRICK_OY+br.r*(BRICK_H+BRICK_PAD);
+      if (b.x+BALL_R>bx&&b.x-BALL_R<bx+BRICK_W&&b.y+BALL_R>by&&b.y-BALL_R<by+BRICK_H) {
+        br.hp--;
+        if (br.hp<=0 && br.itemType) spawnItem(br);
+        const pts = br.maxHp>1?20:10;
+        gScore+=pts;
+        if (gScore>gHi){gHi=gScore;localStorage.setItem('arkanoid_hi',gHi);}
+        updateGameUI();
+        tone('square',660+br.r*40,.12,getCtx().currentTime,.05);
+        const oL=b.x+BALL_R-bx,oR=bx+BRICK_W-(b.x-BALL_R);
+        const oT=b.y+BALL_R-by,oB=by+BRICK_H-(b.y-BALL_R);
+        const minO=Math.min(oL,oR,oT,oB);
+        if(minO===oL||minO===oR) b.vx=-b.vx; else b.vy=-b.vy;
+        break;
+      }
+    }
+    // 落下
+    if (b.y-BALL_R > GH) ballsToRemove.push(bi);
+  });
+
+  // 落下ボール処理
+  if (ballsToRemove.length > 0) {
+    gBalls = gBalls.filter((_, i) => !ballsToRemove.includes(i));
+    if (gBalls.length === 0) {
+      gLives--;
       updateGameUI();
-      tone('square', 660 + b.r * 40, .12, getCtx().currentTime, .05);
-      const overlapL = gBx + BALL_R - bx;
-      const overlapR = bx + BRICK_W - (gBx - BALL_R);
-      const overlapT = gBy + BALL_R - by;
-      const overlapB = by + BRICK_H - (gBy - BALL_R);
-      const minO = Math.min(overlapL, overlapR, overlapT, overlapB);
-      if (minO === overlapL || minO === overlapR) gBvx = -gBvx;
-      else gBvy = -gBvy;
-      break;
+      tone('sawtooth', 180, .3, getCtx().currentTime, .4);
+      if (gLives <= 0) { gState='gameover'; showGameOver(); return; }
+      const spd = diff.speed;
+      gBalls = [{ x:gPx, y:PAD_Y-BALL_R-5,
+                  vx:(Math.random()>.5?1:-1)*spd*.7, vy:-spd }];
+      gPowerUps = { multiball:0, laser:0, wide:0 };
     }
   }
 
-  // 落下
-  if (gBy - BALL_R > GH) {
-    gLives--;
-    updateGameUI();
-    tone('sawtooth', 180, .3, getCtx().currentTime, .4);
-    if (gLives <= 0) { gState = 'gameover'; showGameOver(); return; }
-    gBx = gPx; gBy = PAD_Y - BALL_R - 5;
-    const spd = diff.speed;
-    gBvx = (Math.random() > 0.5 ? 1 : -1) * spd * 0.7;
-    gBvy = -spd;
-  }
-
-  // クリア
-  if (gBricks.every(b => b.hp <= 0)) { gState = 'clear'; showGameClear(); return; }
+  // クリア判定
+  if (gBricks.every(b=>b.hp<=0)){ gState='clear'; showGameClear(); return; }
 
   gAnimId = requestAnimationFrame(gameLoop);
 }
 
+function spawnItem(brick) {
+  const bx = BRICK_OX + brick.c*(BRICK_W+BRICK_PAD) + BRICK_W/2;
+  const by = BRICK_OY + brick.r*(BRICK_H+BRICK_PAD) + BRICK_H/2;
+  gItems.push({ x:bx, y:by, type:brick.itemType, vy:2.5 });
+}
+
+function applyItem(type) {
+  const FPS60_5SEC = 60*5;
+  const FPS60_8SEC = 60*8;
+  tone('triangle', 660, .2, getCtx().currentTime, .15);
+  launchConfetti(6);
+  switch(type) {
+    case 'multiball': {
+      gPowerUps.multiball = FPS60_5SEC;
+      // 現存ボール1個から追加ボール2個スポーン
+      const ref = gBalls[0];
+      const spd = getDiff().speed;
+      [-0.8, 0.8].forEach(angle => {
+        gBalls.push({ x:ref.x, y:ref.y,
+          vx: Math.cos(angle)*spd, vy: -Math.abs(Math.sin(angle)*spd)||(-spd) });
+      });
+      break;
+    }
+    case 'laser':
+      gPowerUps.laser = FPS60_8SEC;
+      break;
+    case 'wide':
+      gPowerUps.wide = FPS60_5SEC;
+      break;
+    case 'life':
+      gLives = Math.min(gLives+1, 5);
+      updateGameUI();
+      break;
+    case 'bomb': {
+      // ランダム列を1列まるごと破壊
+      const cols = [...new Set(gBricks.filter(b=>b.hp>0).map(b=>b.c))];
+      if (cols.length === 0) break;
+      const targetCol = cols[Math.floor(Math.random()*cols.length)];
+      gBricks.forEach(b => {
+        if (b.c===targetCol && b.hp>0) {
+          gScore += 15;
+          if (b.itemType) spawnItem(b);
+          b.hp = 0;
+        }
+      });
+      if (gScore > gHi) { gHi=gScore; localStorage.setItem('arkanoid_hi',gHi); }
+      updateGameUI();
+      tone('sawtooth', 200, .3, getCtx().currentTime, .3);
+      launchConfetti(15);
+      break;
+    }
+  }
+}
+
 function showGameOver() {
-  const overlay = document.getElementById('game-overlay');
-  overlay.classList.remove('hidden');
+  document.getElementById('game-overlay').classList.remove('hidden');
   document.getElementById('overlay-title').textContent = '💔 ゲームオーバー';
   document.getElementById('overlay-sub').textContent = 'スコア: ' + gScore;
   document.getElementById('overlay-btn').textContent = '▶ もう一度';
 }
 function showGameClear() {
   playAllClear(); launchConfetti(30);
-  const overlay = document.getElementById('game-overlay');
-  overlay.classList.remove('hidden');
+  document.getElementById('game-overlay').classList.remove('hidden');
   document.getElementById('overlay-title').textContent = '🎊 クリア！！';
   document.getElementById('overlay-sub').textContent = 'スコア: ' + gScore;
   document.getElementById('overlay-btn').textContent = '▶ もう一度';
 }
+
 
 // ══════════════════════════════
 // マージゲーム（2048風）
