@@ -372,6 +372,24 @@ color:var(--purple);
 .want-item.game-want.checked .want-check-badge{
 background:linear-gradient(135deg,var(--purple),#e040fb);
 }
+/* 読書専用スタイル */
+.want-item.book-want:not(.checked){
+background:linear-gradient(135deg,#fffbf0,#fff8e8);
+}
+.want-item.book-want:hover{
+border-color:#c8a050;
+box-shadow:0 4px 16px rgba(200,160,80,.25);
+}
+.want-item.book-want.checked{
+background:linear-gradient(135deg,#fff8e0,#ffefc0);
+border-color:#d4a020;
+}
+.want-item.book-want.checked .want-item-label{
+color:#a07000;
+}
+.want-item.book-want.checked .want-check-badge{
+background:linear-gradient(135deg,#e0a020,#ffcc40);
+}
 
 /* ═══ ゲームタブ ═══ */
 .game-card{padding:16px 14px!important;}
@@ -665,7 +683,7 @@ transition:all .2s;
       <div class="sp-single" id="sp-single">
         <div class="sp-label">
           <span class="sp-text" id="sp-text">📋 ミッション進捗</span>
-          <span class="sp-count" id="sp-count">0 / 9 完了</span>
+          <span class="sp-count" id="sp-count">0 / 8 完了</span>
         </div>
         <div class="sp-bar-bg"><div class="sp-bar-fill" id="sp-bar" style="width:0%"></div></div>
       </div>
@@ -673,7 +691,7 @@ transition:all .2s;
         <div class="sp-dual-item">
           <div class="sp-label">
             <span class="sp-text">📋 ミッション</span>
-            <span class="sp-count" id="sp-m-count">0 / 9 完了</span>
+            <span class="sp-count" id="sp-m-count">0 / 8 完了</span>
           </div>
           <div class="sp-bar-bg"><div class="sp-bar-fill" id="sp-m-bar" style="width:0%"></div></div>
         </div>
@@ -697,7 +715,7 @@ transition:all .2s;
         <div class="card">
           <div class="card-title">✨ きょうの <span>ミッション</span> ✨</div>
           <div class="card-progress" id="m-card-progress">
-            <div class="cp-label"><span class="cp-text">📋 ミッション進捗</span><span class="cp-count" id="m-cp-count">0 / 9 完了</span></div>
+            <div class="cp-label"><span class="cp-text">📋 ミッション進捗</span><span class="cp-count" id="m-cp-count">0 / 8 完了</span></div>
             <div class="cp-bar-bg"><div class="cp-bar-fill" id="m-cp-bar" style="width:0%"></div></div>
           </div>
           <div class="drum-wrap">
@@ -732,6 +750,12 @@ transition:all .2s;
                 <div class="want-check-badge">✓</div>
                 <div class="want-item-icon">🎮</div>
                 <div class="want-item-label">ゲーム</div>
+              </div>
+              <!-- 読書 -->
+              <div class="want-item book-want" id="want-book" onclick="toggleWant('book')">
+                <div class="want-check-badge">✓</div>
+                <div class="want-item-icon">📖</div>
+                <div class="want-item-label">読書</div>
               </div>
             </div>
           </div>
@@ -812,7 +836,7 @@ transition:all .2s;
             <div class="lock-progress-wrap">
               <div class="lock-prog-label">
                 <span>ミッション進捗</span>
-                <span id="lock-prog-text">0 / 9</span>
+                <span id="lock-prog-text">0 / 8</span>
               </div>
               <div class="lock-prog-bg"><div class="lock-prog-fill" id="lock-prog-fill" style="width:0%"></div></div>
             </div>
@@ -860,7 +884,16 @@ let audioCtx=null;
 function getCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
 function tone(type,freq,vol,start,dur){const c=getCtx(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(0,start);g.gain.linearRampToValueAtTime(vol,start+.02);g.gain.exponentialRampToValueAtTime(.001,start+dur);o.start(start);o.stop(start+dur+.01);}
 function playStart(){const c=getCtx();[440,550,660].forEach((f,i)=>tone('triangle',f,.18,c.currentTime+i*.07,.14));}
-function playRollTick(s){const c=getCtx(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='square';o.frequency.value=500+s*800;g.gain.setValueAtTime(.055,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.04);o.start(c.currentTime);o.stop(c.currentTime+.04);}
+function playRollTick(s){
+  // progressが低いときは音を間引いてゆっくり聞こえるように
+  if(Math.random()>0.3+s*0.5) return;
+  const c=getCtx(),o=c.createOscillator(),g=c.createGain();
+  o.connect(g);g.connect(c.destination);
+  o.type='square';o.frequency.value=300+s*500;
+  g.gain.setValueAtTime(.04,c.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.07);
+  o.start(c.currentTime);o.stop(c.currentTime+.07);
+}
 function playLand(){const c=getCtx(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(200,c.currentTime);o.frequency.exponentialRampToValueAtTime(60,c.currentTime+.3);g.gain.setValueAtTime(.45,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.35);o.start(c.currentTime);o.stop(c.currentTime+.4);}
 function playFanfare(){const c=getCtx();[{f:523,t:0},{f:659,t:.12},{f:784,t:.24},{f:1047,t:.36}].forEach(({f,t})=>tone('triangle',f,.2,c.currentTime+t,.2));}
 function playHabitCheck(){const c=getCtx();tone('sine',660,.15,c.currentTime,.1);tone('sine',880,.11,c.currentTime+.06,.1);}
@@ -879,13 +912,14 @@ const MISSION_ITEMS=[
   {label:'ピアノ',icon:'🎹'},{label:'日記',icon:'📔'},{label:'勉強',icon:'📚'},
   {label:'新体操',icon:'🎀'},{label:'チャレンジタッチ',icon:'📱'},
   {label:'ストレッチ',icon:'🤸'},{label:'Y字バランス10秒',icon:'⭐'},
-  {label:'タッチタイピング',icon:'⌨️'},{label:'読書',icon:'📖'},
+  {label:'タッチタイピング',icon:'⌨️'},
 ];
 
 // やりたいことアイテム（下部エリア）
 const WANT_ITEMS={
   ninja:{label:'忍者修行',icon:'🥷'},
   game: {label:'ゲーム',icon:'🎮'},
+  book: {label:'読書',icon:'📖'},
 };
 
 // 隠しミッション（ドラムには含まれない）
