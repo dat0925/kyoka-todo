@@ -1546,27 +1546,39 @@ const SUPABASE_URL = 'https://sfhtvtcmgueystyuhzvd.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmaHR2dGNtZ3VleXN0eXVoenZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3Nzg0MDYsImV4cCI6MjA5MDM1NDQwNn0.qsON2xYdDf22LtU-jGd96Ubaif0xzzswC9KnzWndKNw';
 
 async function sbUpsert(task_id, task_label, task_type, checked) {
-  // date + task_id のユニーク制約を利用してUPSERT
-  // Supabase REST: onConflict でUPDATE
+  const base = `${SUPABASE_URL}/rest/v1/task_logs`;
+  const headers = {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${SUPABASE_KEY}`,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=minimal',
+  };
   try {
-    const headers = {
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'resolution=merge-duplicates,return=minimal',
-    };
-    const body = JSON.stringify({
-      date: TODAY,
-      task_id,
-      task_label,
-      task_type,
-      checked,
-    });
-    // POST with on_conflict → INSERT or UPDATE
-    await fetch(
-      `${SUPABASE_URL}/rest/v1/task_logs?on_conflict=date,task_id`,
-      { method: 'POST', headers, body }
+    // まず既存レコードを確認
+    const checkRes = await fetch(
+      `${base}?date=eq.${TODAY}&task_id=eq.${encodeURIComponent(task_id)}&select=id`,
+      { headers }
     );
+    const existing = await checkRes.json();
+
+    if (existing && existing.length > 0) {
+      // 既存レコードあり → PATCH でcheckedを更新
+      await fetch(
+        `${base}?date=eq.${TODAY}&task_id=eq.${encodeURIComponent(task_id)}`,
+        {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify({ checked }),
+        }
+      );
+    } else {
+      // 新規 → POST でINSERT
+      await fetch(base, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ date: TODAY, task_id, task_label, task_type, checked }),
+      });
+    }
   } catch(e) {
     console.warn('Supabase sync failed:', e);
   }
