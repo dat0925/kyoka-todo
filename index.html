@@ -394,25 +394,48 @@ background:linear-gradient(135deg,#e0a020,#ffcc40);
 /* ═══ ゲームタブ ═══ */
 .game-card{padding:12px 10px!important;gap:8px!important;}
 /* ── ゲーム切替タブ ── */
-.game-tab-bar{display:flex;gap:4px;width:100%;}
+.game-tab-bar{display:flex;gap:6px;width:100%;}
 .game-tab-btn{
-  flex:1;padding:7px 4px;border-radius:10px;border:2px solid var(--pink2);
-  background:#fff5fb;color:#c097d0;font-family:"Noto Sans JP",sans-serif;
-  font-size:.68rem;font-weight:900;letter-spacing:.04em;cursor:pointer;
-  transition:all .18s;
+  flex:1;padding:10px 4px 8px;border-radius:14px;
+  border:2.5px solid #e8d8f8;
+  background:#fafafa;color:#b8a0cc;
+  font-family:"Noto Sans JP",sans-serif;
+  font-size:.62rem;font-weight:700;letter-spacing:.03em;
+  cursor:pointer;transition:all .2s cubic-bezier(.34,1.2,.64,1);
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  user-select:none;-webkit-tap-highlight-color:transparent;
 }
-.game-tab-btn.active{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border-color:transparent;}
-.game-tab-btn:hover:not(.active){background:#ffe8f5;border-color:var(--pink);}
+.game-tab-btn .gtab-icon{font-size:1.5rem;line-height:1;}
+.game-tab-btn .gtab-label{font-size:.62rem;font-weight:900;letter-spacing:.04em;}
+.game-tab-btn.active{
+  background:linear-gradient(160deg,#2d2d4e,#4a4a8a);
+  color:#fff;border-color:transparent;
+  box-shadow:0 4px 16px rgba(74,74,138,.35);
+  transform:translateY(-2px);
+}
+.game-tab-btn.active .gtab-icon{filter:drop-shadow(0 0 6px rgba(255,255,255,.5));}
+.game-tab-btn:hover:not(.active){
+  background:#f0e8ff;border-color:var(--purple);color:var(--purple);
+  transform:translateY(-1px);
+}
 /* ── 難易度 ── */
-.difficulty-row{display:flex;align-items:center;gap:5px;width:100%;}
-.diff-label{font-size:.68rem;color:#c097d0;font-weight:700;white-space:nowrap;}
+.difficulty-row{display:flex;gap:6px;width:100%;}
 .diff-btn{
-  flex:1;padding:5px 4px;border-radius:9px;
-  border:2px solid var(--pink2);background:#fff5fb;
-  color:#c097d0;font-family:"Noto Sans JP",sans-serif;
-  font-size:.68rem;font-weight:900;cursor:pointer;transition:all .15s;
+  flex:1;padding:8px 4px 6px;border-radius:12px;
+  border:2.5px solid #e8e8f0;background:#fafafa;
+  font-family:"Noto Sans JP",sans-serif;
+  cursor:pointer;transition:all .2s cubic-bezier(.34,1.2,.64,1);
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  user-select:none;-webkit-tap-highlight-color:transparent;
 }
-.diff-btn.active{background:linear-gradient(135deg,#fdcb6e,#e17055);color:#fff;border-color:transparent;}
+.diff-btn .diff-stars{font-size:.9rem;letter-spacing:1px;}
+.diff-btn .diff-name{font-size:.62rem;font-weight:900;color:#aaa;letter-spacing:.05em;}
+.diff-btn.active .diff-name{color:#fff;}
+.diff-btn:nth-child(1).active{background:linear-gradient(135deg,#55efc4,#00b894);border-color:transparent;box-shadow:0 3px 12px rgba(0,184,148,.3);}
+.diff-btn:nth-child(2).active{background:linear-gradient(135deg,#fdcb6e,#e17055);border-color:transparent;box-shadow:0 3px 12px rgba(225,112,85,.3);}
+.diff-btn:nth-child(3).active{background:linear-gradient(135deg,#fd79a8,#e84393);border-color:transparent;box-shadow:0 3px 12px rgba(232,67,147,.3);}
+.diff-btn:hover:not(.active){background:#f8f0ff;border-color:var(--purple);}
+.diff-btn.active{transform:translateY(-2px);}
 /* ── 一時停止ボタン ── */
 .game-ctrl-row{display:flex;align-items:center;justify-content:space-between;width:100%;}
 .pause-btn{
@@ -907,9 +930,18 @@ transition:all .2s;
         <div class="card game-card" id="game-main-card" style="display:none">
           <!-- ゲーム切替タブ -->
           <div class="game-tab-bar">
-            <button class="game-tab-btn active" id="gtab-arkanoid" onclick="switchGame('arkanoid')">🧱 アルカノイド</button>
-            <button class="game-tab-btn" id="gtab-merge" onclick="switchGame('merge')">🔢 マージ</button>
-            <button class="game-tab-btn" id="gtab-slide" onclick="switchGame('slide')">🧩 スライド</button>
+            <button class="game-tab-btn active" id="gtab-arkanoid" onclick="switchGame('arkanoid')">
+              <span class="gtab-icon">🧱</span>
+              <span class="gtab-label">アルカノイド</span>
+            </button>
+            <button class="game-tab-btn" id="gtab-merge" onclick="switchGame('merge')">
+              <span class="gtab-icon">🔢</span>
+              <span class="gtab-label">マージ2048</span>
+            </button>
+            <button class="game-tab-btn" id="gtab-slide" onclick="switchGame('slide')">
+              <span class="gtab-icon">🧩</span>
+              <span class="gtab-label">スライドパズル</span>
+            </button>
           </div>
 
           <!-- アルカノイド -->
@@ -920,10 +952,18 @@ transition:all .2s;
               <div class="game-stat">残機 <span id="g-lives">❤️❤️❤️</span></div>
             </div>
             <div class="difficulty-row">
-              <span class="diff-label">難易度：</span>
-              <button class="diff-btn active" id="diff-easy" onclick="setDifficulty('easy')">やさしい</button>
-              <button class="diff-btn" id="diff-normal" onclick="setDifficulty('normal')">ふつう</button>
-              <button class="diff-btn" id="diff-hard" onclick="setDifficulty('hard')">むずかしい</button>
+              <button class="diff-btn active" id="diff-easy" onclick="setDifficulty('easy')">
+                <span class="diff-stars">⭐</span>
+                <span class="diff-name">やさしい</span>
+              </button>
+              <button class="diff-btn" id="diff-normal" onclick="setDifficulty('normal')">
+                <span class="diff-stars">⭐⭐</span>
+                <span class="diff-name">ふつう</span>
+              </button>
+              <button class="diff-btn" id="diff-hard" onclick="setDifficulty('hard')">
+                <span class="diff-stars">⭐⭐⭐</span>
+                <span class="diff-name">むずかしい</span>
+              </button>
             </div>
             <div class="game-wrap">
               <canvas id="game-canvas"></canvas>
