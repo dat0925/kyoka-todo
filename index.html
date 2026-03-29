@@ -1707,6 +1707,12 @@ function playAllClear(){const c=getCtx();[{f:523,t:0},{f:659,t:.13},{f:784,t:.26
 function playHabitAllClear(){const c=getCtx();[523,659,784,880,1047].forEach((f,i)=>tone('triangle',f,.22,c.currentTime+i*.1,.22));}
 function playBulk(n){const c=getCtx();for(let i=0;i<Math.min(n,6);i++)tone('sine',660+i*80,.12,c.currentTime+i*.07,.11);}
 function playNinjaCheck(){const c=getCtx();[300,200,440,660].forEach((f,i)=>tone('square',f,.1,c.currentTime+i*.06,.12));}
+function playTimerPreset(){const c=getCtx();tone('triangle',880,.12,c.currentTime,.07);tone('triangle',1100,.08,c.currentTime+.05,.07);}
+function playTimerStart(){const c=getCtx();[440,550,660].forEach((f,i)=>tone('sine',f,.14,c.currentTime+i*.06,.14));}
+function playTimerPause(){const c=getCtx();tone('sine',440,.12,c.currentTime,.1);tone('sine',330,.09,c.currentTime+.09,.12);}
+function playTimerReset2(){const c=getCtx();[440,330,220].forEach((f,i)=>tone('sine',f,.1,c.currentTime+i*.06,.1));}
+function playResetSoft(){const c=getCtx();tone('sine',330,.1,c.currentTime,.1);tone('sine',220,.08,c.currentTime+.08,.12);}
+function playResetAll(){const c=getCtx();[300,250,200].forEach((f,i)=>tone('square',f,.1,c.currentTime+i*.07,.12));}
 
 // ══════════════════════════════
 // データ
@@ -2287,6 +2293,7 @@ function updateProgress(){
 // ══════════════════════════════
 function resetMission(){
   if(!confirm('ミッションをリセットしてもいい？'))return;
+  playResetSoft();
   mChecked=[];mRolls=0;
   saveJSON(`m_checked_${TODAY}`,[]);
   localStorage.setItem(`m_rolls_${TODAY}`,'0');
@@ -2307,6 +2314,7 @@ function resetMission(){
 }
 function resetHabit(){
   if(!confirm('習慣チェックをリセットしてもいい？'))return;
+  playResetSoft();
   hChecked=[];
   saveJSON(`h_checked_${TODAY}`,[]);
   document.querySelectorAll('.habit-item.checked').forEach(el=>el.classList.remove('checked'));
@@ -2316,6 +2324,7 @@ function resetHabit(){
 }
 function resetAll(){
   if(!confirm('全部リセットしてもいい？'))return;
+  playResetAll();
   resetMission();
   hChecked=[];
   saveJSON(`h_checked_${TODAY}`,[]);
@@ -3406,7 +3415,7 @@ let timerRingInterval = null;
 function timerPresetSec(sec) {
   timerSeconds += sec;
   timerTotal += sec;
-  // ボタンを一瞬光らせる
+  playTimerPreset();
   const idMap = {10:'tp-s10', 60:'tp-1', 600:'tp-10', 900:'tp-15'};
   const btn = document.getElementById(idMap[sec]);
   if (btn) {
@@ -3424,6 +3433,7 @@ function timerStart() {
   if (timerSeconds <= 0 && timerTotal <= 0) return;
   if (timerState === 'idle' || timerState === 'paused') {
     timerState = 'running';
+    playTimerStart();
     timerUpdateStartBtn(true);
     timerSetSegClass('running');
     timerInterval = setInterval(() => {
@@ -3442,6 +3452,7 @@ function timerStart() {
 function timerPause() {
   timerStopRing();
   if (timerState === 'running') {
+    playTimerPause();
     clearInterval(timerInterval);
     timerInterval = null;
     timerState = 'paused';
@@ -3452,6 +3463,7 @@ function timerPause() {
 
 function timerReset() {
   timerStopRing();
+  playTimerReset2();
   clearInterval(timerInterval);
   timerInterval = null;
   timerState = 'idle';
