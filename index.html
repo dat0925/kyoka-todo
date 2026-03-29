@@ -810,10 +810,58 @@ transition:all .2s;
 .external-links{
   display:flex;gap:6px;
   width:min(440px,92vw);
-  margin:14px auto 0;
+  margin:0 auto;
   padding:0 0 8px;
 }
 @media(min-width:768px){.external-links{width:100%;}}
+/* ── カード外アコーディオンエリア ── */
+.card-outer-panel{
+  width:min(440px,92vw);
+  margin:0 auto;
+}
+@media(min-width:768px){.card-outer-panel{width:100%;}}
+.card-outer-toggle{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 14px;
+  background:rgba(255,255,255,.55);
+  border:1.5px solid #e8d8f0;
+  border-radius:12px;
+  cursor:pointer;
+  font-family:'Noto Sans JP',sans-serif;
+  font-size:.7rem;font-weight:900;color:#b090c8;
+  letter-spacing:.06em;
+  margin-top:12px;
+  transition:all .18s;
+  user-select:none;-webkit-tap-highlight-color:transparent;
+}
+.card-outer-toggle:hover{background:rgba(255,255,255,.85);border-color:var(--purple);color:var(--purple);}
+.card-outer-toggle.open{
+  border-radius:12px 12px 0 0;
+  border-bottom-color:transparent;
+  background:rgba(255,255,255,.85);
+}
+.card-outer-toggle .cot-chevron{
+  font-size:.75rem;transition:transform .25s;display:inline-block;
+}
+.card-outer-toggle.open .cot-chevron{transform:rotate(180deg);}
+.card-outer-body{
+  overflow:hidden;max-height:0;opacity:0;
+  transition:max-height .3s cubic-bezier(.4,0,.2,1),opacity .25s;
+  background:rgba(255,255,255,.85);
+  border:1.5px solid #e8d8f0;border-top:none;
+  border-radius:0 0 12px 12px;
+}
+.card-outer-body.open{max-height:300px;opacity:1;}
+.card-outer-inner{
+  padding:10px 12px 12px;
+  display:flex;flex-direction:column;gap:8px;
+}
+/* リセットボタン行（アコーディオン内） */
+.reset-row{
+  display:flex;gap:6px;width:100%;
+}
+.reset-row .reset-btn{flex:1;}
+.reset-row .all-reset-btn{flex:1;}
 .ext-link-btn{
   flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
   padding:9px 8px;border-radius:12px;
@@ -1347,22 +1395,32 @@ transition:all .2s;
             </div>
           </div>
 
-          <div class="bottom-row">
-            <div class="count-row">まわした回数 <b id="m-roll-count">0</b> かい</div>
-            <button class="reset-btn" onclick="resetMission()">🔄 リセット</button>
-            <button class="all-reset-btn" onclick="resetAll()">🗑️ 全リセット</button>
+          <div class="count-row" style="font-size:.64rem;color:#c097d0;letter-spacing:.04em;text-align:right;width:100%">
+            まわした回数 <b id="m-roll-count" style="color:var(--pink)">0</b> かい
           </div>
         </div>
-        <!-- カード外リンクエリア（ミッション） -->
-        <div class="external-links">
-          <a class="ext-link-btn parent-link" href="https://dat0925.github.io/kyoka-todo/parent.html" target="_blank">
-            <span class="el-icon">🔐</span>
-            保護者用ページ
-          </a>
-          <a class="ext-link-btn doc-link" href="https://dat0925.github.io/kyoka-todo/doc.html" target="_blank">
-            <span class="el-icon">📋</span>
-            開発ドキュメント
-          </a>
+        <!-- カード外アコーディオン（ミッション） -->
+        <div class="card-outer-panel">
+          <div class="card-outer-toggle" id="m-outer-toggle" onclick="toggleCardOuter('m')">
+            <span>⚙ リセット・リンク</span>
+            <span class="cot-chevron">▼</span>
+          </div>
+          <div class="card-outer-body" id="m-outer-body">
+            <div class="card-outer-inner">
+              <div class="reset-row">
+                <button class="reset-btn" onclick="resetMission()">🔄 ミッションリセット</button>
+                <button class="all-reset-btn" onclick="resetAll()">🗑️ 全リセット</button>
+              </div>
+              <div class="external-links" style="margin:0">
+                <a class="ext-link-btn parent-link" href="https://dat0925.github.io/kyoka-todo/parent.html" target="_blank">
+                  <span class="el-icon">🔐</span>保護者用ページ
+                </a>
+                <a class="ext-link-btn doc-link" href="https://dat0925.github.io/kyoka-todo/doc.html" target="_blank">
+                  <span class="el-icon">📋</span>開発ドキュメント
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1431,9 +1489,20 @@ transition:all .2s;
               <div class="habit-list" id="habit-list-evening"></div>
             </div>
           </div>
-          <div class="habit-bottom">
-            <button class="reset-btn" onclick="resetHabit()">🔄 習慣リセット</button>
-            <button class="all-reset-btn" onclick="resetAll()">🗑️ 全部リセット</button>
+        </div>
+        <!-- カード外アコーディオン（習慣） -->
+        <div class="card-outer-panel">
+          <div class="card-outer-toggle" id="h-outer-toggle" onclick="toggleCardOuter('h')">
+            <span>⚙ リセット</span>
+            <span class="cot-chevron">▼</span>
+          </div>
+          <div class="card-outer-body" id="h-outer-body">
+            <div class="card-outer-inner">
+              <div class="reset-row">
+                <button class="reset-btn" onclick="resetHabit()">🔄 習慣リセット</button>
+                <button class="all-reset-btn" onclick="resetAll()">🗑️ 全部リセット</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -3643,6 +3712,15 @@ function playTimerRing() {
   }, { passive: true });
 })();
 
+
+// カード外アコーディオン
+function toggleCardOuter(id) {
+  const toggle = document.getElementById(id + '-outer-toggle');
+  const body   = document.getElementById(id + '-outer-body');
+  if (!toggle || !body) return;
+  toggle.classList.toggle('open');
+  body.classList.toggle('open');
+}
 
 // ══════════════════════════════
 // 初期化
