@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>きょうのミッション — 開発ドキュメント</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=M+PLUS+Rounded+1c:wght@700;900&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --pink:#ff7eb3;--pink2:#ffb3d1;--purple:#c97ef7;--purple2:#e8d5ff;
+  --yellow:#ffe066;--mint:#7ee8c8;--bg:#fff0f8;
+  --navy:#1a0030;--dark:#2d1445;
+  --card:#fff;--border:#f0d8ff;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Noto Sans JP',sans-serif;
+  background:var(--bg);
+  color:#333;
+  overflow-x:hidden;
+}
+
+/* ═══ HERO ═══ */
+.hero{
+  background:linear-gradient(135deg,var(--navy) 0%,#3d1060 50%,#1a0030 100%);
+  padding:60px 24px 80px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.hero::before{
+  content:'';
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at 30% 50%,rgba(201,126,247,.18) 0%,transparent 60%),
+              radial-gradient(ellipse at 75% 30%,rgba(255,126,179,.15) 0%,transparent 55%);
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.1);
+  border:1.5px solid rgba(255,255,255,.2);
+  border-radius:50px;padding:6px 16px;
+  font-size:.72rem;color:rgba(255,255,255,.8);
+  letter-spacing:.12em;font-weight:700;
+  margin-bottom:22px;
+  position:relative;
+}
+.hero h1{
+  font-family:'M PLUS Rounded 1c',sans-serif;
+  font-size:clamp(1.8rem,5vw,3rem);
+  font-weight:900;color:#fff;
+  letter-spacing:.06em;
+  line-height:1.2;
+  margin-bottom:12px;
+  position:relative;
+}
+.hero h1 span{color:var(--pink);}
+.hero-sub{
+  font-size:.9rem;color:rgba(255,255,255,.65);
+  letter-spacing:.06em;margin-bottom:32px;
+  position:relative;
+}
+.hero-links{
+  display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
+  position:relative;
+}
+.hero-link{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:10px 22px;border-radius:50px;
+  font-size:.8rem;font-weight:900;letter-spacing:.08em;
+  text-decoration:none;transition:all .2s;
+}
+.hero-link.primary{background:var(--pink);color:#fff;box-shadow:0 4px 18px rgba(255,126,179,.4);}
+.hero-link.primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,126,179,.5);}
+.hero-link.secondary{background:rgba(255,255,255,.12);color:#fff;border:1.5px solid rgba(255,255,255,.25);}
+.hero-link.secondary:hover{background:rgba(255,255,255,.2);}
+
+/* 浮かぶ星 */
+.star{
+  position:absolute;opacity:.3;pointer-events:none;
+  animation:floatStar linear infinite;
+}
+@keyframes floatStar{
+  0%{transform:translateY(0) rotate(0deg);opacity:0;}
+  10%,90%{opacity:.35;}
+  100%{transform:translateY(-120px) rotate(360deg);opacity:0;}
+}
+
+/* ═══ SECTIONS ═══ */
+.section{padding:56px 20px;max-width:960px;margin:0 auto;}
+.section-label{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:.65rem;font-weight:900;letter-spacing:.2em;
+  color:var(--purple);text-transform:uppercase;
+  border:2px solid var(--purple2);border-radius:50px;
+  padding:4px 14px;margin-bottom:14px;
+  background:var(--purple2);
+}
+.section-title{
+  font-family:'M PLUS Rounded 1c',sans-serif;
+  font-size:clamp(1.3rem,3.5vw,2rem);
+  font-weight:900;color:var(--dark);
+  letter-spacing:.04em;margin-bottom:32px;
+  line-height:1.3;
+}
+.section-title span{color:var(--pink);}
+
+/* ═══ TECH STACK ═══ */
+.tech-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:12px;
+}
+.tech-card{
+  background:var(--card);
+  border:2px solid var(--border);
+  border-radius:16px;
+  padding:18px 16px;
+  display:flex;flex-direction:column;gap:6px;
+  transition:all .2s;
+  position:relative;overflow:hidden;
+}
+.tech-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  border-radius:16px 16px 0 0;
+}
+.tech-card:nth-child(1)::before{background:linear-gradient(90deg,var(--pink),var(--purple));}
+.tech-card:nth-child(2)::before{background:linear-gradient(90deg,var(--purple),#74b9ff);}
+.tech-card:nth-child(3)::before{background:linear-gradient(90deg,#74b9ff,var(--mint));}
+.tech-card:nth-child(4)::before{background:linear-gradient(90deg,var(--mint),var(--yellow));}
+.tech-card:nth-child(5)::before{background:linear-gradient(90deg,var(--yellow),var(--pink));}
+.tech-card:nth-child(6)::before{background:linear-gradient(90deg,var(--pink),var(--purple));}
+.tech-card:nth-child(7)::before{background:linear-gradient(90deg,var(--purple),var(--mint));}
+.tech-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(201,126,247,.15);border-color:var(--purple2);}
+.tech-icon{font-size:1.6rem;}
+.tech-name{font-size:.75rem;font-weight:900;color:#555;letter-spacing:.05em;}
+.tech-val{font-size:.7rem;color:#888;line-height:1.5;}
+
+/* ═══ ファイル構成 ═══ */
+.file-tree{
+  background:var(--navy);
+  border-radius:20px;
+  padding:28px 24px;
+  font-family:'Courier New',monospace;
+  font-size:.82rem;
+  color:rgba(255,255,255,.85);
+  line-height:2;
+  position:relative;
+  overflow:hidden;
+}
+.file-tree::before{
+  content:'';position:absolute;
+  top:-40px;right:-40px;
+  width:180px;height:180px;
+  background:radial-gradient(circle,rgba(201,126,247,.15),transparent 70%);
+  border-radius:50%;
+}
+.file-tree .folder{color:var(--yellow);font-weight:700;}
+.file-tree .html{color:var(--pink);}
+.file-tree .json{color:var(--mint);}
+.file-tree .png{color:#74b9ff;}
+.file-tree .comment{color:rgba(255,255,255,.35);font-size:.72rem;}
+.file-tree .indent1{padding-left:20px;}
+.file-tree .indent2{padding-left:40px;}
+.file-size-badge{
+  display:inline-block;
+  background:rgba(255,255,255,.08);
+  border-radius:4px;padding:0 6px;
+  font-size:.65rem;color:rgba(255,255,255,.5);
+  margin-left:8px;
+}
+
+/* ═══ 機能図解 ═══ */
+.features-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:16px;
+}
+.feature-card{
+  background:var(--card);
+  border:2px solid var(--border);
+  border-radius:20px;
+  padding:22px 20px;
+  position:relative;
+  overflow:hidden;
+  transition:all .22s;
+}
+.feature-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(255,126,179,.13);}
+.feature-card .fc-num{
+  position:absolute;top:16px;right:16px;
+  font-size:2rem;font-weight:900;
+  color:var(--border);
+  font-family:'M PLUS Rounded 1c',sans-serif;
+  line-height:1;
+}
+.feature-icon{font-size:2rem;margin-bottom:10px;display:block;}
+.feature-title{
+  font-size:.9rem;font-weight:900;color:var(--dark);
+  margin-bottom:8px;letter-spacing:.05em;
+}
+.feature-desc{font-size:.75rem;color:#666;line-height:1.8;}
+.feature-tag{
+  display:inline-block;
+  margin-top:10px;padding:3px 10px;
+  border-radius:50px;font-size:.62rem;font-weight:700;
+  letter-spacing:.06em;
+}
+.tag-pink{background:#fff0f8;color:var(--pink);border:1.5px solid var(--pink2);}
+.tag-purple{background:var(--purple2);color:var(--purple);}
+.tag-mint{background:#e8faf5;color:#2a9e7a;border:1.5px solid var(--mint);}
+.tag-navy{background:#e8e8f8;color:#4a4a8a;border:1.5px solid #c0c0e8;}
+
+/* ═══ アーキテクチャ図 ═══ */
+.arch-wrap{
+  background:var(--card);
+  border:2px solid var(--border);
+  border-radius:24px;
+  padding:32px 24px;
+}
+.arch-flow{
+  display:flex;align-items:stretch;gap:0;
+  overflow-x:auto;padding-bottom:8px;
+}
+.arch-node{
+  flex:1;min-width:130px;
+  background:linear-gradient(135deg,var(--purple2),#fff);
+  border:2px solid var(--purple2);
+  border-radius:14px;
+  padding:16px 12px;
+  text-align:center;
+  position:relative;
+}
+.arch-node.user{background:linear-gradient(135deg,#fff8e0,#fff3cd);border-color:#ffe066;}
+.arch-node.app{background:linear-gradient(135deg,#fff0f8,#ffe8f5);border-color:var(--pink2);}
+.arch-node.storage{background:linear-gradient(135deg,#e8f8f0,#d4f4e8);border-color:var(--mint);}
+.arch-node.host{background:linear-gradient(135deg,#e8f0ff,#d4e4ff);border-color:#90b8ff;}
+.arch-node-icon{font-size:1.8rem;margin-bottom:6px;display:block;}
+.arch-node-title{font-size:.7rem;font-weight:900;color:var(--dark);letter-spacing:.06em;}
+.arch-node-desc{font-size:.62rem;color:#888;margin-top:4px;line-height:1.5;}
+.arch-arrow{
+  display:flex;align-items:center;padding:0 6px;
+  color:var(--purple2);font-size:1.4rem;
+  flex-shrink:0;
+}
+
+/* ═══ データフロー ═══ */
+.data-flow{
+  display:flex;flex-direction:column;gap:10px;
+  margin-top:24px;
+}
+.data-row{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);
+  border:1.5px solid var(--border);
+  border-radius:12px;
+  padding:12px 16px;
+}
+.data-key{
+  font-family:'Courier New',monospace;
+  font-size:.7rem;color:var(--pink);
+  background:#fff0f8;border-radius:6px;
+  padding:3px 8px;flex-shrink:0;font-weight:700;
+  border:1px solid var(--pink2);
+}
+.data-arrow-sm{color:var(--purple);font-size:.9rem;flex-shrink:0;}
+.data-desc{font-size:.72rem;color:#555;flex:1;}
+.data-type{
+  font-size:.62rem;color:#888;
+  background:#f5f5f5;border-radius:4px;
+  padding:2px 7px;flex-shrink:0;
+}
+
+/* ═══ 更新履歴 ═══ */
+.timeline{position:relative;padding-left:24px;}
+.timeline::before{
+  content:'';position:absolute;left:6px;top:0;bottom:0;
+  width:2px;background:linear-gradient(to bottom,var(--pink),var(--purple),var(--mint));
+  border-radius:2px;
+}
+.timeline-item{
+  position:relative;margin-bottom:24px;
+}
+.timeline-item::before{
+  content:'';position:absolute;left:-20px;top:4px;
+  width:10px;height:10px;border-radius:50%;
+  background:var(--pink);border:2px solid #fff;
+  box-shadow:0 0 0 2px var(--pink);
+}
+.timeline-item:nth-child(2)::before{background:var(--purple);box-shadow:0 0 0 2px var(--purple);}
+.timeline-item:nth-child(3)::before{background:var(--mint);box-shadow:0 0 0 2px var(--mint);}
+.timeline-item:nth-child(4)::before{background:#74b9ff;box-shadow:0 0 0 2px #74b9ff;}
+.timeline-item:nth-child(5)::before{background:var(--yellow);box-shadow:0 0 0 2px var(--yellow);}
+.timeline-date{font-size:.65rem;color:var(--purple);font-weight:700;letter-spacing:.08em;margin-bottom:4px;}
+.timeline-version{
+  display:inline-block;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;font-size:.62rem;font-weight:900;
+  border-radius:4px;padding:1px 8px;margin-right:6px;
+}
+.timeline-title{font-size:.85rem;font-weight:900;color:var(--dark);margin-bottom:4px;}
+.timeline-desc{font-size:.73rem;color:#666;line-height:1.7;}
+
+/* ═══ 効果音マップ ═══ */
+.sound-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:10px;
+}
+.sound-item{
+  display:flex;align-items:center;gap:10px;
+  background:var(--card);
+  border:1.5px solid var(--border);
+  border-radius:11px;padding:10px 14px;
+}
+.sound-wave{
+  font-size:1.3rem;flex-shrink:0;
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
+.sound-event{font-size:.7rem;font-weight:700;color:var(--dark);}
+.sound-desc{font-size:.62rem;color:#888;margin-top:1px;}
+
+/* ═══ ゲーム機能セクション ═══ */
+.game-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+@media(max-width:600px){.game-cards{grid-template-columns:1fr;}}
+.game-card-item{
+  border-radius:16px;padding:18px 14px;text-align:center;
+}
+.game-card-item.ark{background:linear-gradient(135deg,#1a0030,#3d1060);color:#fff;}
+.game-card-item.merge{background:linear-gradient(135deg,#2d1600,#5a3000);color:#fff;}
+.game-card-item.slide{background:linear-gradient(135deg,#001a30,#003060);color:#fff;}
+.game-card-icon{font-size:2.2rem;margin-bottom:8px;display:block;}
+.game-card-name{font-size:.85rem;font-weight:900;margin-bottom:6px;letter-spacing:.06em;}
+.game-card-features{font-size:.68rem;opacity:.75;line-height:1.9;text-align:left;}
+.game-card-features li{list-style:none;padding-left:1em;position:relative;}
+.game-card-features li::before{content:'›';position:absolute;left:0;opacity:.6;}
+
+/* ═══ アイテム表 ═══ */
+.item-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;}
+.item-card{
+  background:var(--card);border:2px solid var(--border);
+  border-radius:14px;padding:14px 12px;text-align:center;
+}
+.item-icon-big{font-size:1.8rem;margin-bottom:6px;display:block;}
+.item-name{font-size:.75rem;font-weight:900;color:var(--dark);margin-bottom:4px;}
+.item-effect{font-size:.65rem;color:#666;line-height:1.5;}
+
+/* ═══ FOOTER ═══ */
+.footer{
+  background:var(--navy);
+  padding:40px 24px;text-align:center;
+  color:rgba(255,255,255,.5);
+  font-size:.72rem;letter-spacing:.06em;
+}
+.footer a{color:var(--pink);text-decoration:none;}
+
+/* ═══ DIVIDER ═══ */
+.divider{
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--border),transparent);
+  margin:0 20px;
+}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:600px){
+  .arch-flow{flex-direction:column;}
+  .arch-arrow{transform:rotate(90deg);padding:4px 0;}
+  .tech-grid{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <!-- 星 -->
+  <div class="star" style="left:10%;top:20%;font-size:12px;animation-duration:8s;animation-delay:-2s">✨</div>
+  <div class="star" style="left:85%;top:30%;font-size:10px;animation-duration:11s;animation-delay:-5s">⭐</div>
+  <div class="star" style="left:50%;top:60%;font-size:8px;animation-duration:9s;animation-delay:-1s">💫</div>
+  <div class="star" style="left:25%;top:70%;font-size:14px;animation-duration:13s;animation-delay:-7s">🌟</div>
+  <div class="star" style="left:70%;top:55%;font-size:9px;animation-duration:10s;animation-delay:-3s">✨</div>
+
+  <div class="hero-badge">📱 PWA対応 • GitHub Pages • バニラJS</div>
+  <h1>✨ きょうのミッション<br><span>開発ドキュメント</span></h1>
+  <p class="hero-sub">8歳向けランダムミッション＋習慣チェック＋ゲームアプリの技術解説</p>
+  <div class="hero-links">
+    <a class="hero-link primary" href="https://dat0925.github.io/kyoka-todo/" target="_blank">🚀 アプリを開く</a>
+    <a class="hero-link secondary" href="https://github.com/dat0925/kyoka-todo" target="_blank">🐙 GitHub</a>
+  </div>
+</section>
+
+<!-- ── 技術スタック ── -->
+<section class="section">
+  <div class="section-label">🛠 Tech Stack</div>
+  <h2 class="section-title">使用技術</h2>
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="tech-icon">📄</div>
+      <div class="tech-name">言語</div>
+      <div class="tech-val">HTML / CSS / JavaScript<br>（バニラ・ライブラリなし）</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-icon">🔤</div>
+      <div class="tech-name">フォント</div>
+      <div class="tech-val">Google Fonts<br>Noto Sans JP / M PLUS Rounded</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-icon">🔊</div>
+      <div class="tech-name">効果音</div>
+      <div class="tech-val">Web Audio API<br>外部ファイル不要・完全自前生成</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-icon">💾</div>
+      <div class="tech-name">データ保存</div>
+      <div class="tech-val">localStorage（日付キー）<br>翌日に自動リセット</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-icon">🌐</div>
+      <div class="tech-name">ホスティング</div>
+      <div class="tech-val">GitHub Pages<br>mainブランチ自動デプロイ</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-icon">📱</div>
+      <div class="tech-name">PWA</div>
+      <div class="tech-val">manifest.json<br>ホーム画面に追加可能</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-icon">🎨</div>
+      <div class="tech-name">アニメーション</div>
+      <div class="tech-val">requestAnimationFrame<br>CSS transitions / keyframes</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── ファイル構成 ── -->
+<section class="section">
+  <div class="section-label">📁 File Structure</div>
+  <h2 class="section-title">ファイル構成</h2>
+  <div class="file-tree">
+    <div><span class="folder">kyoka-todo/</span></div>
+    <div class="indent1">├── <span class="html">index.html</span><span class="file-size-badge">〜90KB</span> <span class="comment">← メインアプリ（全機能を1ファイルに集約）</span></div>
+    <div class="indent1">├── <span class="json">manifest.json</span> <span class="comment">← PWAマニフェスト（アイコン・名前・テーマカラー）</span></div>
+    <div class="indent1">├── <span class="png">icon-192.png</span> <span class="comment">← ホーム画面アイコン（192×192px）</span></div>
+    <div class="indent1">├── <span class="png">icon-512.png</span> <span class="comment">← ホーム画面アイコン（512×512px）</span></div>
+    <div class="indent1">└── <span class="json">icon-gen.js</span> <span class="comment">← アイコン生成スクリプト（開発用）</span></div>
+    <br>
+    <div><span class="comment">// index.html の内部構成</span></div>
+    <div class="indent1"><span class="comment">├── &lt;style&gt;    CSS変数・アニメーション・レイアウト定義</span></div>
+    <div class="indent1"><span class="comment">├── &lt;body&gt;     HTML構造（3ペイン構成）</span></div>
+    <div class="indent1"><span class="comment">│   ├── sticky-header（タブバー＋進捗バー）</span></div>
+    <div class="indent1"><span class="comment">│   ├── pane-mission（ルーレット＋やりたいことエリア）</span></div>
+    <div class="indent1"><span class="comment">│   ├── pane-habit（習慣チェック 3セクション）</span></div>
+    <div class="indent1"><span class="comment">│   └── pane-game（アルカノイド / マージ / スライド）</span></div>
+    <div class="indent1"><span class="comment">└── &lt;script&gt;   全ロジック（約500行）</span></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── アーキテクチャ ── -->
+<section class="section">
+  <div class="section-label">🏗 Architecture</div>
+  <h2 class="section-title">アーキテクチャ図</h2>
+  <div class="arch-wrap">
+    <div class="arch-flow">
+      <div class="arch-node user">
+        <span class="arch-node-icon">👧</span>
+        <div class="arch-node-title">ユーザー</div>
+        <div class="arch-node-desc">梗華ちゃん<br>（8歳）<br>スマホ / iPad</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node app">
+        <span class="arch-node-icon">✨</span>
+        <div class="arch-node-title">PWAアプリ</div>
+        <div class="arch-node-desc">index.html<br>オフライン動作<br>ホーム画面から起動</div>
+      </div>
+      <div class="arch-arrow">⇄</div>
+      <div class="arch-node storage">
+        <span class="arch-node-icon">💾</span>
+        <div class="arch-node-title">localStorage</div>
+        <div class="arch-node-desc">日付キーで保存<br>翌日自動リセット<br>サーバー不要</div>
+      </div>
+      <div class="arch-arrow">←</div>
+      <div class="arch-node host">
+        <span class="arch-node-icon">🐙</span>
+        <div class="arch-node-title">GitHub Pages</div>
+        <div class="arch-node-desc">静的ホスティング<br>mainブランチ<br>自動デプロイ</div>
+      </div>
+    </div>
+
+    <!-- データフロー -->
+    <h3 style="font-size:.85rem;font-weight:900;color:var(--dark);margin:28px 0 12px;letter-spacing:.06em;">📦 localStorageのデータ構造</h3>
+    <div class="data-flow">
+      <div class="data-row">
+        <div class="data-key">m_checked_2026-03-29</div>
+        <div class="data-arrow-sm">→</div>
+        <div class="data-desc">チェック済みミッションのラベル配列</div>
+        <div class="data-type">JSON配列</div>
+      </div>
+      <div class="data-row">
+        <div class="data-key">m_rolls_2026-03-29</div>
+        <div class="data-arrow-sm">→</div>
+        <div class="data-desc">当日のルーレット回転回数</div>
+        <div class="data-type">数値</div>
+      </div>
+      <div class="data-row">
+        <div class="data-key">h_checked_2026-03-29</div>
+        <div class="data-arrow-sm">→</div>
+        <div class="data-desc">チェック済み習慣のID配列（39項目）</div>
+        <div class="data-type">JSON配列</div>
+      </div>
+      <div class="data-row">
+        <div class="data-key">want_checked_2026-03-29</div>
+        <div class="data-arrow-sm">→</div>
+        <div class="data-desc">やりたいこと（忍者修行・ゲーム・読書）のチェック状態</div>
+        <div class="data-type">JSON配列</div>
+      </div>
+      <div class="data-row">
+        <div class="data-key">game_unlocked_2026-03-29</div>
+        <div class="data-arrow-sm">→</div>
+        <div class="data-desc">ゲーム解放フラグ（ミッション半分クリアで解放）</div>
+        <div class="data-type">文字列</div>
+      </div>
+      <div class="data-row">
+        <div class="data-key">arkanoid_hi</div>
+        <div class="data-arrow-sm">→</div>
+        <div class="data-desc">アルカノイドのハイスコア（日付をまたいで保持）</div>
+        <div class="data-type">数値</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── 機能一覧 ── -->
+<section class="section">
+  <div class="section-label">⚡ Features</div>
+  <h2 class="section-title">主要<span>機能</span>一覧</h2>
+  <div class="features-grid">
+
+    <div class="feature-card">
+      <div class="fc-num">01</div>
+      <span class="feature-icon">🎲</span>
+      <div class="feature-title">ドラムロール式ルーレット</div>
+      <div class="feature-desc">8種のミッションからランダム選出。requestAnimationFrameで60fps滑らか動作。easeOutBackのバウンドアニメ付き。チェック済みは除外。</div>
+      <span class="feature-tag tag-pink">ミッションタブ</span>
+    </div>
+
+    <div class="feature-card">
+      <div class="fc-num">02</div>
+      <span class="feature-icon">🌟</span>
+      <div class="feature-title">やりたいことエリア</div>
+      <div class="feature-desc">忍者修行🥷・ゲーム🎮・読書📖はミッションドラムから独立。カード下部に専用エリア。タップでチェック＆コンフェッティ演出。</div>
+      <span class="feature-tag tag-navy">ミッションタブ</span>
+    </div>
+
+    <div class="feature-card">
+      <div class="fc-num">03</div>
+      <span class="feature-icon">🤫</span>
+      <div class="feature-title">かくしミッション</div>
+      <div class="feature-desc">ミッション3回以上チェック後に25%の確率で出現。クリアするとゲームが即解放。専用エフェクト＆豪華サウンド付き。</div>
+      <span class="feature-tag tag-purple">シークレット</span>
+    </div>
+
+    <div class="feature-card">
+      <div class="fc-num">04</div>
+      <span class="feature-icon">✅</span>
+      <div class="feature-title">習慣チェック（39項目）</div>
+      <div class="feature-desc">朝・学校準備・下校後の3セクション。アコーディオン開閉、一括チェックボタン、サブセクション対応。</div>
+      <span class="feature-tag tag-mint">習慣タブ</span>
+    </div>
+
+    <div class="feature-card">
+      <div class="fc-num">05</div>
+      <span class="feature-icon">📊</span>
+      <div class="feature-title">リアルタイム進捗バー</div>
+      <div class="feature-desc">ヘッダーにstickyで固定。現在タブに合わせて内容が切替。全完了でミント色に変化。PCでは2本並列表示。</div>
+      <span class="feature-tag tag-pink">全タブ</span>
+    </div>
+
+    <div class="feature-card">
+      <div class="fc-num">06</div>
+      <span class="feature-icon">🔒</span>
+      <div class="feature-title">ゲーム解放システム</div>
+      <div class="feature-desc">ミッションを半分以上クリアorかくしミッションクリアで解放。解放時は豪華オーバーレイ演出。当日限りリセット。</div>
+      <span class="feature-tag tag-navy">ゲームタブ</span>
+    </div>
+
+    <div class="feature-card">
+      <div class="fc-num">07</div>
+      <span class="feature-icon">🔊</span>
+      <div class="feature-title">Web Audio API効果音</div>
+      <div class="feature-desc">外部音声ファイル不要。オシレーター合成で全効果音を自前生成。ルーレット・チェック・クリア・ゲームで異なる音。</div>
+      <span class="feature-tag tag-purple">全体</span>
+    </div>
+
+    <div class="feature-card">
+      <div class="fc-num">08</div>
+      <span class="feature-icon">📱</span>
+      <div class="feature-title">PWA対応</div>
+      <div class="feature-desc">manifest.jsonでホーム画面追加可能。apple-touch-icon対応。テーマカラー設定でステータスバーまで統一。</div>
+      <span class="feature-tag tag-mint">インフラ</span>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── ゲーム機能 ── -->
+<section class="section">
+  <div class="section-label">🎮 Games</div>
+  <h2 class="section-title">ゲーム<span>3種</span></h2>
+  <div class="game-cards">
+    <div class="game-card-item ark">
+      <span class="game-card-icon">🧱</span>
+      <div class="game-card-name">アルカノイド</div>
+      <ul class="game-card-features">
+        <li>Canvas 2D描画（360×320px）</li>
+        <li>難易度3段階（⭐〜⭐⭐⭐）</li>
+        <li>11列×9行 = 99ブロック</li>
+        <li>特殊アイテム5種類</li>
+        <li>一時停止ボタン</li>
+        <li>ハイスコア保存</li>
+      </ul>
+    </div>
+    <div class="game-card-item merge">
+      <span class="game-card-icon">🔢</span>
+      <div class="game-card-name">マージ2048</div>
+      <ul class="game-card-features">
+        <li>4×4グリッド</li>
+        <li>スワイプ操作対応</li>
+        <li>スコア＆ハイスコア</li>
+        <li>遊び方パネル付き</li>
+        <li>矢印キー操作</li>
+        <li>ゲームオーバー判定</li>
+      </ul>
+    </div>
+    <div class="game-card-item slide">
+      <span class="game-card-icon">🧩</span>
+      <div class="game-card-name">スライドパズル</div>
+      <ul class="game-card-features">
+        <li>3×3 / 4×4 / 5×5選択</li>
+        <li>タップ＆スワイプ操作</li>
+        <li>手数カウント</li>
+        <li>ベスト記録保存</li>
+        <li>クリア検出＋演出</li>
+        <li>ランダムシャッフル</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- アイテム表 -->
+  <h3 style="font-size:.9rem;font-weight:900;color:var(--dark);margin:28px 0 14px;letter-spacing:.06em;">⚡ アルカノイド 特殊アイテム</h3>
+  <div class="item-grid">
+    <div class="item-card">
+      <span class="item-icon-big">⚽</span>
+      <div class="item-name">マルチボール</div>
+      <div class="item-effect">ボールが3個に増える（5秒間）</div>
+    </div>
+    <div class="item-card">
+      <span class="item-icon-big">⚡</span>
+      <div class="item-name">レーザー</div>
+      <div class="item-effect">列ごと貫通レーザー発射（8秒間）</div>
+    </div>
+    <div class="item-card">
+      <span class="item-icon-big">↔</span>
+      <div class="item-name">パドル拡大</div>
+      <div class="item-effect">パドルが1.5倍に（5秒間・緑色）</div>
+    </div>
+    <div class="item-card">
+      <span class="item-icon-big">❤</span>
+      <div class="item-name">+1ライフ</div>
+      <div class="item-effect">残機+1（最大5まで）</div>
+    </div>
+    <div class="item-card">
+      <span class="item-icon-big">💣</span>
+      <div class="item-name">爆弾</div>
+      <div class="item-effect">ランダム1列をまるごと破壊</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── 効果音 ── -->
+<section class="section">
+  <div class="section-label">🎵 Sound</div>
+  <h2 class="section-title">効果音マップ <span style="font-size:.7em;color:#aaa">Web Audio API</span></h2>
+  <div class="sound-grid">
+    <div class="sound-item"><span class="sound-wave">🎵</span><div><div class="sound-event">ルーレット開始</div><div class="sound-desc">triangle 3音 順次上昇</div></div></div>
+    <div class="sound-item"><span class="sound-wave">🎶</span><div><div class="sound-event">回転中（ティック）</div><div class="sound-desc">square 高速連打→減速</div></div></div>
+    <div class="sound-item"><span class="sound-wave">✨</span><div><div class="sound-event">着地・決定</div><div class="sound-desc">sine 5音上昇＋鈴の倍音</div></div></div>
+    <div class="sound-item"><span class="sound-wave">🎺</span><div><div class="sound-event">ミッションチェック</div><div class="sound-desc">sine 3音 上昇系</div></div></div>
+    <div class="sound-item"><span class="sound-wave">🔔</span><div><div class="sound-event">習慣チェック</div><div class="sound-desc">sine 2音 軽いポン</div></div></div>
+    <div class="sound-item"><span class="sound-wave">🎊</span><div><div class="sound-event">全クリア</div><div class="sound-desc">triangle 6音＋sineハーモニー</div></div></div>
+    <div class="sound-item"><span class="sound-wave">💜</span><div><div class="sound-event">かくしミッション</div><div class="sound-desc">triangle 7音 華やかなファンファーレ</div></div></div>
+    <div class="sound-item"><span class="sound-wave">🎮</span><div><div class="sound-event">ゲームボール反射</div><div class="sound-desc">sine / square 短音</div></div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── 更新履歴 ── -->
+<section class="section">
+  <div class="section-label">📝 Changelog</div>
+  <h2 class="section-title">更新<span>履歴</span></h2>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-date">2026-03-29</div>
+      <div><span class="timeline-version">v2.3</span><span class="timeline-title">UX改善・バグ修正</span></div>
+      <div class="timeline-desc">ゲームタブ中のタブスワイプ誤操作防止。着地音をキラキラ可愛い音に変更。ゲームタブ・難易度ボタンのデザイン改善。スコア行の余白調整。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2026-03-29</div>
+      <div><span class="timeline-version">v2.2</span><span class="timeline-title">アルカノイド大幅強化</span></div>
+      <div class="timeline-desc">行数30%増（9行）・縦幅半分化。特殊アイテム5種追加（マルチボール・レーザー・パドル拡大・爆弾・ライフ）。マージ遊び方パネル追加。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2026-03-29</div>
+      <div><span class="timeline-version">v2.1</span><span class="timeline-title">ゲーム3種追加</span></div>
+      <div class="timeline-desc">マージ2048・スライドパズル追加。アルカノイド改善（難易度3段階・一時停止・ブロック30%小・iPad縦幅拡大）。ゲーム切替タブUI。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2026-03-29</div>
+      <div><span class="timeline-version">v2.0</span><span class="timeline-title">やりたいことエリア・忍者修行</span></div>
+      <div class="timeline-desc">修行→忍者修行🥷に変更。ゲーム・読書をミッションドラムから除外しやりたいことエリアへ。回転音スロー化。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2026-03-22</div>
+      <div><span class="timeline-version">v1.0</span><span class="timeline-title">初回リリース</span></div>
+      <div class="timeline-desc">ミッション・習慣チェック・かくしミッション・ゲーム解放・効果音・PWA対応。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <p>✨ きょうのミッション — 梗華ちゃん専用アプリ</p>
+  <p style="margin-top:8px">
+    <a href="https://dat0925.github.io/kyoka-todo/">🚀 App</a> &nbsp;·&nbsp;
+    <a href="https://github.com/dat0925/kyoka-todo">🐙 GitHub</a>
+  </p>
+  <p style="margin-top:12px;font-size:.65rem;opacity:.5">Built with ❤️ using Vanilla JS + Web Audio API + GitHub Pages</p>
+</footer>
+
+</body>
+</html>
