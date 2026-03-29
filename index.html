@@ -859,6 +859,71 @@ transition:all .2s;
 }
 .omikuji-again-btn:hover{background:var(--pink);color:#fff;}
 
+/* おみくじ ロック */
+.omikuji-lock{
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  padding:20px 16px;width:100%;text-align:center;
+}
+.omikuji-lock-icon{
+  font-size:3rem;
+  animation:lockGlow 2s ease-in-out infinite;
+}
+@keyframes lockGlow{
+  0%,100%{transform:scale(1);filter:drop-shadow(0 0 4px rgba(201,126,247,.3));}
+  50%{transform:scale(1.1);filter:drop-shadow(0 0 14px rgba(201,126,247,.7));}
+}
+.omikuji-lock-title{
+  font-family:'M PLUS Rounded 1c','Noto Sans JP',sans-serif;
+  font-size:1.05rem;font-weight:900;color:var(--dark);letter-spacing:.06em;line-height:1.5;
+}
+.omikuji-lock-hint{
+  font-size:.74rem;color:#888;line-height:1.8;
+}
+.omikuji-lock-hint b{color:var(--purple);}
+.omikuji-lock-prog-wrap{width:100%;max-width:240px;}
+.omikuji-lock-prog-bg{
+  height:10px;border-radius:99px;background:#f0e0f8;overflow:hidden;margin-bottom:5px;
+}
+.omikuji-lock-prog-fill{
+  height:100%;border-radius:99px;
+  background:linear-gradient(90deg,var(--pink),var(--purple));
+  transition:width .5s cubic-bezier(.4,0,.2,1);
+}
+.omikuji-lock-prog-label{font-size:.68rem;color:var(--purple);font-weight:700;text-align:center;}
+/* おみくじ main wrap */
+.omikuji-main{width:100%;display:flex;flex-direction:column;align-items:center;gap:10px;}
+/* 引いているアニメーション */
+.omikuji-drawing{
+  display:flex;flex-direction:column;align-items:center;gap:12px;padding:8px 0;
+}
+.omikuji-box{
+  width:80px;height:80px;
+  background:linear-gradient(135deg,#3d1060,#1a0030);
+  border:3px solid #c97ef7;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.2rem;
+  animation:boxShake .18s ease-in-out infinite;
+  box-shadow:0 0 20px rgba(201,126,247,.5);
+}
+@keyframes boxShake{
+  0%,100%{transform:rotate(-4deg) scale(1);}
+  50%{transform:rotate(4deg) scale(1.06);}
+}
+.omikuji-drawing-text{
+  font-size:.85rem;font-weight:900;color:var(--purple);letter-spacing:.1em;
+}
+.omikuji-dots{display:flex;gap:4px;}
+.omikuji-dots span{
+  font-size:1.4rem;color:var(--pink);font-weight:900;
+  animation:dotPop .6s ease-in-out infinite;
+}
+.omikuji-dots span:nth-child(2){animation-delay:.15s;}
+.omikuji-dots span:nth-child(3){animation-delay:.3s;}
+@keyframes dotPop{
+  0%,100%{transform:translateY(0);opacity:.4;}
+  50%{transform:translateY(-6px);opacity:1;}
+}
+
 /* ═══ confetti ═══ */
 .confetti-piece{position:fixed;border-radius:2px;pointer-events:none;z-index:200;animation:confettiFall 1.6s ease-in forwards;}
 @keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(110vh) rotate(720deg);opacity:0;}}
@@ -1181,21 +1246,45 @@ transition:all .2s;
           <!-- おみくじ -->
           <div id="game-omikuji" style="display:none">
             <div class="omikuji-wrap">
-              <div class="omikuji-intro" id="omikuji-intro">
-                <div class="omikuji-shrine">🏮</div>
-                <div class="omikuji-title">おみくじ</div>
-                <div class="omikuji-sub">ひいてみてね！</div>
-                <button class="omikuji-draw-btn" onclick="drawOmikuji()">🎋 おみくじをひく</button>
-                <div class="omikuji-hint">凶・大凶もあるよ…！？</div>
-              </div>
-              <div class="omikuji-result" id="omikuji-result" style="display:none">
-                <div class="omikuji-paper" id="omikuji-paper">
-                  <div class="omikuji-paper-top">✨おみくじ✨</div>
-                  <div class="omikuji-rank" id="omikuji-rank">大吉</div>
-                  <div class="omikuji-message" id="omikuji-message"></div>
-                  <div class="omikuji-lucky" id="omikuji-lucky"></div>
+              <!-- ロック画面 -->
+              <div class="omikuji-lock" id="omikuji-lock">
+                <div class="omikuji-lock-icon">🔮</div>
+                <div class="omikuji-lock-title">おみくじは<br>ひみつのばしょ…</div>
+                <div class="omikuji-lock-hint">きょうの<b>ミッションをひとつ</b>クリアすると<br>おみくじがひけるよ！✨</div>
+                <div class="omikuji-lock-prog-wrap">
+                  <div class="omikuji-lock-prog-bg">
+                    <div class="omikuji-lock-prog-fill" id="omikuji-prog-fill" style="width:0%"></div>
+                  </div>
+                  <div class="omikuji-lock-prog-label" id="omikuji-prog-label">0 / 1 クリア</div>
                 </div>
-                <button class="omikuji-again-btn" onclick="resetOmikuji()">🎋 もう一度ひく</button>
+              </div>
+              <!-- メイン -->
+              <div class="omikuji-main" id="omikuji-main" style="display:none">
+                <div class="omikuji-intro" id="omikuji-intro">
+                  <div class="omikuji-shrine">🏮</div>
+                  <div class="omikuji-title">おみくじ</div>
+                  <div class="omikuji-sub">ひいてみてね！</div>
+                  <button class="omikuji-draw-btn" id="omikuji-draw-btn" onclick="drawOmikuji()">🎋 おみくじをひく</button>
+                  <div class="omikuji-hint">凶・大凶もあるよ…！？</div>
+                </div>
+                <!-- 引いているアニメーション -->
+                <div class="omikuji-drawing" id="omikuji-drawing" style="display:none">
+                  <div class="omikuji-box" id="omikuji-box">
+                    <div class="omikuji-box-inner">🎋</div>
+                  </div>
+                  <div class="omikuji-drawing-text" id="omikuji-drawing-text">ひいています…</div>
+                  <div class="omikuji-dots"><span>.</span><span>.</span><span>.</span></div>
+                </div>
+                <!-- 結果 -->
+                <div class="omikuji-result" id="omikuji-result" style="display:none">
+                  <div class="omikuji-paper" id="omikuji-paper">
+                    <div class="omikuji-paper-top">✨おみくじ✨</div>
+                    <div class="omikuji-rank" id="omikuji-rank">大吉</div>
+                    <div class="omikuji-message" id="omikuji-message"></div>
+                    <div class="omikuji-lucky" id="omikuji-lucky"></div>
+                  </div>
+                  <button class="omikuji-again-btn" onclick="resetOmikuji()">🎋 もう一度ひく</button>
+                </div>
               </div>
             </div>
           </div>
@@ -1292,7 +1381,7 @@ const HABIT_SECTIONS=[
     {id:'shirt', label:'半袖シャツ', note:'体育の日', icon:'👚'},
     {id:'pocket',label:'移動ポケット', note:'', icon:'🎽'},
     {id:'nbook', label:'連絡帳', note:'', icon:'📒'},
-    {id:'cocof', label:'ここフレ', note:'', icon:'📦'},
+    {id:'cocof', label:'ここふれ', note:'', icon:'📦'},
     {id:'sched', label:'時間割と持ち物確認',note:'学級通信で', icon:'📅'},
     {id:'lunch', label:'給食確認', note:'', icon:'🍱'},
     {id:'cream', label:'ハンドクリーム', note:'', icon:'🤲'},
@@ -1308,12 +1397,13 @@ const HABIT_SECTIONS=[
       ]},
       {label:'💊 夕食後・寝る前',items:[
         {id:'drug_eve1',label:'薬：フェキソフェナジン', note:'アレルギー',icon:'💊'},
-        {id:'drug_eve2',label:'薬：モンテルカストチュアブル',note:'喘息予防',icon:'💊'},
-        {id:'drug_eve3',label:'薬：オロパタジン', note:'花粉症', icon:'💊'},
       ]},
       {label:'🌙 夜のルーティン',items:[
         {id:'hagaki2', label:'歯磨き', note:'', icon:'🪥'},
         {id:'ofuro', label:'お風呂', note:'', icon:'🛁'},
+        {id:'stretch_eve', label:'ストレッチ', note:'', icon:'🤸'},
+        {id:'drug_eve2',label:'薬：モンテルカストチュアブル',note:'喘息予防',icon:'💊'},
+        {id:'drug_eve3',label:'薬：オロパタジン', note:'花粉症', icon:'💊'},
         {id:'moist2', label:'保湿液', note:'', icon:'🧴'},
         {id:'cream2', label:'ハンドクリーム', note:'', icon:'🤲'},
       ]},
@@ -1628,6 +1718,7 @@ function checkMission(){
   checkAllMissionDone();
   checkGameUnlock();
   updateLockProgress();
+  updateOmikujiLock();
 }
 
 function checkAllMissionDone(){
@@ -1670,6 +1761,7 @@ function chipToggle(label,chip){
   checkAllMissionDone();
   checkGameUnlock();
   updateLockProgress();
+  updateOmikujiLock();
 }
 
 // ══════════════════════════════
@@ -2000,6 +2092,7 @@ function switchGame(name) {
     slideInit();
   } else if (name === 'omikuji') {
     resetOmikuji();
+    updateOmikujiLock();
   }
 }
 
@@ -2537,39 +2630,68 @@ const OMIKUJI_LIST = [
   },
 ];
 
-function drawOmikuji() {
-  // 演出: ボタンをシェイク→結果表示
-  const btn = document.querySelector('.omikuji-draw-btn');
-  btn.style.transform = 'scale(.9) rotate(-3deg)';
-  setTimeout(() => { btn.style.transform = ''; }, 100);
+// おみくじロック状態を更新
+function updateOmikujiLock() {
+  const needed = 1; // ミッション1個クリアで解放
+  const done = mChecked.length;
+  const unlocked = done >= needed;
+  const lockEl  = document.getElementById('omikuji-lock');
+  const mainEl  = document.getElementById('omikuji-main');
+  if (!lockEl || !mainEl) return;
+  lockEl.style.display  = unlocked ? 'none' : 'flex';
+  mainEl.style.display  = unlocked ? 'flex' : 'none';
+  // プログレス
+  const fill  = document.getElementById('omikuji-prog-fill');
+  const label = document.getElementById('omikuji-prog-label');
+  if (fill)  fill.style.width = Math.min(done / needed * 100, 100) + '%';
+  if (label) label.textContent = done + ' / ' + needed + ' クリア';
+}
 
-  // ランダムで選ぶ
+function drawOmikuji() {
+  const btn = document.getElementById('omikuji-draw-btn');
+  if (btn) { btn.disabled = true; }
+
+  // ① intro非表示 → drawing表示
+  document.getElementById('omikuji-intro').style.display = 'none';
+  const drawing = document.getElementById('omikuji-drawing');
+  drawing.style.display = 'flex';
+
+  // ランダムで結果を決める（見えない場所で）
   const entry = OMIKUJI_LIST[Math.floor(Math.random() * OMIKUJI_LIST.length)];
-  const msg = entry.messages[Math.floor(Math.random() * entry.messages.length)];
+  const msg   = entry.messages[Math.floor(Math.random() * entry.messages.length)];
   const lucky = entry.lucky[Math.floor(Math.random() * entry.lucky.length)];
 
-  // 結果セット
-  const rankEl = document.getElementById('omikuji-rank');
-  rankEl.textContent = entry.rank;
-  rankEl.className = 'omikuji-rank ' + entry.cls;
-  document.getElementById('omikuji-message').textContent = msg;
-  document.getElementById('omikuji-lucky').textContent = lucky;
+  // ② もったいつけるテキスト演出
+  const texts = ['ひいています…','どきどき…','もうすぐ…！','じゃーん…！'];
+  let ti = 0;
+  const textEl = document.getElementById('omikuji-drawing-text');
+  const textInterval = setInterval(() => {
+    ti++;
+    if (ti < texts.length) textEl.textContent = texts[ti];
+  }, 550);
 
-  // 表示切替（少しディレイ）
+  // ③ 2.4秒後に結果表示
   setTimeout(() => {
-    document.getElementById('omikuji-intro').style.display = 'none';
+    clearInterval(textInterval);
+    drawing.style.display = 'none';
+
+    const rankEl = document.getElementById('omikuji-rank');
+    rankEl.textContent = entry.rank;
+    rankEl.className = 'omikuji-rank ' + entry.cls;
+    document.getElementById('omikuji-message').textContent = msg;
+    document.getElementById('omikuji-lucky').textContent = lucky;
+
     const res = document.getElementById('omikuji-result');
     res.style.display = 'flex';
-    // 紙のアニメーションをリセット
+    // 紙のアニメーションリセット
     const paper = document.getElementById('omikuji-paper');
     paper.style.animation = 'none';
-    paper.offsetHeight; // reflow
+    paper.offsetHeight;
     paper.style.animation = '';
 
-    // エフェクト
     playOmikujiSound(entry.cls);
     launchOmikujiEffect(entry.cls);
-  }, 120);
+  }, 2400);
 }
 
 function playOmikujiSound(cls) {
@@ -2614,7 +2736,10 @@ function launchOmikujiEffect(cls) {
 }
 
 function resetOmikuji() {
+  const btn = document.getElementById('omikuji-draw-btn');
+  if (btn) btn.disabled = false;
   document.getElementById('omikuji-intro').style.display = 'flex';
+  document.getElementById('omikuji-drawing').style.display = 'none';
   document.getElementById('omikuji-result').style.display = 'none';
 }
 
@@ -2855,6 +2980,7 @@ function init(){
   applyGameLockState();
   checkHabitAllDone();
   checkAllMissionDone();
+  updateOmikujiLock();
 
   // ペイン幅設定
   const vp=document.getElementById('pane-viewport');
