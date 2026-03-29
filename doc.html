@@ -440,7 +440,8 @@ body{
   <h2 class="section-title">ファイル構成</h2>
   <div class="file-tree">
     <div><span class="folder">kyoka-todo/</span></div>
-    <div class="indent1">├── <span class="html">index.html</span><span class="file-size-badge">〜90KB</span> <span class="comment">← メインアプリ（全機能を1ファイルに集約）</span></div>
+    <div class="indent1">├── <span class="html">index.html</span><span class="file-size-badge">〜95KB</span> <span class="comment">← メインアプリ（全機能を1ファイルに集約）</span></div>
+    <div class="indent1">├── <span class="html">parent.html</span> <span class="comment">← 親の閲覧ページ（日別ログ・ヒートマップ）</span></div>
     <div class="indent1">├── <span class="json">manifest.json</span> <span class="comment">← PWAマニフェスト（アイコン・名前・テーマカラー）</span></div>
     <div class="indent1">├── <span class="png">icon-192.png</span> <span class="comment">← ホーム画面アイコン（192×192px）</span></div>
     <div class="indent1">├── <span class="png">icon-512.png</span> <span class="comment">← ホーム画面アイコン（512×512px）</span></div>
@@ -491,6 +492,21 @@ body{
     </div>
 
     <!-- データフロー -->
+    <h3 style="font-size:.85rem;font-weight:900;color:var(--dark);margin:28px 0 12px;letter-spacing:.06em;">🗄 Supabase連携（v2.4〜）</h3>
+    <div class="data-flow" style="margin-bottom:20px">
+      <div class="data-row">
+        <div class="data-key">子供がチェック</div>
+        <div class="data-arrow-sm">→</div>
+        <div class="data-desc">sbUpsert() がDELETE→INSERTで確実に最新状態を保存</div>
+        <div class="data-type">Supabase</div>
+      </div>
+      <div class="data-row">
+        <div class="data-key">parent.html</div>
+        <div class="data-arrow-sm">→</div>
+        <div class="data-desc">Supabase REST APIで日別ログ・ヒートマップを表示</div>
+        <div class="data-type">親が確認</div>
+      </div>
+    </div>
     <h3 style="font-size:.85rem;font-weight:900;color:var(--dark);margin:28px 0 12px;letter-spacing:.06em;">📦 localStorageのデータ構造</h3>
     <div class="data-flow">
       <div class="data-row">
@@ -728,6 +744,11 @@ body{
       <div class="timeline-date">2026-03-29</div>
       <div><span class="timeline-version">v2.0</span><span class="timeline-title">やりたいことエリア・忍者修行</span></div>
       <div class="timeline-desc">修行→忍者修行🥷に変更。ゲーム・読書をミッションドラムから除外しやりたいことエリアへ。回転音スロー化。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2026-03-29</div>
+      <div><span class="timeline-version">v2.4</span><span class="timeline-title">Supabase連携・親閲覧ページ</span></div>
+      <div class="timeline-desc">Supabase PostgreSQLにタスクログを保存。DELETE→INSERT方式でchecked状態を確実に更新。parent.htmlで日別ログ・達成サマリー・過去30日ヒートマップを閲覧可能に。</div>
     </div>
     <div class="timeline-item">
       <div class="timeline-date">2026-03-22</div>

@@ -796,6 +796,29 @@ transition:all .2s;
 }
 .all-reset-btn:hover{background:#fff0f0;color:#e05050;border-color:#e05050;}
 .all-reset-btn:active{transform:scale(.96);}
+/* ── 外部リンクボタン ── */
+.external-links{
+  display:flex;gap:8px;width:100%;margin-top:6px;
+}
+.ext-link-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:10px 6px;border-radius:14px;
+  text-decoration:none;
+  font-family:'Noto Sans JP',sans-serif;
+  font-size:.65rem;font-weight:900;letter-spacing:.04em;
+  transition:all .18s;-webkit-tap-highlight-color:transparent;
+}
+.ext-link-btn .el-icon{font-size:1.3rem;}
+.ext-link-btn.parent-link{
+  background:linear-gradient(135deg,#fff0f8,#ffe8f5);
+  color:var(--pink);border:2px solid var(--pink2);
+}
+.ext-link-btn.parent-link:hover{background:var(--pink);color:#fff;border-color:var(--pink);}
+.ext-link-btn.doc-link{
+  background:linear-gradient(135deg,#f0f0ff,#e8e8f8);
+  color:#4a4a8a;border:2px solid #c0c0e8;
+}
+.ext-link-btn.doc-link:hover{background:#4a4a8a;color:#fff;border-color:#4a4a8a;}
 /* ═══ おみくじ ═══ */
 .omikuji-wrap{
   width:100%;display:flex;flex-direction:column;align-items:center;
@@ -1340,6 +1363,16 @@ transition:all .2s;
           <div class="habit-bottom">
             <button class="reset-btn" onclick="resetHabit()">🔄 習慣リセット</button>
             <button class="all-reset-btn" onclick="resetAll()">🗑️ 全部リセット</button>
+          </div>
+          <div class="external-links">
+            <a class="ext-link-btn parent-link" href="https://dat0925.github.io/kyoka-todo/parent.html" target="_blank">
+              <span class="el-icon">👀</span>
+              親の閲覧ページ
+            </a>
+            <a class="ext-link-btn doc-link" href="https://dat0925.github.io/kyoka-todo/doc.html" target="_blank">
+              <span class="el-icon">📊</span>
+              開発ドキュメント
+            </a>
           </div>
         </div>
       </div>
