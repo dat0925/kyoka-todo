@@ -890,6 +890,27 @@ transition:all .2s;
   transition:width .5s cubic-bezier(.4,0,.2,1);
 }
 .omikuji-lock-prog-label{font-size:.68rem;color:var(--purple);font-weight:700;text-align:center;}
+.omikuji-target-mission{
+  display:inline-block;font-size:.9rem;color:var(--pink);
+  background:#fff0f8;border:2px solid var(--pink2);
+  border-radius:10px;padding:4px 14px;margin:4px 0;
+  animation:targetPulse 1.8s ease-in-out infinite;
+}
+@keyframes targetPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(255,126,179,.3);}
+  50%{box-shadow:0 0 0 6px rgba(255,126,179,0);}
+}
+.omikuji-target-mission{
+  display:inline-block;
+  font-size:.9rem;color:var(--pink);
+  background:#fff0f8;border:2px solid var(--pink2);
+  border-radius:10px;padding:4px 14px;margin:4px 0;
+  animation:targetPulse 1.8s ease-in-out infinite;
+}
+@keyframes targetPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(255,126,179,.3);}
+  50%{box-shadow:0 0 0 6px rgba(255,126,179,0);}
+}
 /* おみくじ main wrap */
 .omikuji-main{width:100%;display:flex;flex-direction:column;align-items:center;gap:10px;}
 /* 引いているアニメーション */
@@ -1250,12 +1271,16 @@ transition:all .2s;
               <div class="omikuji-lock" id="omikuji-lock">
                 <div class="omikuji-lock-icon">🔮</div>
                 <div class="omikuji-lock-title">おみくじは<br>ひみつのばしょ…</div>
-                <div class="omikuji-lock-hint">きょうの<b>ミッションをひとつ</b>クリアすると<br>おみくじがひけるよ！✨</div>
+                <div class="omikuji-lock-hint">
+                  きょうのミッション<br>
+                  <b id="omikuji-target-mission" class="omikuji-target-mission">…</b><br>
+                  をクリアすると ひけるよ！✨
+                </div>
                 <div class="omikuji-lock-prog-wrap">
                   <div class="omikuji-lock-prog-bg">
                     <div class="omikuji-lock-prog-fill" id="omikuji-prog-fill" style="width:0%"></div>
                   </div>
-                  <div class="omikuji-lock-prog-label" id="omikuji-prog-label">0 / 1 クリア</div>
+                  <div class="omikuji-lock-prog-label" id="omikuji-prog-label">まだ…</div>
                 </div>
               </div>
               <!-- メイン -->
@@ -1345,7 +1370,7 @@ function playNinjaCheck(){const c=getCtx();[300,200,440,660].forEach((f,i)=>tone
 // ══════════════════════════════
 // ※ 修行・ゲームはミッションドラムから除外
 const MISSION_ITEMS=[
-  {label:'ピアノ',icon:'🎹'},{label:'日記',icon:'📔'},{label:'勉強',icon:'📚'},
+  {label:'ピアノ',icon:'🎹'},{label:'日記',icon:'📔',weekendOnly:true},{label:'勉強',icon:'📚'},
   {label:'新体操',icon:'🎀'},{label:'チャレンジタッチ',icon:'📱'},
   {label:'ストレッチ',icon:'🤸'},{label:'Y字バランス10秒',icon:'⭐'},
   {label:'タッチタイピング',icon:'⌨️'},{label:'宿題',icon:'📝'},
@@ -1381,7 +1406,7 @@ const HABIT_SECTIONS=[
     {id:'shirt', label:'半袖シャツ', note:'体育の日', icon:'👚'},
     {id:'pocket',label:'移動ポケット', note:'', icon:'🎽'},
     {id:'nbook', label:'連絡帳', note:'', icon:'📒'},
-    {id:'cocof', label:'ここふれ', note:'', icon:'📦'},
+    {id:'cocof', label:'ココフレ', note:'', icon:'📦'},
     {id:'sched', label:'時間割と持ち物確認',note:'学級通信で', icon:'📅'},
     {id:'lunch', label:'給食確認', note:'', icon:'🍱'},
     {id:'cream', label:'ハンドクリーム', note:'', icon:'🤲'},
@@ -1397,9 +1422,8 @@ const HABIT_SECTIONS=[
       ]},
       {label:'💊 夕食後・寝る前',items:[
         {id:'drug_eve1',label:'薬：フェキソフェナジン', note:'アレルギー',icon:'💊'},
-      ]},
-      {label:'🌙 夜のルーティン',items:[
         {id:'hagaki2', label:'歯磨き', note:'', icon:'🪥'},
+        {id:'kataduke', label:'おかたづけ', note:'', icon:'🧹'},
         {id:'ofuro', label:'お風呂', note:'', icon:'🛁'},
         {id:'stretch_eve', label:'ストレッチ', note:'', icon:'🤸'},
         {id:'drug_eve2',label:'薬：モンテルカストチュアブル',note:'喘息予防',icon:'💊'},
@@ -1437,7 +1461,9 @@ let hChecked=loadJSON(`h_checked_${TODAY}`,[]);
 let wantChecked=loadJSON(`want_checked_${TODAY}`,[]);
 let mCurrentLabel=null,mRolling=false;
 
-function mRemaining(){return MISSION_ITEMS.filter(it=>!mChecked.includes(it.label));}
+function isWeekend(){const d=new Date().getDay();return d===0||d===6;}
+function getActiveMissions(){return MISSION_ITEMS.filter(it=>!(it.weekendOnly&&!isWeekend()));}
+function mRemaining(){return getActiveMissions().filter(it=>!mChecked.includes(it.label));}
 
 // ══════════════════════════════
 // ゲーム解放
@@ -1446,7 +1472,7 @@ const GAME_UNLOCK_KEY=`game_unlocked_${TODAY}`;
 let gameUnlocked=!!localStorage.getItem(GAME_UNLOCK_KEY);
 
 function isGameUnlockable(){
-  return mChecked.length >= Math.ceil(MISSION_ITEMS.length/2);
+  return mChecked.length >= Math.ceil(getActiveMissions().length/2);
 }
 function applyGameLockState(){
   const tab=document.getElementById('tab-game');
@@ -1639,7 +1665,8 @@ function startRoll(){
   // 大量ループ + ターゲット
   const targetItem=rem[Math.floor(Math.random()*rem.length)];
   const LOOPS=6;
-  const items=[...MISSION_ITEMS,...MISSION_ITEMS,...MISSION_ITEMS,...MISSION_ITEMS,...MISSION_ITEMS,...MISSION_ITEMS,...MISSION_ITEMS];
+  const AM=getActiveMissions();
+  const items=[...AM,...AM,...AM,...AM,...AM,...AM,...AM];
   // ターゲットを末尾近くに埋め込む
   const targetPos=items.length-3+Math.floor(Math.random()*3);
   items[targetPos]={...targetItem};
@@ -1723,7 +1750,7 @@ function checkMission(){
 
 function checkAllMissionDone(){
   const banner=document.getElementById('m-all-done');
-  if(mChecked.length>=MISSION_ITEMS.length){
+  if(mChecked.length>=getActiveMissions().length){
     banner.classList.add('visible');
     playAllClear();
     launchConfetti(40);
@@ -1738,7 +1765,7 @@ function checkAllMissionDone(){
 function renderMissionChips(){
   const wrap=document.getElementById('mission-chips');
   wrap.innerHTML='';
-  MISSION_ITEMS.forEach(it=>{
+  getActiveMissions().forEach(it=>{
     const chip=document.createElement('div');
     chip.className='m-chip'+(mChecked.includes(it.label)?' checked':'');
     chip.innerHTML=`<span class="m-chip-icon">${it.icon}</span>${it.label}`;
@@ -2630,21 +2657,29 @@ const OMIKUJI_LIST = [
   },
 ];
 
-// おみくじロック状態を更新
+// おみくじ：その日のランダムミッションをクリアするとロック解除
+// 解放に必要なミッションをその日決める（日付シードで固定）
+function getOmikujiTargetMission() {
+  const seed = TODAY.replace(/-/g,'');
+  const idx = parseInt(seed) % MISSION_ITEMS.length;
+  return MISSION_ITEMS[idx];
+}
+
 function updateOmikujiLock() {
-  const needed = 1; // ミッション1個クリアで解放
-  const done = mChecked.length;
-  const unlocked = done >= needed;
-  const lockEl  = document.getElementById('omikuji-lock');
-  const mainEl  = document.getElementById('omikuji-main');
+  const target = getOmikujiTargetMission();
+  const unlocked = mChecked.includes(target.label);
+  const lockEl = document.getElementById('omikuji-lock');
+  const mainEl = document.getElementById('omikuji-main');
   if (!lockEl || !mainEl) return;
-  lockEl.style.display  = unlocked ? 'none' : 'flex';
-  mainEl.style.display  = unlocked ? 'flex' : 'none';
-  // プログレス
+  lockEl.style.display = unlocked ? 'none' : 'flex';
+  mainEl.style.display = unlocked ? 'flex' : 'none';
+  // ロック画面の表示更新
   const fill  = document.getElementById('omikuji-prog-fill');
   const label = document.getElementById('omikuji-prog-label');
-  if (fill)  fill.style.width = Math.min(done / needed * 100, 100) + '%';
-  if (label) label.textContent = done + ' / ' + needed + ' クリア';
+  const missionEl = document.getElementById('omikuji-target-mission');
+  if (fill)  fill.style.width = unlocked ? '100%' : '0%';
+  if (label) label.textContent = unlocked ? 'クリア！' : 'まだ…';
+  if (missionEl) missionEl.textContent = target.icon + ' ' + target.label;
 }
 
 function drawOmikuji() {
