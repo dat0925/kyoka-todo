@@ -192,10 +192,36 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);min-height:100vh
   text-align:center;padding:20px;
   font-size:.65rem;color:#c097d0;
 }
+
+/* Pull to Refresh */
+#ptr-bar{
+  position:fixed;top:0;left:0;right:0;z-index:999;
+  height:0;overflow:hidden;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  transition:height .15s ease;pointer-events:none;
+}
+#ptr-bar.show{height:50px;}
+#ptr-bar.done{background:linear-gradient(135deg,var(--mint),#38d39f);}
+.ptr-inner{display:flex;align-items:center;gap:8px;color:#fff;}
+.ptr-ico{font-size:1.2rem;transition:transform .2s;}
+#ptr-bar.done .ptr-ico{animation:ptrSpin .5s linear infinite;}
+@keyframes ptrSpin{to{transform:rotate(360deg);}}
+.ptr-msg{font-size:.75rem;font-weight:900;letter-spacing:.06em;}
+/* 更新ボタン */
+.refresh-btn{
+  width:36px;height:36px;border-radius:50%;
+  border:2px solid var(--pink2);background:#fff;
+  font-size:1rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;color:var(--purple);font-weight:900;
+}
+.refresh-btn:hover{background:var(--purple);color:#fff;border-color:var(--purple);}
 </style>
 </head>
 <body>
 
+<div id="ptr-bar"><div class="ptr-inner"><span class="ptr-ico">↓</span><span class="ptr-msg" id="ptr-msg">下にスワイプで更新</span></div></div>
 <div class="header">
   <h1>🌸 梗華ちゃんの記録</h1>
   <div class="header-sub">ミッション・習慣チェックの達成ログ</div>
@@ -208,6 +234,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);min-height:100vh
   <div class="date-nav-label" id="date-label">—</div>
   <button onclick="changeDate(1)">›</button>
   <button class="today-btn" onclick="gotoToday()">今日</button>
+  <button class="refresh-btn" onclick="location.reload()" title="更新">↺</button>
 </div>
 
 <div id="main-content">
@@ -408,6 +435,39 @@ async function loadHeatmap() {
 
 // 初期表示
 gotoToday();
+
+// Pull-to-Refresh
+(function(){
+  let sy=0,pulling=false,dist=0;
+  const THR=70;
+  document.addEventListener('touchstart',e=>{
+    if(window.scrollY>0)return;
+    sy=e.touches[0].clientY;pulling=true;
+  },{passive:true});
+  document.addEventListener('touchmove',e=>{
+    if(!pulling)return;
+    dist=e.touches[0].clientY-sy;
+    if(dist<=0){pulling=false;return;}
+    const bar=document.getElementById('ptr-bar');
+    const msg=document.getElementById('ptr-msg');
+    if(dist>6){
+      bar.classList.add('show');bar.classList.remove('done');
+      document.querySelector('#ptr-bar .ptr-ico').textContent=dist>=THR?'✓':'↓';
+      msg.textContent=dist>=THR?'はなすと更新！':'下にスワイプで更新';
+    }
+  },{passive:true});
+  document.addEventListener('touchend',()=>{
+    if(!pulling)return;pulling=false;
+    const bar=document.getElementById('ptr-bar');
+    if(dist>=THR){
+      bar.classList.add('done');
+      document.getElementById('ptr-msg').textContent='更新中…';
+      document.querySelector('#ptr-bar .ptr-ico').textContent='🔄';
+      setTimeout(()=>location.reload(),500);
+    }else{bar.classList.remove('show');}
+    dist=0;
+  },{passive:true});
+})();
 </script>
 </body>
 </html>
