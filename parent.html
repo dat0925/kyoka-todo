@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>梗華ちゃんの記録 👀</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=M+PLUS+Rounded+1c:wght@700;900&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --pink:#ff7eb3;--pink2:#ffb3d1;--purple:#c97ef7;
+  --mint:#7ee8c8;--bg:#fff0f8;--dark:#2d1445;
+  --yellow:#ffe066;--navy:#1a0030;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);min-height:100vh;color:#333;}
+
+/* ── ヘッダー ── */
+.header{
+  background:linear-gradient(135deg,var(--navy),#3d1060);
+  padding:20px 20px 24px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.header::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 30% 60%,rgba(201,126,247,.2),transparent 60%);
+}
+.header h1{
+  font-family:'M PLUS Rounded 1c',sans-serif;
+  font-size:1.4rem;font-weight:900;color:#fff;
+  letter-spacing:.08em;position:relative;
+}
+.header-sub{font-size:.75rem;color:rgba(255,255,255,.6);margin-top:5px;position:relative;}
+.header-link{
+  display:inline-block;margin-top:12px;
+  padding:7px 18px;border-radius:50px;
+  background:rgba(255,255,255,.12);color:#fff;
+  text-decoration:none;font-size:.72rem;font-weight:700;
+  border:1.5px solid rgba(255,255,255,.25);
+  transition:all .18s;position:relative;
+}
+.header-link:hover{background:rgba(255,255,255,.22);}
+
+/* ── 日付セレクタ ── */
+.date-nav{
+  display:flex;align-items:center;justify-content:center;
+  gap:12px;padding:14px 20px;
+  background:#fff;border-bottom:2px solid var(--pink2);
+  position:sticky;top:0;z-index:10;
+  box-shadow:0 2px 12px rgba(255,126,179,.1);
+}
+.date-nav button{
+  width:36px;height:36px;border-radius:50%;
+  border:2px solid var(--pink2);background:#fff;
+  font-size:1rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;color:var(--purple);font-weight:900;
+}
+.date-nav button:hover{background:var(--pink);color:#fff;border-color:var(--pink);}
+.date-nav-label{
+  font-family:'M PLUS Rounded 1c',sans-serif;
+  font-size:1rem;font-weight:900;color:var(--dark);
+  letter-spacing:.06em;min-width:140px;text-align:center;
+}
+.today-btn{
+  padding:5px 14px;border-radius:50px;
+  border:2px solid var(--purple);background:#fff;
+  color:var(--purple);font-size:.7rem;font-weight:900;
+  cursor:pointer;transition:all .15s;
+}
+.today-btn:hover{background:var(--purple);color:#fff;}
+
+/* ── ローディング ── */
+.loading{
+  text-align:center;padding:40px;color:#c097d0;
+  font-size:.85rem;letter-spacing:.06em;
+}
+.loading::after{
+  content:'';display:block;margin:12px auto 0;
+  width:28px;height:28px;border-radius:50%;
+  border:3px solid var(--pink2);border-top-color:var(--pink);
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── サマリーカード ── */
+.summary-cards{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:10px;padding:16px;
+}
+.summary-card{
+  background:#fff;border-radius:16px;
+  border:2px solid var(--pink2);
+  padding:14px 10px;text-align:center;
+}
+.summary-card .s-icon{font-size:1.6rem;margin-bottom:4px;}
+.summary-card .s-num{
+  font-family:'M PLUS Rounded 1c',sans-serif;
+  font-size:1.6rem;font-weight:900;color:var(--purple);
+  line-height:1;
+}
+.summary-card .s-label{font-size:.62rem;color:#aaa;margin-top:3px;letter-spacing:.06em;}
+.summary-card .s-sub{font-size:.68rem;color:var(--pink);font-weight:700;margin-top:1px;}
+
+/* ── ヒートマップ ── */
+.section{padding:0 16px 16px;}
+.section-title{
+  font-size:.8rem;font-weight:900;color:var(--dark);
+  letter-spacing:.08em;margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;
+}
+.heatmap{
+  background:#fff;border-radius:16px;border:2px solid var(--pink2);
+  padding:14px 12px;overflow-x:auto;
+}
+.heatmap-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:5px;
+  min-width:280px;
+}
+.hm-day{
+  aspect-ratio:1;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.55rem;font-weight:700;color:#fff;
+  cursor:pointer;transition:transform .12s;
+}
+.hm-day:hover{transform:scale(1.15);}
+.hm-0{background:#f0e0f8;color:#c097d0;}
+.hm-1{background:#ffb3d1;}
+.hm-2{background:#ff85b3;}
+.hm-3{background:#ff5599;}
+.hm-4{background:#e84393;}
+.hm-label-row{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:4px;}
+.hm-label{font-size:.58rem;color:#c097d0;font-weight:700;text-align:center;}
+
+/* ── タスクリスト ── */
+.task-list{display:flex;flex-direction:column;gap:6px;}
+.task-item{
+  display:flex;align-items:center;gap:10px;
+  background:#fff;border-radius:12px;
+  border:1.5px solid var(--pink2);
+  padding:10px 14px;
+  transition:all .15s;
+}
+.task-item.checked{
+  background:linear-gradient(135deg,#f0faf6,#e4f8f0);
+  border-color:var(--mint);
+}
+.task-item.unchecked{opacity:.65;}
+.task-check{
+  width:22px;height:22px;border-radius:6px;
+  border:2.5px solid var(--pink2);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:.8rem;
+}
+.task-item.checked .task-check{
+  background:linear-gradient(135deg,var(--mint),#38d39f);
+  border-color:var(--mint);color:#fff;
+}
+.task-label{font-size:.8rem;font-weight:700;color:#555;flex:1;}
+.task-item.checked .task-label{color:#2a9e7a;text-decoration:line-through;opacity:.8;}
+.task-type-badge{
+  font-size:.6rem;font-weight:900;padding:2px 8px;
+  border-radius:50px;flex-shrink:0;
+}
+.badge-mission{background:#fff0f8;color:var(--pink);border:1.5px solid var(--pink2);}
+.badge-habit{background:#e8f8f0;color:#2a9e7a;border:1.5px solid var(--mint);}
+.badge-want{background:#f0e8ff;color:var(--purple);border:1.5px solid #d0b8f8;}
+
+/* ── 空の状態 ── */
+.empty{
+  text-align:center;padding:32px 20px;
+  color:#c097d0;font-size:.82rem;line-height:2;
+}
+.empty-icon{font-size:2.5rem;display:block;margin-bottom:8px;}
+
+/* ── タブ ── */
+.tabs{display:flex;gap:6px;margin-bottom:12px;}
+.tab{
+  flex:1;padding:8px 4px;border-radius:10px;
+  border:2px solid var(--pink2);background:#fff;
+  color:#c097d0;font-size:.72rem;font-weight:900;
+  cursor:pointer;transition:all .15s;
+}
+.tab.active{
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;border-color:transparent;
+}
+
+/* ── フッター ── */
+.footer{
+  text-align:center;padding:20px;
+  font-size:.65rem;color:#c097d0;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🌸 梗華ちゃんの記録</h1>
+  <div class="header-sub">ミッション・習慣チェックの達成ログ</div>
+  <a class="header-link" href="https://dat0925.github.io/kyoka-todo/">✨ 子供アプリを開く</a>
+</div>
+
+<!-- 日付ナビ -->
+<div class="date-nav">
+  <button onclick="changeDate(-1)">‹</button>
+  <div class="date-nav-label" id="date-label">—</div>
+  <button onclick="changeDate(1)">›</button>
+  <button class="today-btn" onclick="gotoToday()">今日</button>
+</div>
+
+<div id="main-content">
+  <div class="loading">よみこみ中</div>
+</div>
+
+<!-- ヒートマップ（過去30日） -->
+<div class="section" id="heatmap-section" style="display:none">
+  <div class="section-title">📅 過去30日の達成ヒートマップ</div>
+  <div class="heatmap">
+    <div class="hm-label-row">
+      <div class="hm-label">日</div><div class="hm-label">月</div>
+      <div class="hm-label">火</div><div class="hm-label">水</div>
+      <div class="hm-label">木</div><div class="hm-label">金</div>
+      <div class="hm-label">土</div>
+    </div>
+    <div class="heatmap-grid" id="heatmap-grid"></div>
+  </div>
+</div>
+
+<div class="footer">
+  データはSupabaseに保存されています<br>
+  きょうのミッション v2.3
+</div>
+
+<script>
+const SUPABASE_URL = 'https://sfhtvtcmgueystyuhzvd.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmaHR2dGNtZ3VleXN0eXVoenZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3Nzg0MDYsImV4cCI6MjA5MDM1NDQwNn0.qsON2xYdDf22LtU-jGd96Ubaif0xzzswC9KnzWndKNw';
+
+let currentDate = new Date();
+currentDate.setHours(0,0,0,0);
+
+function formatDate(d) {
+  return d.toISOString().slice(0,10);
+}
+function formatDateJP(d) {
+  return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${'日月火水木金土'[d.getDay()]}）`;
+}
+function changeDate(delta) {
+  currentDate.setDate(currentDate.getDate() + delta);
+  loadDay(formatDate(currentDate));
+}
+function gotoToday() {
+  currentDate = new Date();
+  currentDate.setHours(0,0,0,0);
+  loadDay(formatDate(currentDate));
+}
+
+async function fetchLogs(dateStr) {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/task_logs?date=eq.${dateStr}&order=created_at.asc`,
+    { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+  );
+  if (!res.ok) throw new Error('fetch failed');
+  return res.json();
+}
+
+async function fetchRange(startDate, endDate) {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/task_logs?date=gte.${startDate}&date=lte.${endDate}&select=date,checked`,
+    { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+  );
+  if (!res.ok) throw new Error('fetch failed');
+  return res.json();
+}
+
+let currentFilter = 'all';
+
+async function loadDay(dateStr) {
+  document.getElementById('date-label').textContent = formatDateJP(currentDate);
+  document.getElementById('main-content').innerHTML = '<div class="loading">よみこみ中</div>';
+
+  try {
+    const logs = await fetchLogs(dateStr);
+    renderDay(logs);
+    await loadHeatmap();
+  } catch(e) {
+    document.getElementById('main-content').innerHTML =
+      '<div class="empty"><span class="empty-icon">📡</span>データを取得できませんでした<br>インターネット接続を確認してください</div>';
+  }
+}
+
+function renderDay(logs) {
+  const checked = logs.filter(l => l.checked);
+  const missions = logs.filter(l => l.task_type === 'mission');
+  const habits   = logs.filter(l => l.task_type === 'habit');
+  const wants    = logs.filter(l => l.task_type === 'want');
+  const mDone = missions.filter(l => l.checked).length;
+  const hDone = habits.filter(l => l.checked).length;
+  const wDone = wants.filter(l => l.checked).length;
+  const total = checked.length;
+
+  const filtered = () => {
+    if (currentFilter === 'mission') return logs.filter(l => l.task_type === 'mission');
+    if (currentFilter === 'habit')   return logs.filter(l => l.task_type === 'habit');
+    if (currentFilter === 'want')    return logs.filter(l => l.task_type === 'want');
+    return logs;
+  };
+
+  const taskHTML = filtered().length === 0
+    ? `<div class="empty"><span class="empty-icon">📭</span>この日のデータはまだありません<br>アプリでチェックすると記録されるよ！</div>`
+    : `<div class="task-list">${filtered().map(l => `
+      <div class="task-item ${l.checked ? 'checked' : 'unchecked'}">
+        <div class="task-check">${l.checked ? '✓' : ''}</div>
+        <div class="task-label">${escHtml(l.task_label)}</div>
+        <span class="task-type-badge badge-${l.task_type}">${
+          l.task_type === 'mission' ? 'ミッション' :
+          l.task_type === 'habit'   ? '習慣' : 'やりたいこと'
+        }</span>
+      </div>`).join('')}</div>`;
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="s-icon">🎲</div>
+        <div class="s-num">${mDone}</div>
+        <div class="s-label">ミッション</div>
+        <div class="s-sub">クリア</div>
+      </div>
+      <div class="summary-card">
+        <div class="s-icon">✅</div>
+        <div class="s-num">${hDone}</div>
+        <div class="s-label">習慣チェック</div>
+        <div class="s-sub">完了</div>
+      </div>
+      <div class="summary-card">
+        <div class="s-icon">🌟</div>
+        <div class="s-num">${wDone}</div>
+        <div class="s-label">やりたいこと</div>
+        <div class="s-sub">達成</div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="tabs">
+        <button class="tab ${currentFilter==='all'?'active':''}" onclick="setFilter('all')">すべて (${logs.length})</button>
+        <button class="tab ${currentFilter==='mission'?'active':''}" onclick="setFilter('mission')">ミッション</button>
+        <button class="tab ${currentFilter==='habit'?'active':''}" onclick="setFilter('habit')">習慣</button>
+        <button class="tab ${currentFilter==='want'?'active':''}" onclick="setFilter('want')">やりたい</button>
+      </div>
+      <div id="task-list-area">${taskHTML}</div>
+    </div>`;
+}
+
+function setFilter(f) {
+  currentFilter = f;
+  loadDay(formatDate(currentDate));
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+async function loadHeatmap() {
+  const end = new Date();
+  const start = new Date();
+  start.setDate(start.getDate() - 29);
+
+  try {
+    const logs = await fetchRange(formatDate(start), formatDate(end));
+    // 日付ごとにチェック数を集計
+    const countByDate = {};
+    logs.forEach(l => {
+      if (!l.checked) return;
+      countByDate[l.date] = (countByDate[l.date] || 0) + 1;
+    });
+
+    const grid = document.getElementById('heatmap-grid');
+    grid.innerHTML = '';
+
+    // 先頭を日曜日に合わせるための空白
+    const startDay = start.getDay(); // 0=日
+    for (let i = 0; i < startDay; i++) {
+      const blank = document.createElement('div');
+      grid.appendChild(blank);
+    }
+
+    for (let i = 0; i < 30; i++) {
+      const d = new Date(start);
+      d.setDate(d.getDate() + i);
+      const ds = formatDate(d);
+      const count = countByDate[ds] || 0;
+      const level = count === 0 ? 0 : count <= 3 ? 1 : count <= 8 ? 2 : count <= 15 ? 3 : 4;
+      const cell = document.createElement('div');
+      cell.className = `hm-day hm-${level}`;
+      cell.textContent = d.getDate();
+      cell.title = `${ds}：${count}件`;
+      cell.onclick = () => {
+        currentDate = new Date(ds + 'T00:00:00');
+        loadDay(ds);
+      };
+      grid.appendChild(cell);
+    }
+    document.getElementById('heatmap-section').style.display = '';
+  } catch(e) {
+    document.getElementById('heatmap-section').style.display = 'none';
+  }
+}
+
+// 初期表示
+gotoToday();
+</script>
+</body>
+</html>
