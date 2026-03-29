@@ -1109,7 +1109,15 @@ function playRollTick(s){
   g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.07);
   o.start(c.currentTime);o.stop(c.currentTime+.07);
 }
-function playLand(){const c=getCtx(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(200,c.currentTime);o.frequency.exponentialRampToValueAtTime(60,c.currentTime+.3);g.gain.setValueAtTime(.45,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.35);o.start(c.currentTime);o.stop(c.currentTime+.4);}
+function playLand(){
+  const c=getCtx();
+  // キラキラ上昇メロディ ✨
+  [{f:523,t:0},{f:659,t:.07},{f:784,t:.14},{f:1047,t:.21},{f:1319,t:.28}]
+    .forEach(({f,t})=>tone('sine',f,.13,c.currentTime+t,.18));
+  // 鈴のような倍音
+  [{f:2093,t:.1},{f:2637,t:.18}]
+    .forEach(({f,t})=>tone('triangle',f,.06,c.currentTime+t,.22));
+}
 function playFanfare(){const c=getCtx();[{f:523,t:0},{f:659,t:.12},{f:784,t:.24},{f:1047,t:.36}].forEach(({f,t})=>tone('triangle',f,.2,c.currentTime+t,.2));}
 function playHabitCheck(){const c=getCtx();tone('sine',660,.15,c.currentTime,.1);tone('sine',880,.11,c.currentTime+.06,.1);}
 function playHabitUncheck(){tone('sine',440,.08,getCtx().currentTime,.09);}
