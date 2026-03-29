@@ -1685,7 +1685,23 @@ function playLand(){
 }
 function playFanfare(){const c=getCtx();[{f:523,t:0},{f:659,t:.12},{f:784,t:.24},{f:1047,t:.36}].forEach(({f,t})=>tone('triangle',f,.2,c.currentTime+t,.2));}
 function playHabitCheck(){const c=getCtx();tone('sine',660,.15,c.currentTime,.1);tone('sine',880,.11,c.currentTime+.06,.1);}
-function playHabitUncheck(){tone('sine',440,.08,getCtx().currentTime,.09);}
+function playHabitUncheck(){
+  const c=getCtx();
+  // 高→低の下降2音でポコンと外れた感じ
+  tone('sine',660,.13,c.currentTime,.09);
+  tone('sine',440,.11,c.currentTime+.07,.1);
+}
+function playMUncheck(){
+  const c=getCtx();
+  // ミッション外し：ちょっと残念な下降3音
+  [660,550,440].forEach((f,i)=>tone('sine',f,.13,c.currentTime+i*.07,.12));
+}
+function playWantUncheck(){
+  const c=getCtx();
+  // やりたいこと外し：軽いポコン2音
+  tone('triangle',520,.12,c.currentTime,.09);
+  tone('triangle',380,.09,c.currentTime+.08,.1);
+}
 function playMCheck(){const c=getCtx();[880,1100,1320].forEach((f,i)=>tone('sine',f,.18,c.currentTime+i*.08,.2));}
 function playAllClear(){const c=getCtx();[{f:523,t:0},{f:659,t:.13},{f:784,t:.26},{f:1047,t:.4},{f:784,t:.54},{f:1047,t:.68}].forEach(({f,t})=>tone('triangle',f,.24,c.currentTime+t,.22));[{f:330,t:.4},{f:440,t:.54},{f:523,t:.68}].forEach(({f,t})=>tone('sine',f,.09,c.currentTime+t,.3));}
 function playHabitAllClear(){const c=getCtx();[523,659,784,880,1047].forEach((f,i)=>tone('triangle',f,.22,c.currentTime+i*.1,.22));}
@@ -1889,6 +1905,7 @@ function toggleWant(key){
     el.classList.remove('checked');
     if(key==='ninja') el.classList.remove('ninja-checked');
     sbUpsert('want_'+key, wantLabel, 'want', false);
+    playWantUncheck();
   } else {
     wantChecked.push(key);
     el.classList.add('checked');
@@ -2105,6 +2122,7 @@ function chipToggle(label,chip){
     mChecked=mChecked.filter(l=>l!==label);
     chip.classList.remove('checked');
     sbUpsert('mission_'+label, label, 'mission', false);
+    playMUncheck();
   } else {
     mChecked.push(label);
     chip.classList.add('checked');
