@@ -849,10 +849,13 @@ transition:all .2s;
   overflow:hidden;max-height:0;opacity:0;
   transition:max-height .3s cubic-bezier(.4,0,.2,1),opacity .25s;
   background:rgba(255,255,255,.85);
-  border:1.5px solid #e8d8f0;border-top:none;
-  border-radius:0 0 12px 12px;
+  border:0px solid #e8d8f0;border-top:none;
+  border-radius:0 0 14px 14px;
 }
-.card-outer-body.open{max-height:400px;opacity:1;}
+.card-outer-body.open{
+  max-height:400px;opacity:1;
+  border-width:1.5px;
+}
 .card-outer-inner{
   padding:10px 12px 12px;
   display:flex;flex-direction:column;gap:8px;
