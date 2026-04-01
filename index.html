@@ -824,44 +824,47 @@ transition:all .2s;
 /* ── カード外アコーディオンエリア ── */
 .card-outer-panel{
   width:min(440px,92vw);
-  margin:0 auto;
-  /* カードとの隙間なし */
+  margin:12px auto 0;
+  background:rgba(255,255,255,.7);
+  border:1.5px solid #e8d8f0;
+  border-radius:14px;
+  overflow:hidden;
+  transition:border-color .18s;
 }
 @media(min-width:768px){.card-outer-panel{width:100%;}}
+.card-outer-panel:has(.card-outer-toggle:hover){border-color:var(--purple);}
 .card-outer-toggle{
   display:flex;align-items:center;justify-content:space-between;
   padding:11px 18px;
-  background:rgba(255,255,255,.55);
-  border:1.5px solid #e8d8f0;
-  border-radius:14px;
+  background:transparent;
   cursor:pointer;
   font-family:'Noto Sans JP',sans-serif;
   font-size:.85rem;font-weight:900;color:#b090c8;
   letter-spacing:.06em;
-  margin-top:12px;
-  transition:all .18s;
+  transition:color .18s, background .18s;
   user-select:none;-webkit-tap-highlight-color:transparent;
 }
-.card-outer-toggle:hover{background:rgba(255,255,255,.85);border-color:var(--purple);color:var(--purple);}
-.card-outer-toggle.open{
-  border-radius:12px 12px 0 0;
-  border-bottom-color:transparent;
-  background:rgba(255,255,255,.85);
-}
+.card-outer-toggle:hover{color:var(--purple);}
 .card-outer-toggle .cot-chevron{
-  font-size:.95rem;transition:transform .25s;display:inline-block;
+  font-size:.95rem;transition:transform .3s cubic-bezier(.4,0,.2,1);display:inline-block;
 }
 .card-outer-toggle.open .cot-chevron{transform:rotate(180deg);}
+/* bodyはgrid-template-rowsで滑らかに開閉 */
 .card-outer-body{
-  overflow:hidden;max-height:0;opacity:0;
-  transition:max-height .3s cubic-bezier(.4,0,.2,1),opacity .25s;
-  background:rgba(255,255,255,.85);
-  border:0px solid #e8d8f0;border-top:none;
-  border-radius:0 0 14px 14px;
+  display:grid;
+  grid-template-rows:0fr;
+  transition:grid-template-rows .32s cubic-bezier(.4,0,.2,1), opacity .28s ease;
+  opacity:0;
+  border-top:0px solid #e8d8f0;
+}
+.card-outer-body > .card-outer-inner{
+  overflow:hidden;
+  min-height:0;
 }
 .card-outer-body.open{
-  max-height:400px;opacity:1;
-  border-width:1.5px;
+  grid-template-rows:1fr;
+  opacity:1;
+  border-top-width:1.5px;
 }
 .card-outer-inner{
   padding:10px 12px 12px;
