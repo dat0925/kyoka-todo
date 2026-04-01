@@ -355,32 +355,21 @@ async function loadDay(dateStr) {
   }
 }
 
-// 固定母数（アプリ側と同じ定義）
-const FIXED_HABIT_TOTAL = 34;   // 朝10+学校11+下校後4+夕食後9
-const FIXED_WANT_TOTAL  = 3;    // 忍者修行・ゲーム・読書
-// 土日判定（日曜=0, 土曜=6）
-function isMissionWeekend(dateStr) {
-  const d = new Date(dateStr + 'T00:00:00');
-  return d.getDay() === 0 || d.getDay() === 6;
-}
-
 function renderDay(logs) {
-  const checked = logs.filter(l => l.checked);
+  // DBに登録された全タスクが母数（sbInitDayLogsで初期化済み）
   const missions = logs.filter(l => l.task_type === 'mission');
   const habits   = logs.filter(l => l.task_type === 'habit');
   const wants    = logs.filter(l => l.task_type === 'want');
 
   const mDone  = missions.filter(l => l.checked).length;
-  // ミッション母数: 平日8種・土日9種（日記が追加）
-  const mTotal = isMissionWeekend(formatDate(currentDate)) ? 9 : 8;
+  const mTotal = missions.length;   // DBに登録されたミッション数
 
   const hDone  = habits.filter(l => l.checked).length;
-  const hTotal = FIXED_HABIT_TOTAL;   // 常に34
+  const hTotal = habits.length;     // DBに登録された習慣数
 
   const wDone  = wants.filter(l => l.checked).length;
-  const wTotal = FIXED_WANT_TOTAL;    // 常に3
+  const wTotal = wants.length;      // DBに登録されたやりたいこと数
 
-  // 合計: ミッション+習慣+やりたいこと
   const totalDone = mDone + hDone + wDone;
   const total     = mTotal + hTotal + wTotal;
 
