@@ -762,12 +762,19 @@ display:inline-block;opacity:.7;
 }
 .section-header.open .chevron{transform:rotate(180deg);}
 .accordion-body{
-overflow:hidden;
-max-height:0;
-transition:max-height .35s cubic-bezier(.4,0,.2,1), opacity .28s ease;
-opacity:0;
+  display:grid;
+  grid-template-rows:0fr;
+  opacity:0;
+  transition:grid-template-rows .32s cubic-bezier(.4,0,.2,1), opacity .28s ease;
 }
-.accordion-body.open{max-height:2000px;opacity:1;}
+.accordion-body > *{
+  overflow:hidden;
+  min-height:0;
+}
+.accordion-body.open{
+  grid-template-rows:1fr;
+  opacity:1;
+}
 .sub-section{margin:6px 0 2px;}
 .sub-section-title{
 font-size:.68rem;font-weight:900;color:#999;
@@ -2396,12 +2403,15 @@ function toggleSection(id){
   body.classList.toggle('open');
 }
 function toggleAllSections(open){
-  ['morning','school','after','evening'].forEach(id=>{
-    const header=document.querySelector(`#sec-${id} .section-header`);
-    const body=document.getElementById(`body-${id}`);
-    if(!header||!body)return;
-    if(open){header.classList.add('open');body.classList.add('open');}
-    else{header.classList.remove('open');body.classList.remove('open');}
+  ['morning','school','after','evening'].forEach((id, i)=>{
+    // 少しずつずらして開閉することでレンダリング負荷を分散
+    setTimeout(()=>{
+      const header=document.querySelector(`#sec-${id} .section-header`);
+      const body=document.getElementById(`body-${id}`);
+      if(!header||!body)return;
+      if(open){header.classList.add('open');body.classList.add('open');}
+      else{header.classList.remove('open');body.classList.remove('open');}
+    }, i * 40); // 40ms刻みで順次実行
   });
 }
 
