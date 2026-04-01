@@ -101,6 +101,19 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);min-height:100vh
 }
 .summary-card .s-label{font-size:.62rem;color:#aaa;margin-top:3px;letter-spacing:.06em;}
 .summary-card .s-sub{font-size:.68rem;color:var(--pink);font-weight:700;margin-top:1px;}
+.summary-card .s-ratio{
+  font-size:.65rem;font-weight:900;margin-top:4px;
+  padding:2px 8px;border-radius:50px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;display:inline-block;
+}
+.summary-card .s-count{font-size:.72rem;color:#888;margin-top:2px;letter-spacing:.02em;}
+.summary-card .s-ratio{
+  font-size:.65rem;font-weight:900;margin-top:3px;
+  padding:2px 8px;border-radius:50px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;display:inline-block;
+}
 
 /* ── ヒートマップ ── */
 .section{padding:0 16px 16px;}
@@ -253,6 +266,30 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);min-height:100vh
       <div class="hm-label">土</div>
     </div>
     <div class="heatmap-grid" id="heatmap-grid"></div>
+    <!-- 凡例 -->
+    <div style="display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap;">
+      <span style="font-size:.6rem;color:#aaa;font-weight:700;">チェック件数：</span>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <div style="width:14px;height:14px;border-radius:3px;background:#f0e0f8;"></div>
+        <span style="font-size:.6rem;color:#aaa;">0件</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <div style="width:14px;height:14px;border-radius:3px;background:#ffb3d1;"></div>
+        <span style="font-size:.6rem;color:#aaa;">1〜3</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <div style="width:14px;height:14px;border-radius:3px;background:#ff85b3;"></div>
+        <span style="font-size:.6rem;color:#aaa;">4〜8</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <div style="width:14px;height:14px;border-radius:3px;background:#ff5599;"></div>
+        <span style="font-size:.6rem;color:#aaa;">9〜15</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <div style="width:14px;height:14px;border-radius:3px;background:#e84393;"></div>
+        <span style="font-size:.6rem;color:#aaa;">16件〜</span>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -323,10 +360,20 @@ function renderDay(logs) {
   const missions = logs.filter(l => l.task_type === 'mission');
   const habits   = logs.filter(l => l.task_type === 'habit');
   const wants    = logs.filter(l => l.task_type === 'want');
-  const mDone = missions.filter(l => l.checked).length;
-  const hDone = habits.filter(l => l.checked).length;
-  const wDone = wants.filter(l => l.checked).length;
-  const total = checked.length;
+  const mDone  = missions.filter(l => l.checked).length;
+  const mTotal = missions.length;
+  const hDone  = habits.filter(l => l.checked).length;
+  const hTotal = habits.length;
+  const wDone  = wants.filter(l => l.checked).length;
+  const wTotal = wants.length;
+  const total  = logs.length;
+  const totalDone = checked.length;
+  // 達成率計算
+  const pct = (done, t) => t > 0 ? Math.round(done/t*100) : null;
+  const mPct = pct(mDone, mTotal);
+  const hPct = pct(hDone, hTotal);
+  const wPct = pct(wDone, wTotal);
+  const allPct = pct(totalDone, total);
 
   const filtered = () => {
     if (currentFilter === 'mission') return logs.filter(l => l.task_type === 'mission');
@@ -351,23 +398,27 @@ function renderDay(logs) {
     <div class="summary-cards">
       <div class="summary-card">
         <div class="s-icon">🎲</div>
-        <div class="s-num">${mDone}</div>
+        <div class="s-num">${mTotal > 0 ? mDone+'/'+mTotal : '—'}</div>
         <div class="s-label">ミッション</div>
-        <div class="s-sub">クリア</div>
+        ${mPct !== null ? `<div class="s-ratio">${mPct}%</div>` : ''}
       </div>
       <div class="summary-card">
         <div class="s-icon">✅</div>
-        <div class="s-num">${hDone}</div>
+        <div class="s-num" style="font-size:${hTotal>=10?'1.3rem':'1.6rem'}">${hTotal > 0 ? hDone+'/'+hTotal : '—'}</div>
         <div class="s-label">習慣チェック</div>
-        <div class="s-sub">完了</div>
+        ${hPct !== null ? `<div class="s-ratio">${hPct}%</div>` : ''}
       </div>
       <div class="summary-card">
         <div class="s-icon">🌟</div>
-        <div class="s-num">${wDone}</div>
+        <div class="s-num">${wTotal > 0 ? wDone+'/'+wTotal : '—'}</div>
         <div class="s-label">やりたいこと</div>
-        <div class="s-sub">達成</div>
+        ${wPct !== null ? `<div class="s-ratio">${wPct}%</div>` : ''}
       </div>
     </div>
+    ${total > 0 ? `<div style="text-align:center;font-size:.75rem;color:#888;padding:4px 0 8px;font-weight:700;">
+      本日合計 <span style="color:var(--purple);font-size:.9rem;">${totalDone}/${total}</span> 件完了
+      <span style="background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border-radius:50px;padding:1px 10px;margin-left:6px;font-size:.72rem;">${allPct}%</span>
+    </div>` : ''}
     <div class="section">
       <div class="tabs">
         <button class="tab ${currentFilter==='all'?'active':''}" onclick="setFilter('all')">すべて (${logs.length})</button>
