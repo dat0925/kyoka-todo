@@ -302,6 +302,19 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);min-height:100vh
 const SUPABASE_URL = 'https://sfhtvtcmgueystyuhzvd.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmaHR2dGNtZ3VleXN0eXVoenZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3Nzg0MDYsImV4cCI6MjA5MDM1NDQwNn0.qsON2xYdDf22LtU-jGd96Ubaif0xzzswC9KnzWndKNw';
 
+// index.html と同期: 全ミッション一覧（weekendOnly は土日のみ）
+const ALL_MISSION_ITEMS = [
+  {label:'電子ピアノ',icon:'🎹'},{label:'アップライトピアノ',icon:'🎵'},{label:'日記',icon:'📔',weekendOnly:true},{label:'勉強',icon:'📚'},
+  {label:'新体操',icon:'🎀'},{label:'チャレンジタッチ',icon:'📱'},
+  {label:'ストレッチ',icon:'🤸'},{label:'Y字バランス10秒',icon:'⭐'},
+  {label:'タッチタイピング',icon:'⌨️'},{label:'宿題',icon:'📝'},
+  {label:'フラフープの練習',icon:'🌀'},
+];
+function isWeekendDate(d) { const day = d.getDay(); return day === 0 || day === 6; }
+function getActiveMissionsForDate(d) {
+  return ALL_MISSION_ITEMS.filter(it => !(it.weekendOnly && !isWeekendDate(d)));
+}
+
 let currentDate = new Date();
 currentDate.setHours(0,0,0,0);
 
@@ -361,6 +374,16 @@ function renderDay(logs) {
   const habits   = logs.filter(l => l.task_type === 'habit');
   const wants    = logs.filter(l => l.task_type === 'want');
 
+  // DBにないミッションをマスターから補完（アプリ未起動日・追加直後対応）
+  const activeMissions = getActiveMissionsForDate(currentDate);
+  const dbMissionIds = new Set(missions.map(l => l.task_id));
+  activeMissions.forEach(it => {
+    const id = 'mission_' + it.label;
+    if (!dbMissionIds.has(id)) {
+      missions.push({ task_id: id, task_label: it.label, task_type: 'mission', checked: false, _notInDB: true });
+    }
+  });
+
   const mDone  = missions.filter(l => l.checked).length;
   const mTotal = missions.length;   // DBに登録されたミッション数
 
@@ -380,11 +403,14 @@ function renderDay(logs) {
   const wPct = pct(wDone, wTotal);
   const allPct = pct(totalDone, total);
 
+  // 補完したmissionsをlogsに統合（habitとwantはそのまま）
+  const allLogs = [...missions, ...habits, ...wants];
+
   const filtered = () => {
-    if (currentFilter === 'mission') return logs.filter(l => l.task_type === 'mission');
-    if (currentFilter === 'habit')   return logs.filter(l => l.task_type === 'habit');
-    if (currentFilter === 'want')    return logs.filter(l => l.task_type === 'want');
-    return logs;
+    if (currentFilter === 'mission') return missions;
+    if (currentFilter === 'habit')   return habits;
+    if (currentFilter === 'want')    return wants;
+    return allLogs;
   };
 
   const taskHTML = filtered().length === 0
@@ -394,6 +420,7 @@ function renderDay(logs) {
         <div class="task-check">${l.checked ? '✓' : ''}</div>
         <div class="task-label">${escHtml(l.task_label)}</div>
         ${l.task_type === 'habit' ? `<span class="task-type-badge badge-habit-cat">${getHabitCategory(l.task_label)}</span>` : ''}
+        ${l._notInDB ? `<span class="task-type-badge" style="background:#f0f0f0;color:#aaa;border:1.5px solid #ddd;font-size:.55rem;">未記録</span>` : ''}
         <span class="task-type-badge badge-${l.task_type}">${
           l.task_type === 'mission' ? 'ミッション' :
           l.task_type === 'habit'   ? '習慣' : 'やりたいこと'
@@ -404,30 +431,34 @@ function renderDay(logs) {
     <div class="summary-cards">
       <div class="summary-card">
         <div class="s-icon">🎲</div>
-        <div class="s-num">${mTotal > 0 ? mDone+'/'+mTotal : '—'}</div>
+        <div class="s-num">${missions.length > 0 ? missions.filter(l=>l.checked).length+'/'+missions.length : '—'}</div>
         <div class="s-label">ミッション</div>
-        ${mPct !== null ? `<div class="s-ratio">${mPct}%</div>` : ''}
+        ${missions.length > 0 ? `<div class="s-ratio">${Math.round(missions.filter(l=>l.checked).length/missions.length*100)}%</div>` : ''}
       </div>
       <div class="summary-card">
         <div class="s-icon">✅</div>
-        <div class="s-num" style="font-size:${hTotal>=10?'1.3rem':'1.6rem'}">${hTotal > 0 ? hDone+'/'+hTotal : '—'}</div>
+        <div class="s-num" style="font-size:${habits.length>=10?'1.3rem':'1.6rem'}">${habits.length > 0 ? habits.filter(l=>l.checked).length+'/'+habits.length : '—'}</div>
         <div class="s-label">習慣チェック</div>
-        ${hPct !== null ? `<div class="s-ratio">${hPct}%</div>` : ''}
+        ${habits.length > 0 ? `<div class="s-ratio">${Math.round(habits.filter(l=>l.checked).length/habits.length*100)}%</div>` : ''}
       </div>
       <div class="summary-card">
         <div class="s-icon">🌟</div>
-        <div class="s-num">${wTotal > 0 ? wDone+'/'+wTotal : '—'}</div>
+        <div class="s-num">${wants.length > 0 ? wants.filter(l=>l.checked).length+'/'+wants.length : '—'}</div>
         <div class="s-label">やりたいこと</div>
-        ${wPct !== null ? `<div class="s-ratio">${wPct}%</div>` : ''}
+        ${wants.length > 0 ? `<div class="s-ratio">${Math.round(wants.filter(l=>l.checked).length/wants.length*100)}%</div>` : ''}
       </div>
     </div>
-    ${total > 0 ? `<div style="text-align:center;font-size:.75rem;color:#888;padding:4px 0 8px;font-weight:700;">
-      本日合計 <span style="color:var(--purple);font-size:.9rem;">${totalDone}/${total}</span> 件完了
-      <span style="background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border-radius:50px;padding:1px 10px;margin-left:6px;font-size:.72rem;">${allPct}%</span>
-    </div>` : ''}
+    ${allLogs.length > 0 ? (() => {
+      const totalDone = allLogs.filter(l=>l.checked).length;
+      const total = allLogs.length;
+      return `<div style="text-align:center;font-size:.75rem;color:#888;padding:4px 0 8px;font-weight:700;">
+        本日合計 <span style="color:var(--purple);font-size:.9rem;">${totalDone}/${total}</span> 件完了
+        <span style="background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border-radius:50px;padding:1px 10px;margin-left:6px;font-size:.72rem;">${Math.round(totalDone/total*100)}%</span>
+      </div>`;
+    })() : ''}
     <div class="section">
       <div class="tabs">
-        <button class="tab ${currentFilter==='all'?'active':''}" onclick="setFilter('all')">すべて (${logs.length})</button>
+        <button class="tab ${currentFilter==='all'?'active':''}" onclick="setFilter('all')">すべて (${allLogs.length})</button>
         <button class="tab ${currentFilter==='mission'?'active':''}" onclick="setFilter('mission')">ミッション</button>
         <button class="tab ${currentFilter==='habit'?'active':''}" onclick="setFilter('habit')">習慣</button>
         <button class="tab ${currentFilter==='want'?'active':''}" onclick="setFilter('want')">やりたい</button>
