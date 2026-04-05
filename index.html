@@ -1568,6 +1568,7 @@ transition:all .2s;
           <!-- アルカノイド -->
           <div id="game-arkanoid">
             <div class="game-info-row">
+              <div class="game-stat">Lv <b id="g-level">1</b></div>
               <div class="game-stat">スコア <b id="g-score">0</b></div>
               <div class="game-stat">ハイスコア <b id="g-hi">0</b></div>
               <div class="game-stat">残機 <span id="g-lives">❤️❤️❤️</span></div>
@@ -1885,6 +1886,7 @@ const MISSION_ITEMS=[
   {label:'新体操',icon:'🎀'},{label:'チャレンジタッチ',icon:'📱'},
   {label:'ストレッチ',icon:'🤸'},{label:'Y字バランス10秒',icon:'⭐'},
   {label:'タッチタイピング',icon:'⌨️'},{label:'宿題',icon:'📝'},
+  {label:'フラフープの練習',icon:'🌀'},
 ];
 
 // やりたいことアイテム（下部エリア）
@@ -1920,7 +1922,7 @@ const HABIT_SECTIONS=[
     {id:'cocof', label:'ココフレ', note:'', icon:'📦'},
     {id:'sched', label:'時間割と持ち物確認',note:'学級通信で', icon:'📅'},
     {id:'lunch', label:'給食確認', note:'', icon:'🍱'},
-    {id:'cream', label:'ハンドクリーム', note:'', icon:'🤲'},
+    {id:'cream', label:'ハンドクリーム', note:'学校前', icon:'🤲'},
     {id:'mask', label:'マスク', note:'', icon:'😷'},
   ]},
   {id:'after',label:'下校後にやること',cls:'after',items:[
@@ -1938,7 +1940,7 @@ const HABIT_SECTIONS=[
     {id:'drug_eve2',label:'薬：モンテルカストチュアブル',note:'喘息予防',icon:'💊'},
     {id:'drug_eve3',label:'薬：オロパタジン', note:'花粉症', icon:'💊'},
     {id:'moist2', label:'保湿液', note:'', icon:'🧴'},
-    {id:'cream2', label:'ハンドクリーム', note:'', icon:'🤲'},
+    {id:'cream2', label:'ハンドクリーム', note:'就寝前', icon:'🤲'},
   ]},
 ];
 
@@ -2646,7 +2648,7 @@ let gPaused = false;
 // キャンバスサイズ
 const GW = 360, GH = 320;  // 縦幅を半分に
 
-let gPx, gLives, gScore, gHi, gBricks;
+let gPx, gLives, gScore, gHi, gBricks, gLevel;
 
 // マルチボール配列 { x, y, vx, vy }
 let gBalls = [];
@@ -2709,35 +2711,50 @@ function initGameCanvas() {
 }
 
 function gameStart() {
-  const diff = getDiff();
   document.getElementById('game-overlay').classList.add('hidden');
   gPaused = false;
   document.getElementById('pause-btn').textContent = '⏸ 一時停止';
   document.getElementById('pause-btn').classList.remove('paused');
 
   gPx = GW / 2;
-  gBalls = [{ x: GW/2, y: GH-60, vx: (Math.random()>.5?1:-1)*diff.speed*.7, vy: -diff.speed }];
   gItems = [];
   gLasers = [];
   gPowerUps = { multiball: 0, laser: 0, wide: 0 };
   gLaserCooldown = 0;
   gLives = 3; gScore = 0;
+  gLevel = 1;
 
-  gBricks = [];
-  for (let r = 0; r < BRICK_ROWS; r++) {
-    for (let c = 0; c < BRICK_COLS; c++) {
-      const hp = (gDiff === 'hard' && r < 3) ? 2 : 1;
-      // アイテム入りブロック（約20%）
-      const hasItem = Math.random() < 0.20;
-      const itemType = hasItem ? ITEM_TYPES[Math.floor(Math.random() * ITEM_TYPES.length)].type : null;
-      gBricks.push({ r, c, hp, maxHp: hp, itemType });
-    }
-  }
+  initLevel();
   updateGameUI();
   gState = 'playing';
   if (gAnimId) cancelAnimationFrame(gAnimId);
   setupControls();
   gameLoop();
+}
+
+function initLevel() {
+  const diff = getDiff();
+  gBalls = [{ x: GW/2, y: GH-60, vx: (Math.random()>.5?1:-1)*diff.speed*.7, vy: -diff.speed }];
+  gItems = [];
+  gLasers = [];
+  gPowerUps = { multiball: 0, laser: 0, wide: 0 };
+  gLaserCooldown = 0;
+
+  // レベルが上がるほど硬いブロックが増える
+  // easy: 硬いブロックなし / normal: 上2行がlv依存で硬い / hard: 上3行+lv依存
+  const hardRows = gDiff === 'easy' ? 0
+                 : gDiff === 'normal' ? Math.min(2 + Math.floor((gLevel-1)/2), 4)
+                 : Math.min(3 + Math.floor((gLevel-1)/2), 5);
+
+  gBricks = [];
+  for (let r = 0; r < BRICK_ROWS; r++) {
+    for (let c = 0; c < BRICK_COLS; c++) {
+      const hp = r < hardRows ? 2 : 1;
+      const hasItem = Math.random() < 0.20;
+      const itemType = hasItem ? ITEM_TYPES[Math.floor(Math.random() * ITEM_TYPES.length)].type : null;
+      gBricks.push({ r, c, hp, maxHp: hp, itemType });
+    }
+  }
 }
 
 function togglePause() {
@@ -2827,6 +2844,8 @@ function updateGameUI() {
   document.getElementById('g-score').textContent = gScore;
   document.getElementById('g-hi').textContent = gHi;
   document.getElementById('g-lives').textContent = '❤️'.repeat(Math.max(0, gLives));
+  const lv = document.getElementById('g-level');
+  if (lv) lv.textContent = gLevel || 1;
 }
 
 const BRICK_COLORS = [
@@ -3106,13 +3125,37 @@ function showGameOver() {
   document.getElementById('overlay-title').textContent = '💔 ゲームオーバー';
   document.getElementById('overlay-sub').textContent = 'スコア: ' + gScore;
   document.getElementById('overlay-btn').textContent = '▶ もう一度';
+  document.getElementById('overlay-btn').onclick = gameStart;
 }
 function showGameClear() {
   playAllClear(); launchConfetti(30);
   document.getElementById('game-overlay').classList.remove('hidden');
-  document.getElementById('overlay-title').textContent = '🎊 クリア！！';
-  document.getElementById('overlay-sub').textContent = 'スコア: ' + gScore;
-  document.getElementById('overlay-btn').textContent = '▶ もう一度';
+  document.getElementById('overlay-title').textContent = `🎊 レベル ${gLevel} クリア！！`;
+  document.getElementById('overlay-sub').textContent = `スコア: ${gScore}`;
+  document.getElementById('overlay-btn').textContent = `▶ レベル ${gLevel + 1} へ！`;
+  document.getElementById('overlay-btn').onclick = nextLevel;
+}
+
+function nextLevel() {
+  gLevel++;
+  document.getElementById('game-overlay').classList.add('hidden');
+  gPaused = false;
+  document.getElementById('pause-btn').textContent = '⏸ 一時停止';
+  document.getElementById('pause-btn').classList.remove('paused');
+  gPx = GW / 2;
+  initLevel();
+  updateGameUI();
+  gState = 'playing';
+  if (gAnimId) cancelAnimationFrame(gAnimId);
+  gameLoop();
+  // レベルアップ告知
+  const ctx = document.getElementById('game-canvas').getContext('2d');
+  ctx.fillStyle = 'rgba(0,0,30,.5)';
+  ctx.fillRect(0, 0, GW, GH);
+  ctx.fillStyle = '#ffe066';
+  ctx.font = 'bold 28px "Noto Sans JP"';
+  ctx.textAlign = 'center';
+  ctx.fillText(`⭐ LEVEL ${gLevel} ⭐`, GW/2, GH/2);
 }
 
 
