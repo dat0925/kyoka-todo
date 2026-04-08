@@ -371,8 +371,15 @@ async function loadDay(dateStr) {
 function renderDay(logs) {
   // DBに登録された全タスクが母数（sbInitDayLogsで初期化済み）
   const missions = logs.filter(l => l.task_type === 'mission');
-  const habits   = logs.filter(l => l.task_type === 'habit');
+  let habits     = logs.filter(l => l.task_type === 'habit');
   const wants    = logs.filter(l => l.task_type === 'want');
+
+  // 土日は「学校じゅんび」「下校後にやること」カテゴリを除外
+  const isWeekdayDate = d => { const day = d.getDay(); return day >= 1 && day <= 5; };
+  const WEEKDAY_ONLY_HABIT_CATS = ['🎒学校', '🌇下校後'];
+  if (!isWeekdayDate(currentDate)) {
+    habits = habits.filter(l => !WEEKDAY_ONLY_HABIT_CATS.includes(getHabitCategory(l.task_label)));
+  }
 
   // DBにないミッションをマスターから補完（アプリ未起動日・追加直後対応）
   const activeMissions = getActiveMissionsForDate(currentDate);

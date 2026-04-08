@@ -1947,6 +1947,17 @@ const HABIT_SECTIONS=[
 function getAfterItems(){
   return HABIT_SECTIONS.find(s=>s.id==='after').subSections.flatMap(ss=>ss.items);
 }
+// 土日は学校・下校後を除外する平日限定セクション
+const WEEKDAY_ONLY_SECTIONS=['school','after'];
+function isWeekdayHabit(){const d=new Date().getDay();return d>=1&&d<=5;}
+function getActiveHabitIds(){
+  const flat=[];
+  HABIT_SECTIONS.forEach(sec=>{
+    if(WEEKDAY_ONLY_SECTIONS.includes(sec.id)&&!isWeekdayHabit()) return;
+    if(sec.items) sec.items.forEach(it=>flat.push(it.id));
+  });
+  return flat;
+}
 function getAllHabitIds(){
   const flat=[];
   HABIT_SECTIONS.forEach(sec=>{
@@ -1954,7 +1965,8 @@ function getAllHabitIds(){
   });
   return flat;
 }
-const TOTAL_HABITS=getAllHabitIds().length;
+// TOTAL_HABITSは動的に計算（曜日に応じて変わる）
+function getTotalHabits(){return getActiveHabitIds().length;}
 
 // ══════════════════════════════
 // localStorage
@@ -1972,6 +1984,14 @@ let mCurrentLabel=null,mRolling=false;
 
 function isWeekend(){const d=new Date().getDay();return d===0||d===6;}
 function getActiveMissions(){return MISSION_ITEMS.filter(it=>!(it.weekendOnly&&!isWeekend()));}
+// 土日は学校じゅんび・下校後にやることセクションを非表示
+function applyWeekdaySections(){
+  const weekday=isWeekdayHabit();
+  ['school','after'].forEach(id=>{
+    const sec=document.getElementById(`sec-${id}`);
+    if(sec) sec.style.display=weekday?'':'none';
+  });
+}
 function mRemaining(){return getActiveMissions().filter(it=>!mChecked.includes(it.label));}
 
 // ══════════════════════════════
@@ -2319,6 +2339,7 @@ function renderHabits(){
     list.innerHTML='';
     sec.items.forEach(it=>list.appendChild(makeHabitItem(it)));
   });
+  applyWeekdaySections();
   updateHabitSectionCounts();
 }
 function makeHabitItem(it){
@@ -2352,7 +2373,9 @@ function toggleHabit(id,el){
   checkHabitAllDone();
 }
 function updateHabitSectionCounts(){
+  const weekday=isWeekdayHabit();
   HABIT_SECTIONS.forEach(sec=>{
+    if(WEEKDAY_ONLY_SECTIONS.includes(sec.id)&&!weekday) return;
     let ids=[];
     if(sec.items) ids=sec.items.map(it=>it.id);
     const done=ids.filter(id=>hChecked.includes(id)).length;
@@ -2392,9 +2415,11 @@ function bulkCheck(secId,e){
   checkHabitAllDone();
 }
 function checkHabitAllDone(){
-  const total=getAllHabitIds().length;
+  const activeIds=getActiveHabitIds();
+  const total=activeIds.length;
   const banner=document.getElementById('h-all-done');
-  if(hChecked.length>=total){
+  const activeDone=activeIds.filter(id=>hChecked.includes(id)).length;
+  if(activeDone>=total&&total>0){
     banner.classList.add('visible');
     playHabitAllClear();
   } else {
@@ -2408,7 +2433,9 @@ function toggleSection(id){
   body.classList.toggle('open');
 }
 function toggleAllSections(open){
-  ['morning','school','after','evening'].forEach((id, i)=>{
+  const weekday=isWeekdayHabit();
+  const sections=['morning','school','after','evening'].filter(id=>weekday||!WEEKDAY_ONLY_SECTIONS.includes(id));
+  sections.forEach((id, i)=>{
     // 少しずつずらして開閉することでレンダリング負荷を分散
     setTimeout(()=>{
       const header=document.querySelector(`#sec-${id} .section-header`);
@@ -2425,7 +2452,9 @@ function toggleAllSections(open){
 // ══════════════════════════════
 function updateProgress(){
   const mDone=mChecked.length,mTotal=MISSION_ITEMS.length;
-  const hDone=hChecked.length,hTotal=TOTAL_HABITS;
+  const activeHabitIds=getActiveHabitIds();
+  const hTotal=activeHabitIds.length;
+  const hDone=activeHabitIds.filter(id=>hChecked.includes(id)).length;
   const mPct=mTotal?mDone/mTotal*100:0;
   const hPct=hTotal?hDone/hTotal*100:0;
 
