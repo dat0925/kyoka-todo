@@ -1531,7 +1531,7 @@ transition:all .2s;
             <span class="lock-icon-big">🔒</span>
             <div class="lock-title">ゲームはまだ ひみつ…</div>
             <div class="lock-hint">
-              ミッションを <b style="color:var(--pink)">半分以上</b> クリアすると<br>
+              ミッションを <b style="color:var(--pink)" id="lock-hint-condition">半分以上</b> クリアすると<br>
               ゲームがあそべるようになるよ！<br>
               <span style="font-size:.72rem;color:#c8a0e0">（ひみつのミッションをクリアするとすぐ解放！）</span>
             </div>
@@ -2001,7 +2001,13 @@ const GAME_UNLOCK_KEY=`game_unlocked_${TODAY}`;
 let gameUnlocked=!!localStorage.getItem(GAME_UNLOCK_KEY);
 
 function isGameUnlockable(){
-  return mChecked.length >= Math.ceil(getActiveMissions().length/2);
+  if(isWeekdayHabit()){
+    // 平日：全ミッションクリアが必要
+    return mChecked.length >= getActiveMissions().length;
+  } else {
+    // 土日：半分以上でOK
+    return mChecked.length >= Math.ceil(getActiveMissions().length/2);
+  }
 }
 function applyGameLockState(){
   const tab=document.getElementById('tab-game');
@@ -2017,6 +2023,8 @@ function applyGameLockState(){
     tab.onclick=null;
     if(locked) locked.style.display='block';
     if(main) main.style.display='none';
+    const hintEl=document.getElementById('lock-hint-condition');
+    if(hintEl) hintEl.textContent=isWeekdayHabit()?'ぜんぶ':'半分以上';
     updateLockProgress();
   }
 }
