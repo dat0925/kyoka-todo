@@ -1886,7 +1886,7 @@ const MISSION_ITEMS=[
   {label:'新体操',icon:'🎀'},{label:'チャレンジタッチ',icon:'📱'},
   {label:'ストレッチ',icon:'🤸'},{label:'Y字バランス10秒',icon:'⭐'},
   {label:'タッチタイピング',icon:'⌨️'},{label:'宿題',icon:'📝'},
-  {label:'フラフープの練習',icon:'🌀'},
+  {label:'フラフープの練習',icon:'🌀'},{label:'おしゃれドリル',icon:'👗'},
 ];
 
 // やりたいことアイテム（下部エリア）
@@ -1971,7 +1971,15 @@ function getTotalHabits(){return getActiveHabitIds().length;}
 // ══════════════════════════════
 // localStorage
 // ══════════════════════════════
-const TODAY=new Date().toISOString().slice(0,10);
+const TODAY=(()=>{const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;})();
+// 日付が変わったらページをリロードして翌日の状態に切り替える
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'){
+    const now=new Date();
+    const cur=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    if(cur!==TODAY)location.reload();
+  }
+});
 function loadJSON(k,def){try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(def));}catch{return def;}}
 function saveJSON(k,v){localStorage.setItem(k,JSON.stringify(v));}
 
